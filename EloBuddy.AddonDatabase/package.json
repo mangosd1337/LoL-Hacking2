@@ -33,7 +33,7 @@
     "react-router": "^2.8.1",
     "react-swipeable-views": "^0.7.10",
     "react-tap-event-plugin": "^1.0.0",
-    "superagent": "^2.3.0"
+    "superagent": "^5.2.1"
   },
   "scripts": {
     "start": "react-scripts start",
