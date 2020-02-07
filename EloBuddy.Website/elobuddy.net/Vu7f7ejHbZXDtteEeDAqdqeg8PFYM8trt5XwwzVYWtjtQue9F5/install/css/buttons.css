@@ -1,0 +1,156 @@
+/* Base button style */
+.ipsApp .ipsButton {
+	background: #589aaa;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	vertical-align: middle;
+	padding: 0 15px;
+	font-weight: 500;
+	border-radius: 3px;
+	-webkit-transition: 0.1s all linear !important;
+	border: 1px solid rgba(0,0,0,0.1);
+	text-shadow: none;
+}
+
+	.ipsApp .ipsButton, .ipsApp .ipsButton a {
+		color: #fff;
+	}
+
+	.ipsApp .ipsButton:hover {
+		background: #69a8b7;
+		border: 1px solid rgba(0,0,0,0.1);
+		text-shadow: 0px 1px 0px rgba(0,0,0,0.4);
+		/*box-shadow: 0px 1px 2px rgba(255,255,255,0.4) inset, 0px 1px 4px rgba(0,0,0,0.2);*/
+		/*box-shadow: 0px 1px 4px rgba(0,0,0,0.2);*/
+		color: #fff;
+	}
+
+	.ipsApp .ipsButton:active {
+		box-shadow: 1px 1px 4px rgba(0,0,0,0.3) inset;
+		border: 1px solid rgba(0,0,0,0.4);
+		color: #fff;
+		background: #589aaa;
+	}
+
+/* SIZES */
+.ipsApp .ipsButton, .ipsApp .ipsButton_normal {
+	height: 32px;
+	line-height: 32px;
+	font-size: 12px;
+	text-transform: uppercase;
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+.ipsApp .ipsButton_large {
+	height: 45px;
+	line-height: 45px;
+	font-size: 13px;
+	padding: 0 20px;
+}
+
+.ipsApp .ipsButton_small {
+	height: 28px;
+	line-height: 28px;
+	font-size: 12px;
+}
+
+.ipsButton_fullWidth {
+	display: block;
+	width: 100%;
+}
+
+.ipsApp .ipsButton_narrow {
+	padding: 0 8px;
+}
+
+/* BUTTON STYLES */
+.ipsApp .ipsButton_primary {
+	background: #151515;
+}
+
+	.ipsApp .ipsButton_primary:hover {
+		background: #323232;
+	}
+
+	.ipsApp .ipsButton_primary:active {
+		background: #151515;
+	}
+
+.ipsApp .ipsButton_alternate, .ipsApp .ipsButton_alternate:active {
+	background: #748391;
+}
+
+	.ipsApp .ipsButton_alternate:hover {
+		background: #8a98a5;
+	}
+
+.ipsApp .ipsButton_simple {
+	background: #f0f0f0;
+	color: #555555;
+	text-transform: none;
+	border-color: rgba(0,0,0,0.03);
+}
+	
+	.ipsApp .ipsButton_simple a {
+		color: #555555;
+	}
+	
+	.ipsApp .ipsButton_simple:hover {
+		background: #e8e8e8;
+		color: #555555;
+		text-shadow: none;
+		box-shadow: 0px 1px 2px rgba(255,255,255,0.4) inset, 0px 1px 4px rgba(0,0,0,0.075);
+	}
+
+.ipsApp .ipsButton_overlaid {
+	background: rgba(0,0,0,0.5);
+	opacity: 0.6;
+}
+
+	.ipsApp .ipsButton_overlaid:hover {
+		box-shadow: none;
+		opacity: 1;
+		background: #000;
+	}
+
+	.ipsApp .ipsButton_overlaid:active {
+		background: #000;
+	}
+
+.ipsApp .ipsButton.ipsButton_link {
+	background: transparent;
+	color: #52585f;
+	font-size: 13px;
+	border: 0;
+	text-transform: none;
+}
+
+	.ipsApp .ipsButton.ipsButton_link:hover,
+	.ipsApp .ipsButton.ipsButton_link:active {
+		border: 0;
+		text-shadow: none;
+		box-shadow: none;
+		color: #000;
+	}
+
+/* BUTTON STATES */
+.ipsApp .ipsButton_disabled, .ipsApp input.ipsButton:disabled {
+	background: rgba(255,255,255,0.5);
+	color: rgba(0,0,0,0.15);
+	font-style: italic;
+	text-shadow: 0px 1px 0px #fff;
+	cursor: default;
+}
+
+	.ipsApp .ipsButton_disabled:hover, .ipsApp input.ipsButton:disabled:hover {
+		box-shadow: none;
+		background: rgba(255,255,255,0.5);
+		color: rgba(0,0,0,0.15);
+	}
+
+	.ipsApp .ipsButton_disabled:active, .ipsApp input.ipsButton:disabled:active {
+		box-shadow: none;
+		border: 1px solid rgba(0,0,0,0.1);
+	}

@@ -1,0 +1,38 @@
+[
+    {
+        "key": "ipchat_24hour",
+        "default": "12"
+    },
+    {
+        "key": "ipchat_hide_usermessage",
+        "default": "0"
+    },
+    {
+        "key": "ipchat_inactive_minutes",
+        "default": "360"
+    },
+    {
+        "key": "ipchat_log_prune",
+        "default": "30"
+    },
+    {
+        "key": "ipchat_new_window",
+        "default": "0"
+    },
+    {
+        "key": "ipchat_no_buffer",
+        "default": "0"
+    },
+    {
+        "key": "ipschat_enable_rules",
+        "default": "0"
+    },
+    {
+        "key": "ipschat_online",
+        "default": ""
+    },
+    {
+        "key": "ipschat_rules",
+        "default": ""
+    }
+]

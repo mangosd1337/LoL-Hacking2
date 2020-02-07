@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EloBuddy.SDK", "EloBuddy.SDK\EloBuddy.SDK.csproj", "{D01EDE4F-8AF4-4E89-9B48-4AEBBB57FBBD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EloBuddy.Testing", "EloBuddy.Testing\EloBuddy.Testing.csproj", "{32F8A833-AE4A-4979-ADDD-97E1DC5D07E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDragonToDLibrary", "DDragonToDLibrary\DDragonToDLibrary.csproj", "{2F58C2CC-576C-47B3-AA98-D6EA0A8456FE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D01EDE4F-8AF4-4E89-9B48-4AEBBB57FBBD}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{D01EDE4F-8AF4-4E89-9B48-4AEBBB57FBBD}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{D01EDE4F-8AF4-4E89-9B48-4AEBBB57FBBD}.Debug|x86.ActiveCfg = Debug|x86
+		{D01EDE4F-8AF4-4E89-9B48-4AEBBB57FBBD}.Debug|x86.Build.0 = Debug|x86
+		{D01EDE4F-8AF4-4E89-9B48-4AEBBB57FBBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D01EDE4F-8AF4-4E89-9B48-4AEBBB57FBBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D01EDE4F-8AF4-4E89-9B48-4AEBBB57FBBD}.Release|x86.ActiveCfg = Release|x86
+		{D01EDE4F-8AF4-4E89-9B48-4AEBBB57FBBD}.Release|x86.Build.0 = Release|x86
+		{32F8A833-AE4A-4979-ADDD-97E1DC5D07E3}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{32F8A833-AE4A-4979-ADDD-97E1DC5D07E3}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{32F8A833-AE4A-4979-ADDD-97E1DC5D07E3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{32F8A833-AE4A-4979-ADDD-97E1DC5D07E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32F8A833-AE4A-4979-ADDD-97E1DC5D07E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32F8A833-AE4A-4979-ADDD-97E1DC5D07E3}.Release|x86.ActiveCfg = Release|Any CPU
+		{2F58C2CC-576C-47B3-AA98-D6EA0A8456FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F58C2CC-576C-47B3-AA98-D6EA0A8456FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F58C2CC-576C-47B3-AA98-D6EA0A8456FE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2F58C2CC-576C-47B3-AA98-D6EA0A8456FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F58C2CC-576C-47B3-AA98-D6EA0A8456FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F58C2CC-576C-47B3-AA98-D6EA0A8456FE}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

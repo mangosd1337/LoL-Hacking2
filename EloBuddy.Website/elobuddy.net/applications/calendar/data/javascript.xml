@@ -1,0 +1,628 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<javascript app="calendar">
+ <file javascript_app="calendar" javascript_location="front" javascript_path="controllers/browse" javascript_name="ips.browse.main.js" javascript_type="controller" javascript_version="101030" javascript_position="1000050"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.browse.main.js - Calendar main browsing controller
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('calendar.front.browse.main', {
+
+		_ajaxObj: null,
+		
+		initialize: function () {
+			this.on( 'click', '[data-action="changeView"]', this.changeView );
+			this.on( window, 'statechange', this.stateChange );
+			this.setup();
+		},
+
+		/**
+		 * Controller setup method
+		 *
+		 * @returns {void}
+		 */
+		setup: function () {
+			History.pushState( { controller: 'calendarView' }, document.title, window.location.href );	
+		},
+
+		/**
+		 * Changes the calendar view dynamically
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		changeView: function (e) {
+			e.preventDefault();
+
+			// Load the url via ajax instead
+			var self = this;
+			var title = $( e.currentTarget ).attr('title');
+			var url = $( e.currentTarget ).attr('href');
+
+			History.pushState( { controller: 'calendarView' }, title, url );
+		},
+
+		/**
+		 * Event handler for history state changes
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		stateChange: function () {
+			var state = History.getState();
+
+			if( _.isUndefined( state.data.controller ) || state.data.controller != 'calendarView' ) {
+				return;
+			}
+
+			this._updateView( state.url, state.title )
+		},
+
+		/**
+		 * Loads a new view 
+		 *
+		 * @param 	{string} 	url 	URL to load
+		 * @param 	{string} 	title 	New browser title
+		 * @returns {void}
+		 */
+		_updateView: function (url, title) {
+			var self = this;
+
+			if( this._ajaxObj && _.isFunction( this._ajaxObj.abort ) ){
+				this._ajaxObj.abort();
+			}
+
+			this._setLoading( true );
+
+			this._ajaxObj = ips.getAjax()( url, {
+				showLoading: true
+			} )
+				.done( function (response) {
+					self.scope.html( response );
+
+					$( document ).trigger( 'contentChange', [ self.scope ] );
+
+					History.pushState( { controller: 'calendarView' }, title, url );
+				})
+				.always( function () {
+					self._setLoading( false );
+				});
+		},
+
+		/**
+		 * Toggles the loading state on the view
+		 *
+		 * @param 	{boolean} 	state 		Enable the loading state?
+		 * @returns {void}
+		 */
+		_setLoading: function (state) {
+			if( state ){
+				this.scope.animate( { opacity: 0.6 }, 'fast' );
+			} else {
+				this.scope.animate( { opacity: 1 }, 'fast' );
+			}
+		}
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="calendar" javascript_location="front" javascript_path="controllers/browse" javascript_name="ips.browse.monthView.js" javascript_type="controller" javascript_version="101030" javascript_position="1000050"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.browse.monthView.js - Month view controller
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('calendar.front.browse.monthView', {
+
+		_emptyEvent: "<li class='cEvents_event cEvents_empty' data-eventid='0'><span></span></a></li>",
+
+		initialize: function () {
+			this.setup();
+		},
+
+		/**
+		 * Setup method
+		 *
+		 * @returns 	{void}
+		 */
+		setup: function () {
+			this._alignEvents();
+		},
+
+
+		_alignEvents: function () {
+			// Lets start by getting all active days in the current calendar
+			var days = this.scope.find('.cCalendar_date');
+			var currentPositions = [];
+			var self = this;
+
+			_.each( days, function (day) {
+				var day = $( day );
+				var dayNumber = day.find('.cCalendar_dayNumber').text();
+				var weekStart = false;
+
+				if( day.closest('td').is('tr > td:first-child') ){
+					weekStart = true;
+				}
+
+				// Get events for this day
+				var events = day.find('.cEvents_ranged [data-eventID]');
+
+				// If there's no events, we can skip this day
+				if( !events.length ){
+					currentPositions = [];
+					return;
+				}
+
+				// Build a wrapper into which we'll move our events
+				var wrapper = $("<ul/>").addClass('cEvents');
+				var spaces = 0;
+				
+				// Now we loop over currentPositions (from the previous day), and try and arrange today's events
+				// in the same order
+				if( currentPositions.length ){
+					var doneEvent = false;
+
+					for( var i = 0; i < currentPositions.length; i++ ){	
+						if( events.filter('[data-eventID="' + currentPositions[i] + '"]').length ){
+							wrapper.append( events.filter('[data-eventID="' + currentPositions[i] + '"]') );
+							doneEvent = true;
+						} else {
+
+							// If this is the first day of the week, we won't bother adding spacers unless we've already done an event today
+							// This prevents lots of unnecessary spacers carrying over from the previous row
+							if( !weekStart || doneEvent ){
+								wrapper.append( self._emptyEvent );
+								spaces++;
+							}
+						}
+					}
+				}
+
+				var remainingEvents = day.find('.cEvents_ranged [data-eventID]');
+
+				// If we have any remaining events, and there's gaps available, we can move those events into the gaps rather than
+				// just putting them at the end
+				if( spaces && remainingEvents.length ){
+					var availableSpaces = wrapper.find('[data-eventID="0"]');
+
+					// If we have a space and an event, move the event into that space
+					for( var i = 0; i <= spaces; i++ ){
+						if( remainingEvents[ i ] && availableSpaces[ i ] ){
+							$( availableSpaces[ i ] ).replaceWith( $( remainingEvents[ i ] ) );
+						}
+					}
+
+					// Update remaining events again
+					remainingEvents = day.find('.cEvents_ranged [data-eventID]');
+				}
+
+				// Add in remaining events
+				wrapper.append( remainingEvents );
+
+				// Replace the existing wrapper with the new, correctly-ordered one
+				day.find('.cEvents_ranged > .cEvents').replaceWith( wrapper );
+
+				// Now we need to build a new currentPositions array for this day, so that the following
+				// day can use it to do its thing
+				currentPositions = [];
+
+				_.each( day.find('.cEvents_ranged [data-eventID]'), function (event) {
+					var eventID = parseInt( $( event ).attr('data-eventID') );
+
+					if( eventID === 0 ){
+						currentPositions.push('-');
+					} else if( _.isNumber( eventID ) && !_.isNaN( eventID ) ){
+						currentPositions.push( eventID );
+					}
+				});
+			});
+
+			// Now get all rows and cells to recalculate height
+			_.each( this.scope.find('tr'), function (row) {
+
+				// Don't bother if there's no birthdays in this row
+				if( !$( row ).find('.cCalendar_birthdays').length ){
+					return;
+				}
+
+				var cells = $( row ).find('td.cCalendar_date');
+				var maxHeightCell = _.max( cells, function (cell) {
+					return parseInt( $( cell ).height() );
+				});
+
+				if( !_.isElement( maxHeightCell ) ){
+					return;
+				}
+
+				// Set the div height
+				cells.find('> div').css({
+					height: $( maxHeightCell ).height() + 20 + 'px'
+				});
+			});
+		}
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="calendar" javascript_location="front" javascript_path="controllers/submit" javascript_name="ips.submit.dates.js" javascript_type="controller" javascript_version="101030" javascript_position="1000100"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.submit.dates.js - Helper for date selection enhancements
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('calendar.front.submit.dates', {
+
+		initialize: function () {
+			this.on( 'click', '[data-action="updateTimezone"]', this.updateTimezone );
+
+			// Monitor focus in recurring event input fields and select appropriate radio button
+			this.on( 'focus', 'input[name="repeat_end_occurrences"]', function(){ $('#event_repeat_end_afterx').prop('checked', true); } );
+			this.on( 'focus', 'input[name="repeat_end_date"]', function(){ $('#event_repeat_end_ondate').prop('checked', true); } );
+			
+			this.on( 'change', 'input, select', this.checkForSummaryChange );
+			this.on( 'change', 'input, select', this.setEndDate );
+			this.on( 'change', '#check_single_day, #check_all_day', this.toggleFields );
+			this.on( 'click', '#elRecurRemove', this.disableRecurring );
+
+			$( window ).on( 'resize', _.bind( this._resizeEndGrid, this ) );
+
+			this.on( 'click', '[data-action="updateRepeat"]', this.finishRepeat );
+
+			this.setup();
+		},
+
+		/**
+		 * Set the end date for single & all day event
+		 */
+		setEndDate: function() {
+			var singleDay = this.scope.find('#check_single_day');
+			var allDay = this.scope.find('#check_all_day');
+
+			if( singleDay.is(':checked') && !allDay.is(':checked') ) {
+				this.scope.find('input[name="event_dates[end_date]"]').val( this.scope.find('input[name="event_dates[start_date]"]').val() )
+			}
+		},
+
+		/**
+		 * Finish setting the options
+		 *
+		 * @returns 	{void}
+		 */
+		finishRepeat: function () {
+			this._updateSummary();
+			$('#elRecurEdit_menu').trigger('closeMenu');
+		},
+
+		/**
+		 * Setup method
+		 *
+		 * @returns 	{void}
+		 */
+		setup: function () {
+			this._updateSummary();
+			this.toggleFields();
+			this.updateTimezone();
+
+			// Make Event End cell as big as Event Start cell
+			this._resizeEndGrid();
+		},
+
+		/**
+		 * Manual toggle functionality for the Single/All Day checkboxes
+		 *
+		 * @param 		{event} 	e 		Event object
+		 * @returns 	{void}
+		 */
+		toggleFields: function (e) {
+			var singleDay = this.scope.find('#check_single_day');
+			var allDay = this.scope.find('#check_all_day');
+			var self = this;
+
+			var toggles = {
+				start_time_wrap: true,
+				end_time_wrap: true,
+				event_end_date_wrap: true,
+				elDateGrid_arrow: true,
+				elDateGrid_end: true
+			};
+
+			// Single day, not all day
+			if( singleDay.is(':checked') && !allDay.is(':checked') ){
+				toggles.event_end_date_wrap = false;
+			// Single day, all day
+			} else if( singleDay.is(':checked') && allDay.is(':checked') ){
+				toggles.elDateGrid_arrow = false;
+				toggles.elDateGrid_end = false;
+				toggles.start_time_wrap = false;
+			// Multiple days, all day
+			} else if( !singleDay.is(':checked') && allDay.is(':checked') ){
+				toggles.start_time_wrap = false;
+				toggles.end_time_wrap = false;
+			}
+
+			// Hide appropriate elements
+			_.each( toggles, function (val, key) {
+				self.scope.find( '#' + key ).toggle( val );
+			});
+
+			// Manual check for ful;-width start date
+			this.scope.find('#elDateGrid_start').toggleClass('ipsGrid_span5', this.scope.find('#elDateGrid_end').is(':visible') );
+		},
+
+		/**
+		 * Monitor changes to the repeat options and update the summary
+		 *
+		 * @param 		{event} 	e 		Event object
+		 * @param 		{object} 	data 	Event data object
+		 * @returns 	{void}
+		 */
+		checkForSummaryChange: function (e) {
+			if( $( e.currentTarget ).attr('name').startsWith('event_dates[') ){
+				this._updateSummary();
+			}
+		},
+
+		/**
+		 * Updates the timezone value both in the hidden field and in the display to the end user
+		 *
+		 * @param 		{event} 	e 		Event object
+		 * @returns 	{void}
+		 */
+		updateTimezone: function (e) {
+			if( e ){
+				e.preventDefault();
+			}
+
+			// Update displayed timezone
+			this.scope.find('[data-role="timezone_display"]').text( $('#event_timezone option:selected').data('abbreviated') ).trigger('closeMenu');
+		},
+
+		/**
+		 * Removes the Repeat summary and unchecks the Repeat checkbox
+		 *
+		 * @param 		{event} 	e 		Event object
+		 * @param 		{object} 	data 	Event data object
+		 * @returns 	{void}
+		 */
+		disableRecurring: function (e) {
+			e.preventDefault();
+
+			this.scope.find('#elRepeatCb').prop( 'checked', false  );
+			this._updateSummary();
+		},
+
+		/**
+		 * Finalize our recurring options
+		 *
+		 * @param 		{event} 	e 		Event object
+		 * @param 		{object} 	data 	Event data object
+		 * @returns 	{void}
+		 */
+		finishRepeatConfiguration: function (e, data) {
+			e.preventDefault();
+
+			// Copy the summary from the menu to the main display and close the menu
+			this.scope.find('[data-role="recur_summary_final"]').text( this.scope.find('[data-role="recur_summary"]').text() );
+			this.scope.find('#elRecurEdit').trigger('closeMenu');
+		},
+
+		/**
+		 * Update the recurring string
+		 *
+		 * @param 		{event} 	e 		Event object
+		 * @param 		{object} 	data 	Event data object
+		 * @returns 	{void}
+		 */
+		_updateSummary: function () {
+			var summary = this.scope.find('[data-role="recurringSummary"]');
+
+			// Update repeating text
+			if( this.scope.find('#elRepeatCb').is(':checked') ){
+				summary.text( this._getSummary() );
+				this.scope.find('#elRepeatRow_hidden').hide();
+				this.scope.find('#elRepeatRow_shown').show();
+			} else {
+				summary.html( "<em class='ipsType_light'>" + ips.getString('doesnt_repeat') + "</em>" );
+				this.scope.find('#elRepeatRow_hidden').show();
+				this.scope.find('#elRepeatRow_shown').hide();
+			}
+
+			// Update the dates
+			this.scope.find('[data-role="dateSummary"]').html( this._dateSummary() );
+		},
+
+		/**
+		 * Builds a summary of the selected dates/times
+		 *
+		 * @returns 	{string}
+		 */
+		_dateSummary: function () {
+			// Build start date
+			var startDate = ips.utils.time.getDateFromInput( this.scope.find('input[name="event_dates[start_date]"]') );
+			var singleDay = this.scope.find('#check_single_day');
+			var allDay = this.scope.find('#check_all_day');
+
+			// If there's no start time, then abandon showing any summary for now
+			if( !ips.utils.time.isValidDateObj( startDate ) || startDate.getFullYear() < 1900 ) {
+				return '';
+			}		
+
+			ips.utils.time.removeTimezone( startDate );
+
+			var startDateString = ips.utils.time.localeDateString( startDate, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' } );
+			var startTime = this._getTime( this.scope.find('input[name="event_dates[start_time]"]').val() );
+			var endTime = this._getTime( this.scope.find('input[name="event_dates[end_time]"]').val() );
+			var endDate = ips.utils.time.getDateFromInput( this.scope.find('input[name="event_dates[end_date]"]') );
+			var endDateString = '';
+
+			// If we have a valid end date...
+			if( !singleDay.is(':checked') && ips.utils.time.isValidDateObj( endDate ) ){
+				ips.utils.time.removeTimezone( endDate );
+				endDateString = ips.utils.time.localeDateString( endDate, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' } );
+			}
+
+			// Now build strings
+			var finalString = '';
+
+			if( singleDay.is(':checked') && !allDay.is(':checked') ){
+				finalString = ips.getString( 'single_not_allday', { startDate: startDateString, startTime: startTime, endTime: endTime } );
+			} else if ( ( !singleDay.is(':checked') && !allDay.is(':checked') ) && endDateString && startTime && endTime ) {
+				finalString = ips.getString( 'not_single_not_allday', { startDate: startDateString, endDate: endDateString, startTime: startTime, endTime: endTime } );
+			} else if( !singleDay.is(':checked') && allDay.is(':checked') && endDateString ) {
+				finalString = ips.getString( 'not_single_allday', { startDate: startDateString, endDate: endDateString } );
+			} else {
+				finalString = ips.getString( 'single_allday', { startDate: startDateString } );
+			}
+
+			return finalString;
+		},
+
+		/**
+		 * Returns the given time, or a placeholder string if empty
+		 *
+		 * @param 		{string} 	time 		Time string
+		 * @returns 	{string}
+		 */
+		_getTime: function (time) {
+			if( !time ){
+				return "<em class='ipsType_light ipsType_unbold ipsFaded'>" + ips.getString('select_time') + "</em>";
+			}
+
+			return time;
+		},
+
+		/**
+		 * Returns the summary string for recurring events
+		 *
+		 * @returns 	{string}
+		 */
+		_getSummary: function () {
+			var type = this.scope.find('#elSelect_event_repeats').val();
+			var intervalString = '';
+			var endString = '';
+
+			// Build the 'interval' string
+			switch( type ){
+				case 'daily':
+				case 'monthly':
+				case 'yearly':
+					intervalString = this._buildString( type );
+				break;
+				case 'weekly':
+					intervalString = this._buildWeekly();
+				break;
+			}
+
+			// Build the 'end after' string
+			if( this.scope.find('#event_repeat_end_afterx').is(':checked') ){
+				var occurrences = parseInt( this.scope.find('input[name="event_dates[repeat_end_occurrences]"]').val() );
+
+				if( _.isNumber( occurrences ) && !_.isNaN( occurrences ) ){
+					endString = ips.pluralize( ips.getString( 'x_times' ), occurrences );				
+				}
+			} else if( this.scope.find('#event_repeat_end_ondate').is(':checked') ){
+				var dateObj = ips.utils.time.getDateFromInput( this.scope.find('input[name="event_dates[repeat_end_date]"]') );
+
+				if( ips.utils.time.isValidDateObj( dateObj ) && dateObj.getFullYear() > 1900 ){ // > 1900 just so it doesn't start updating on year 19 etc.
+					endString = ips.getString('until', { date: ips.utils.time.localeDateString( dateObj, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' } ) } );
+				}
+			}
+
+			// Put it together
+			if( endString ){
+				return ips.getString( 'with_end', { interval: intervalString, endAfter: endString } );
+			} else {
+				return intervalString;
+			}
+		},
+
+		/**
+		 * Builds a summary string for daily, monthly and yearly repeats
+		 *
+		 * @param 		{string} 	type 	The type of repeat
+		 * @returns 	{string}
+		 */
+		_buildString: function ( type ) {
+			var val = parseInt( this.scope.find('#elSelect_event_repeat_freq').val() ) || 1;
+			return ips.pluralize( ips.getString( 'every_x', { period: ips.pluralize( ips.getString( 'x_' + type ), val ) } ), val );
+		},
+
+		/**
+		 * Builds a summary string for weekly repeats
+		 *
+		 * @returns 	{string}
+		 */
+		_buildWeekly: function () {
+			var selectedDays = this.scope.find('[data-iCal]:checked');
+			var val = parseInt( this.scope.find('#elSelect_event_repeat_freq').val() ) || 1;
+			var weekString = '';
+
+			weekString = ips.pluralize( ips.getString( 'x_weekly' ), val );
+
+			// If no days are selected, we can bypass and finish now
+			if( !selectedDays.length ){
+				return weekString;
+			}
+
+			// Get full days
+			var fullDays = _.map( selectedDays, function (day, key) {
+				return ips.getString( $( day ).attr('data-iCal') );
+			});
+
+			// Build string
+			var dayString = '';
+
+			if( fullDays.length === 1 ){
+				dayString = ips.getString( 'one_day', { first: fullDays[0] } );
+			} else {
+				dayString = ips.getString( 'multiple_day', { days: fullDays.slice(0, -1).join(', '), last: fullDays[ fullDays.length - 1 ] });
+			}
+
+			return ips.getString( 'week_string', { week: weekString, days: dayString } );
+		},
+
+		/**
+		 * Resizes the "Event End" grid box to be the same height as the start box
+		 *
+		 * @returns 	{void}
+		 */
+		_resizeEndGrid: function () {
+			var height = 'auto';
+
+			if( !ips.utils.responsive.enabled() || !ips.utils.responsive.currentIs('phone') ){
+				height = this.scope.find('#elDateGrid_start').outerHeight() + 'px';
+			}
+
+			this.scope.find('#elDateGrid_end').css({
+				height: height
+			});
+		}
+	});
+}(jQuery, _));]]></file>
+ <order app="global" path="/dev/js//framework/">templates
+common/ui
+common/utils
+common
+controllers</order>
+ <order app="global" path="/dev/js//library/">underscore
+jquery
+mustache
+jstz
+Debug.js
+app.js</order>
+ <order app="global" path="/dev/js//library//jquery">jquery.js
+jquery.history.js
+jquery.transform.js</order>
+</javascript>

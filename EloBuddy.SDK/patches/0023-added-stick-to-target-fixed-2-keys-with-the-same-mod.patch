@@ -1,0 +1,177 @@
+From efed1fd4050a96a143f62b172315e878995320cf Mon Sep 17 00:00:00 2001
+From: Javier <jachicao@uc.cl>
+Date: Wed, 17 Feb 2016 14:10:05 -0300
+Subject: [PATCH 23/28] added stick to target, fixed 2 keys with the same mode,
+ improved attackspeed for rangeds,.
+
+---
+ EloBuddy.SDK/Orbwalker.cs | 71 +++++++++++++++++++++++--------
+ 1 file changed, 54 insertions(+), 17 deletions(-)
+
+diff --git a/EloBuddy.SDK/Orbwalker.cs b/EloBuddy.SDK/Orbwalker.cs
+index 06b5386..8a94f7c 100644
+--- a/EloBuddy.SDK/Orbwalker.cs
++++ b/EloBuddy.SDK/Orbwalker.cs
+@@ -81,7 +81,11 @@ namespace EloBuddy.SDK
+ 
+         public static bool IsMelee
+         {
+-            get { return Player.Instance.IsMelee || Player.Instance.Hero == Champion.Azir || Player.Instance.Hero == Champion.Thresh || Player.Instance.Hero == Champion.Velkoz; }
++            get
++            {
++                return Player.Instance.IsMelee || Player.Instance.Hero == Champion.Azir || Player.Instance.Hero == Champion.Thresh || Player.Instance.Hero == Champion.Velkoz ||
++                       (Player.Instance.Hero == Champion.Viktor && Player.Instance.HasBuff("viktorpowertransferreturn"));
++            }
+         }
+         public static bool IsRanged
+         {
+@@ -90,12 +94,35 @@ namespace EloBuddy.SDK
+ 
+         private static int InternalPing
+         {
+-            get { return (IncludePing ? (Game.Ping / 2) : 0); }
++            get { return IncludePing ? Game.Ping / 2 : 0; }
+         }
+ 
+         public static ActiveModes ActiveModesFlags { get; set; }
+ 
+         public static OrbwalkPositionDelegate OverrideOrbwalkPosition { get; set; }
++        public static Vector3 OrbwalkPosition
++        {
++            get
++            {
++                if (OverrideOrbwalkPosition != null)
++                {
++                    var pos = OverrideOrbwalkPosition();
++                    if (pos.HasValue)
++                    {
++                        return pos.Value;
++                    }
++                }
++                if (StickToTarget)
++                {
++                    var targetBase = LastTarget as Obj_AI_Base;
++                    if (targetBase != null && targetBase.Path.Length > 0)
++                    {
++                        return targetBase.Path.Last();
++                    }
++                }
++                return Game.CursorPos;
++            }
++        }
+ 
+         public static int LastAutoAttack { get; internal set; }
+ 
+@@ -132,17 +159,17 @@ namespace EloBuddy.SDK
+                 }
+                 return Core.GameTickCount - _lastAutoAttackSent > 175 &&
+                        ((!ParanoidMode && !_autoAttackStarted) ||
+-                        Core.GameTickCount - LastAutoAttack + 80 >=
++                        Core.GameTickCount - LastAutoAttack + 25 >=
+                         Player.Instance.AttackDelay * 1000) && !Player.Instance.Spellbook.IsChanneling;
+             }
+             internal set
+             {
+                 if (value)
+                 {
+-                    _lastAutoAttackSent = Core.GameTickCount - InternalPing - (int) (Player.Instance.AttackDelay * 1000) - 175;
++                    _lastAutoAttackSent = Core.GameTickCount - (int) (Player.Instance.AttackDelay * 1000) - 175;
+                     _autoAttackStarted = false;
+                     _autoAttackCompleted = true;
+-                    LastAutoAttack = Core.GameTickCount - InternalPing - (int) (Player.Instance.AttackDelay * 1000);
++                    LastAutoAttack = Core.GameTickCount - (int) (Player.Instance.AttackDelay * 1000);
+                     LastMovementSent = 0;
+                 }
+                 else
+@@ -251,6 +278,10 @@ namespace EloBuddy.SDK
+         {
+             get { return Menu["attackObjects"].Cast<CheckBox>().CurrentValue; }
+         }
++        internal static bool StickToTarget
++        {
++            get { return Player.Instance.IsMelee && Menu["stickToTarget"].Cast<CheckBox>().CurrentValue; }
++        }
+         public static bool LastHitPriority
+         {
+             get { return FarmingMenu["lastHitPriority"].Cast<CheckBox>().CurrentValue; }
+@@ -521,6 +552,7 @@ namespace EloBuddy.SDK
+             Menu.AddGroupLabel("Extra settings");
+             Menu.Add("attackObjects", new CheckBox("Attack other objects"));
+             Menu.Add("laneClearChamps", new CheckBox("Attack champions in LaneClear mode"));
++            Menu.Add("stickToTarget", new CheckBox("Stick to target (only melee)", false));
+             Menu.Add("pingInclude", new CheckBox("Include your ping into calculations"));
+             Menu.Add("paranoid", new CheckBox("Paranoid: Look as human as possible!", false));
+             Menu.Add("holdRadius" + Player.Instance.ChampionName, new Slider("Hold radius", 100, 0, Math.Max(100, (int) (Player.Instance.GetAutoAttackRange() / 2))));
+@@ -646,9 +678,7 @@ namespace EloBuddy.SDK
+ 
+                 if (ActiveModesFlags != ActiveModes.None)
+                 {
+-                    OrbwalkTo(OverrideOrbwalkPosition != null
+-                        ? OverrideOrbwalkPosition() ?? Game.CursorPos
+-                        : Game.CursorPos);
++                    OrbwalkTo(OrbwalkPosition);
+                 }
+             }
+         }
+@@ -666,9 +696,7 @@ namespace EloBuddy.SDK
+             }
+             if (!DisableAttacking && CanAutoAttack && !Player.Instance.HasBuffOfType(BuffType.Blind))
+             {
+-                // Get a valid target for orbwalking
+                 var target = GetTarget();
+-
+                 // Validate the target
+                 if (target != null)
+                 {
+@@ -685,12 +713,12 @@ namespace EloBuddy.SDK
+                     if (args.Process)
+                     {
+                         // Issue the attack
+-                        if (Player.IssueOrder(GameObjectOrder.AttackUnit, target))
++                        if (Player.IssueOrder(GameObjectOrder.AttackUnit, args.Target))
+                         {
+                             // Set the new "last" target
+                             _autoAttackStarted = false;
+                             _lastAutoAttackSent = Core.GameTickCount;
+-                            LastTarget = target;
++                            LastTarget = args.Target;
+                             return;
+                         }
+                     }
+@@ -778,8 +806,11 @@ namespace EloBuddy.SDK
+ 
+         internal static void _OnPostAttack(Obj_AI_Base sender)
+         {
+-            // Set to a more precise last auto attack time
+-            LastAutoAttack = Core.GameTickCount - (int) (sender.AttackCastDelay * 1000) - InternalPing;
++            if (sender.IsMelee)
++            {
++                // Set to a more precise last auto attack time
++                LastAutoAttack = Core.GameTickCount - (int)(sender.AttackCastDelay * 1000) - InternalPing;
++            }
+ 
+             // Trigger the after attack event
+             if (Game.Ping < 50)
+@@ -1414,11 +1445,17 @@ namespace EloBuddy.SDK
+             {
+                 if (args.NewValue)
+                 {
+-                    ActiveModesFlags = ActiveModesFlags | mode;
++                    if (!ActiveModesFlags.HasFlag(mode))
++                    {
++                        ActiveModesFlags = ActiveModesFlags | mode;
++                    }
+                 }
+                 else
+                 {
+-                    ActiveModesFlags = ActiveModesFlags ^ mode;
++                    if (ActiveModesFlags.HasFlag(mode))
++                    {
++                        ActiveModesFlags = ActiveModesFlags ^ mode;
++                    }
+                 }
+             };
+         }
+-- 
+1.9.4.msysgit.2
+

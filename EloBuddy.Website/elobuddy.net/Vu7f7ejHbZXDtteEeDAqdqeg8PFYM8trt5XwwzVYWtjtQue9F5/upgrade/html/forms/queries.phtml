@@ -1,0 +1,13 @@
+<ips:template parameters="$queries, $url, $message=NULL" />
+<h1 class='ipsType_veryLarge'>{lang="manual_query_header"}</h1>
+<hr class='ipsHr'>
+<p class="ipsType_normal">{lang="manual_query_instructions"}</p>
+{{foreach $queries as $query}}
+	<pre class="ipsCode prettyprint lang-sql">{$query}{{if mb_substr( $query, -1 ) != ';'}};{{endif}}</pre>
+{{endforeach}}
+<div class="ipsAreaBackground ipsPad ipsType_center">
+	{{$mr = \IPS\core\Setup\Upgrade::adjustMultipleRedirect( array( 'extra' => array( 'lastSqlId' => $_SESSION['lastJsonIndex'] - 0.1 ) ) );}}
+	<a href="{$url->setQueryString( array( 'key' => $_SESSION['uniqueKey'], 'mr_continue' => NULL, 'run_anyway' => 1, 'mr' => $mr ) )}" data-action="redirectContinue" class="ipsButton ipsButton_primary">{lang="manual_query_auto"}</a>
+	&nbsp;{lang="or"}&nbsp;
+	<a href="{$url}" data-action="redirectContinue" class="ipsButton ipsButton_primary">{lang="manual_query_manual"}</a>
+</div>

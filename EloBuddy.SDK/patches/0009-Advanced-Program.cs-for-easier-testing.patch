@@ -1,0 +1,44 @@
+From 0d97a1b913fa5d5795b2a988b5979a712c5fa3d5 Mon Sep 17 00:00:00 2001
+From: Hellsing <matrix11@gmx.net>
+Date: Sat, 6 Feb 2016 12:16:04 +0100
+Subject: [PATCH 09/13] Advanced Program.cs for easier testing
+
+---
+ EloBuddy.SDK/Program.cs | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/EloBuddy.SDK/Program.cs b/EloBuddy.SDK/Program.cs
+index 0eb10cd..9f37277 100644
+--- a/EloBuddy.SDK/Program.cs
++++ b/EloBuddy.SDK/Program.cs
+@@ -1,10 +1,26 @@
+-﻿namespace EloBuddy.SDK
++﻿using EloBuddy.SDK.Events;
++
++namespace EloBuddy.SDK
+ {
+     public static class Program
+     {
+         public static void Main(string[] args)
+         {
+             // Please do your testing of the classes in here
++            Loading.OnLoadingComplete += delegate
++            {
++                // Disable regular SDK functions
++                SDK.Orbwalker.DisableAttacking = true;
++                SDK.Orbwalker.DisableMovement = true;
++
++                // Enable AddonDeveloper classes
++                TargetSelector.Initialize();
++                Orbwalker.Initialize();
++                Prediction.Initialize();
++                DamageLibrary.Initialize();
++
++                // Your testing here
++            };
+         }
+     }
+ }
+-- 
+1.9.4.msysgit.2
+

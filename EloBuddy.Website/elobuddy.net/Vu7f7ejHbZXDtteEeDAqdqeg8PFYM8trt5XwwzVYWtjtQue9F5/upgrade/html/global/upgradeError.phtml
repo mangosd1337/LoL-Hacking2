@@ -1,0 +1,28 @@
+<ips:template parameters="$exception, $showContinueUrl=false, $retryUrl=false" />
+<div class='ipsMessage ipsMessage_error'>
+	<span class="ipsMessage_code">{$exception->getCode()}</span>
+	{$exception->getMessage()}
+	<br />
+	{{if $exception instanceof \IPS\Db\Exception}}
+		{{$trace = $exception->getTrace();}}
+		{{if $trace[3]['function'] == 'installDatabaseUpdates'}}
+			<small>
+				{expression="\IPS\ROOT_PATH"}/applications/{$trace[4]['args'][0][1]}/setup/upg_{$trace[3]['args'][0]}/queries.json{{if isset($_SESSION['lastJsonIndex'])}} - query #{$_SESSION['lastJsonIndex']}{{endif}}<br>
+				<pre>{$exception->query}</pre>
+			</small>
+		{{else}}
+			<small>
+				{$trace[1]['file']}::{$trace[1]['line']}<br>
+				<pre>{$exception->query}</pre>
+			</small>
+		{{endif}}
+	{{else}}
+		<small>{$exception->getFile()}::{$exception->getLine()}</small>
+	{{endif}}
+</div>
+{{if $retryUrl}}
+<a href="$retryUrl" class='ipsButton'>{lang="retry"}</a>
+{{endif}}
+{{if $showContinueUrl}}
+<a href="$showContinueUrl" class='ipsButton'>{lang="continue"}</a>
+{{endif}}

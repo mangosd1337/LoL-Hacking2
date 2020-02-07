@@ -1,0 +1,31 @@
+{
+  "name": "elobuddy.api",
+  "version": "1.0.0",
+  "description": "EloBuddy Mastery API\r ===================",
+  "main": "index.js",
+  "bin": {
+    "elobuddy.api": "app.js"
+  },
+  "dependencies": {
+    "console-stamp": "^0.2.0",
+    "download": "^4.4.1",
+    "express": "^4.13.3",
+    "lol-js": "^1.4.10",
+    "md5": "^2.0.0",
+    "request": "^2.65.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EloBuddy/EloBuddy.API.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EloBuddy/EloBuddy.API/issues"
+  },
+  "homepage": "https://github.com/EloBuddy/EloBuddy.API#readme"
+}

@@ -1,0 +1,28 @@
+[9/15/2015 12:16:59 PM] <Info> Deserializing settings...
+[9/15/2015 12:16:59 PM] <Info> Elobuddy.Loader initialized successfully.
+[9/15/2015 12:17:00 PM] <Info> Running Elobuddy Updater.
+[9/15/2015 12:17:03 PM] <Info> Elobuddy Updater has finished updating.
+[9/15/2015 12:17:03 PM] <Info> Copied EloBuddy.Sandbox.dll to: "C:\Users\Administrator\AppData\Local\Temp\2\FH32RuZNwh0GFqz\9sdNEKbj2lRvEyA.dll"
+[9/15/2015 12:17:10 PM] <Info> Cloning repository: "https://github.com/finndev/EloBuddy_TestRepo" to directory: "C:\Users\Administrator\AppData\Roaming\EloBuddy\Temp\92AE9166\".
+[9/15/2015 12:17:11 PM] <Info> Successfully cloned repository: "https://github.com/finndev/EloBuddy_TestRepo" to directory: "C:\Users\Administrator\AppData\Roaming\EloBuddy\Temp\92AE9166\".
+[9/15/2015 12:17:11 PM] <Info> Installing addon: "https://github.com/finndev/EloBuddy_TestRepo+EloBuddy.TestRepo".
+[9/15/2015 12:17:11 PM] <Info> Updating addon: "EloBuddy.TestRepo" with url: "https://github.com/finndev/EloBuddy_TestRepo" and project name: "EloBuddy.TestRepo.csproj"
+[9/15/2015 12:17:11 PM] <Info> Cloning repository: "https://github.com/finndev/EloBuddy_TestRepo" to directory: "C:\Users\Administrator\AppData\Roaming\EloBuddy\Temp\92AE9166\".
+[9/15/2015 12:17:11 PM] <Info> Successfully cloned repository: "https://github.com/finndev/EloBuddy_TestRepo" to directory: "C:\Users\Administrator\AppData\Roaming\EloBuddy\Temp\92AE9166\".
+[9/15/2015 12:17:11 PM] <Info> Successfully updated addon: "EloBuddy.TestRepo" with url: "https://github.com/finndev/EloBuddy_TestRepo" and project name: "EloBuddy.TestRepo.csproj" to directory "C:\Users\Administrator\AppData\Roaming\EloBuddy\Repositories\EloBuddy.TestRepo_ECF84614\".
+[9/15/2015 12:17:11 PM] <Info> Compiling project: "C:\Users\Administrator\AppData\Roaming\EloBuddy\Repositories\EloBuddy.TestRepo_ECF84614\EloBuddy.TestRepo.csproj".
+[9/15/2015 12:17:11 PM] <Error> Failed to compile project: "C:\Users\Administrator\AppData\Roaming\EloBuddy\Repositories\EloBuddy.TestRepo_ECF84614\EloBuddy.TestRepo.csproj". Build log file saved to "C:\Users\Administrator\.jenkins\jobs\EloBuddy.Loader\workspace\EloBuddy.Loader\bin\Release\Logs\compile_log_EloBuddy.TestRepo_30126F75.txt".
+[9/15/2015 12:17:11 PM] <Error> Failed to install addon: "https://github.com/finndev/EloBuddy_TestRepo+EloBuddy.TestRepo". Addon state: "CompilingError". The addon either did not update or did not compile!
+[9/15/2015 12:17:15 PM] <Info> Installing addon: "https://github.com/finndev/EloBuddy_TestRepo+EloBuddy.TestRepo".
+[9/15/2015 12:17:15 PM] <Info> Updating addon: "EloBuddy.TestRepo" with url: "https://github.com/finndev/EloBuddy_TestRepo" and project name: "EloBuddy.TestRepo.csproj"
+[9/15/2015 12:17:15 PM] <Info> Cloning repository: "https://github.com/finndev/EloBuddy_TestRepo" to directory: "C:\Users\Administrator\AppData\Roaming\EloBuddy\Temp\92AE9166\".
+[9/15/2015 12:17:16 PM] <Info> Successfully cloned repository: "https://github.com/finndev/EloBuddy_TestRepo" to directory: "C:\Users\Administrator\AppData\Roaming\EloBuddy\Temp\92AE9166\".
+[9/15/2015 12:17:16 PM] <Info> Successfully updated addon: "EloBuddy.TestRepo" with url: "https://github.com/finndev/EloBuddy_TestRepo" and project name: "EloBuddy.TestRepo.csproj" to directory "C:\Users\Administrator\AppData\Roaming\EloBuddy\Repositories\EloBuddy.TestRepo_ECF84614\".
+[9/15/2015 12:17:16 PM] <Info> Compiling project: "C:\Users\Administrator\AppData\Roaming\EloBuddy\Repositories\EloBuddy.TestRepo_ECF84614\EloBuddy.TestRepo.csproj".
+[9/15/2015 12:17:16 PM] <Error> Failed to compile project: "C:\Users\Administrator\AppData\Roaming\EloBuddy\Repositories\EloBuddy.TestRepo_ECF84614\EloBuddy.TestRepo.csproj". Build log file saved to "C:\Users\Administrator\.jenkins\jobs\EloBuddy.Loader\workspace\EloBuddy.Loader\bin\Release\Logs\compile_log_EloBuddy.TestRepo_30126F75.txt".
+[9/15/2015 12:17:16 PM] <Error> Failed to install addon: "https://github.com/finndev/EloBuddy_TestRepo+EloBuddy.TestRepo". Addon state: "CompilingError". The addon either did not update or did not compile!
+[9/15/2015 12:17:25 PM] <Info> Elobuddy.Loader is exiting.
+[9/15/2015 12:17:25 PM] <Info> Deleted temporary core directory: "C:\Users\Administrator\AppData\Local\Temp\2\FH32RuZNwh0GFqz"
+[9/15/2015 12:17:25 PM] <Info> Serializing settings...
+[9/15/2015 12:17:25 PM] <Info> Elobuddy.Loader has exited.
+

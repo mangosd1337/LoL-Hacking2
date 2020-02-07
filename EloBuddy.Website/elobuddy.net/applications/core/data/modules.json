@@ -1,0 +1,135 @@
+{
+    "admin": {
+        "overview": {
+            "default_controller": "dashboard",
+            "protected": 0
+        },
+        "system": {
+            "default_controller": "login",
+            "protected": 1
+        },
+        "applications": {
+            "default_controller": "applications",
+            "protected": null
+        },
+        "settings": {
+            "default_controller": "general",
+            "protected": null
+        },
+        "members": {
+            "default_controller": "members",
+            "protected": null
+        },
+        "membersettings": {
+            "default_controller": "general",
+            "protected": null
+        },
+        "staff": {
+            "default_controller": "moderators",
+            "protected": null
+        },
+        "customization": {
+            "default_controller": "skins",
+            "protected": null
+        },
+        "languages": {
+            "default_controller": "languages",
+            "protected": null
+        },
+        "editor": {
+            "default_controller": "toolbar",
+            "protected": null
+        },
+        "bulkmail": {
+            "default_controller": "bulkmail",
+            "protected": null
+        },
+        "livesearch": {
+            "default_controller": null,
+            "protected": null
+        },
+        "promotion": {
+            "default_controller": null,
+            "protected": null
+        },
+        "dashboard": {
+            "default_controller": null,
+            "protected": 1
+        },
+        "stats": {
+            "default_controller": null,
+            "protected": null
+        },
+        "support": {
+            "default_controller": null,
+            "protected": 0
+        },
+        "logs": {
+            "default_controller": "admin",
+            "protected": null
+        },
+        "logsettings": {
+            "default_controller": null,
+            "protected": null
+        },
+        "diagnostics": {
+            "default_controller": null,
+            "protected": null
+        },
+        "discovery": {
+            "default_controller": "",
+            "protected": 0
+        }
+    },
+    "front": {
+        "system": {
+            "default_controller": "splash",
+            "protected": 1
+        },
+        "members": {
+            "default_controller": "profile",
+            "protected": 0
+        },
+        "search": {
+            "default_controller": null,
+            "protected": null
+        },
+        "messaging": {
+            "default_controller": "messenger",
+            "protected": null
+        },
+        "online": {
+            "default_controller": "online",
+            "protected": 0
+        },
+        "modcp": {
+            "default_controller": "modcp",
+            "protected": null
+        },
+        "sitemap": {
+            "default_controller": null,
+            "protected": 0
+        },
+        "contact": {
+            "default_controller": null,
+            "protected": 0
+        },
+        "status": {
+            "default_controller": "",
+            "protected": 0
+        },
+        "dashboard": {
+            "default_controller": "dashboard",
+            "protected": 1
+        },
+        "discover": {
+            "default_controller": "streams",
+            "protected": 0,
+            "default": true
+        },
+        "staffdirectory": {
+            "default_controller": "directory",
+            "protected": 0
+        }
+    }
+}

@@ -1,0 +1,159 @@
+From 249dec9055c983513157d535af8350fce1eb164f Mon Sep 17 00:00:00 2001
+From: Javier <jachicao@uc.cl>
+Date: Fri, 5 Feb 2016 14:55:06 -0300
+Subject: [PATCH 4/8] Using 1 foreach that is a o(n) + o(m) operation instead
+ GetPrediction that is be a o(n) * o(m).
+
+---
+ EloBuddy.SDK/Orbwalker.cs | 94 +++++++++++++++++++------------
+ 1 file changed, 57 insertions(+), 37 deletions(-)
+
+diff --git a/EloBuddy.SDK/Orbwalker.cs b/EloBuddy.SDK/Orbwalker.cs
+index eab52c8..b0012a1 100644
+--- a/EloBuddy.SDK/Orbwalker.cs
++++ b/EloBuddy.SDK/Orbwalker.cs
+@@ -1134,27 +1134,6 @@ namespace EloBuddy.SDK
+             return LastTargetTurrets.Any(o => o.Value.IdEquals(minion));
+         }
+ 
+-        private static bool IsLaneclearMinion(this Obj_AI_Minion minion)
+-        {
+-            var turretNear = EntityManager.Turrets.Allies.FirstOrDefault(t => t.Distance(minion, true) <= TurretRangeSqr);
+-            if (turretNear != null)
+-            {
+-                var turretDamage = turretNear.GetAutoAttackDamage(minion);
+-                var damage = GetAutoAttackDamage(minion);
+-                for (var minionHealth = minion.Health; minionHealth > 0 && turretDamage > 0; minionHealth -= turretDamage)
+-                {
+-                    if (minionHealth <= damage)
+-                    {
+-                        return false;
+-                    }
+-                }
+-            }
+-            var laneClearHealth = CurrentMinionValues[minion.NetworkId].LaneClearHealth;
+-            return laneClearHealth >
+-                   2 * ((Player.Instance.FlatCritChanceMod >= 0.5f && Player.Instance.FlatCritChanceMod < 1f) ? Player.Instance.GetCriticalStrikePercentMod() : 1f) * GetAutoAttackDamage(minion) ||
+-                   Math.Abs(laneClearHealth - minion.Health) < float.Epsilon;
+-        }
+-
+         internal enum TargetMinionType
+         {
+             LastHit,
+@@ -1253,45 +1232,58 @@ namespace EloBuddy.SDK
+                 var time = minion.GetLasthitTime();
+ 
+                 // Create new minion value instance
+-                var values = new CalculatedMinionValue
++                var values = new CalculatedMinionValue(minion)
+                 {
+-                    Handle = minion,
+                     LastHitProjectileTime =
+                         time + extraTime +
+-                        Math.Max(0, (int)(1000 * (Player.Instance.Distance(minion) - Player.Instance.GetAutoAttackRange(minion)) / Player.Instance.MoveSpeed) + InternalPing + 250),
++                        Math.Max(0, (int)(1.5f * 1000 * (Player.Instance.Distance(minion) - Player.Instance.GetAutoAttackRange(minion)) / Player.Instance.MoveSpeed)),
+                     LaneClearProjectileTime = time + (int)(1.25f * minion.GetAttackDelay())
+                 };
+-
+-                // Predict values health
+-                values.PredictHealths();
+-
+-                // Add the values to the hash set
+                 CurrentMinionValues[minion.NetworkId] = values;
++            }
+ 
++            //Adding the damage that minions will receive
++            foreach (var lists in Prediction.Health.IncomingAttacks)
++            {
++                foreach (var attack in lists.Value)
++                {
++                    var netId = attack.Target.NetworkId;
++                    if (CurrentMinionValues.ContainsKey(netId))
++                    {
++                        CurrentMinionValues[netId].LastHitHealth -= attack.GetDamage(CurrentMinionValues[netId].LastHitProjectileTime);
++                        CurrentMinionValues[netId].LaneClearHealth -= attack.GetDamage(CurrentMinionValues[netId].LaneClearProjectileTime);
++                    }
++                }
++            }
++            //Selecting minion type
++            foreach (var pair in CurrentMinionValues)
++            {
++                var value = pair.Value;
++                var minion = value.Handle;
+                 // Check if minion is unkillable
+-                if (values.IsUnkillable)
++                if (pair.Value.IsUnkillable)
+                 {
+                     if (!minion.IdEquals(LastTarget))
+                     {
+                         if (OnUnkillableMinion != null && canMove)
+                         {
+-                            OnUnkillableMinion(minion, new UnkillableMinionArgs { RemainingHealth = values.LastHitHealth });
++                            OnUnkillableMinion(minion, new UnkillableMinionArgs { RemainingHealth = value.LastHitHealth });
+                         }
+                         CurrentMinionsLists[TargetMinionType.UnKillable].Add(minion);
+                     }
+                 }
+                 // Check if minion can be last hitted
+-                else if (values.IsLastHittable)
++                else if (value.IsLastHittable)
+                 {
+                     CurrentMinionsLists[TargetMinionType.LastHit].Add(minion);
+                 }
+                 // Check if minion is close to be lasthittable
+-                else if (values.IsAlmostLastHittable)
++                else if (value.IsAlmostLastHittable)
+                 {
+                     CurrentMinionsLists[TargetMinionType.PriorityLastHitWaiting].Add(minion);
+                 }
+                 // Check if we can lane clear the minion
+-                else if (minion.IsLaneclearMinion())
++                else if (value.IsLaneClearMinion)
+                 {
+                     CurrentMinionsLists[TargetMinionType.LaneClear].Add(minion);
+                 }
+@@ -1376,10 +1368,38 @@ namespace EloBuddy.SDK
+                 }
+             }
+ 
+-            internal void PredictHealths()
++            internal bool IsLaneClearMinion
++            {
++                get
++                {
++                    if (_onlyLastHit)
++                    {
++                        return false;
++                    }
++                    var turretNear = EntityManager.Turrets.Allies.FirstOrDefault(t => t.Distance(Handle, true) <= TurretRangeSqr);
++                    if (turretNear != null)
++                    {
++                        var turretDamage = turretNear.GetAutoAttackDamage(Handle);
++                        var damage = GetAutoAttackDamage(Handle);
++                        for (var minionHealth = Handle.Health; minionHealth > 0 && turretDamage > 0; minionHealth -= turretDamage)
++                        {
++                            if (minionHealth <= damage)
++                            {
++                                return false;
++                            }
++                        }
++                    }
++                    return LaneClearHealth >
++                           2 * ((Player.Instance.FlatCritChanceMod >= 0.5f && Player.Instance.FlatCritChanceMod < 1f) ? Player.Instance.GetCriticalStrikePercentMod() : 1f) * GetAutoAttackDamage(Handle) ||
++                           Math.Abs(LaneClearHealth - Handle.Health) < float.Epsilon;
++                }
++            }
++
++            internal CalculatedMinionValue(Obj_AI_Minion minion)
+             {
+-                LastHitHealth = Prediction.Health.GetPrediction(Handle, LastHitProjectileTime);
+-                LaneClearHealth = Prediction.Health.GetPrediction(Handle, LaneClearProjectileTime);
++                Handle = minion;
++                LastHitHealth = Handle.Health;
++                LaneClearHealth = Handle.Health;
+             }
+         }
+ 
+-- 
+1.9.4.msysgit.2
+

@@ -1,0 +1,9 @@
+<ips:template parameters="$title, $message, $code, $backtrace" />
+<div class='ipsMessage ipsMessage_error'>
+	<span class="ipsMessage_code">{$code}</span>
+	{lang="$message"}
+</div>
+{{if $backtrace}}
+	<br><hr class='ipsHr'><br>
+	<pre>{$backtrace}</pre>
+{{endif}}

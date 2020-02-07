@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<javascript app="forums">
+ <file javascript_app="forums" javascript_location="front" javascript_path="controllers/forum" javascript_name="ips.forum.forumList.js" javascript_type="controller" javascript_version="101030" javascript_position="1000050"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.forum.forumList.js - Controller for a forum listing
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('forums.front.forum.forumList', {
+		initialize: function () {
+			this.on( 'click', '[data-action="toggleCategory"]', this.toggleCategory );
+			this.setup();
+		},
+
+		/**
+		 * Setup method
+		 * Hides categories the user has already hidden
+		 *
+		 * @returns {void}
+		 */
+		setup: function () {
+			var self = this;
+			var hiddenCategories = ips.utils.db.get( 'hiddenCategories' );
+
+			if( _.isObject( hiddenCategories ) && _.size( hiddenCategories ) ){
+				_.each( hiddenCategories, function (val, key) {
+					self.scope.find('[data-categoryID="' + key + '"]')
+						.addClass('cForumRow_hidden')
+						.attr( 'data-hidden', true )
+						.find( '[data-role="forums"]' )
+							.hide();
+				});
+			}
+		},
+
+		/**
+		 * Event handler for toggling a category
+		 * Hidden categories are stored localDB
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		toggleCategory: function (e) {
+			e.preventDefault();
+
+			var category = $( e.currentTarget ).closest('[data-categoryID]');
+
+			if( !category.attr('data-hidden') ){
+				ips.utils.db.set( 'hiddenCategories', category.attr('data-categoryID'), true );
+				category
+					.addClass('cForumRow_hidden')
+					.attr( 'data-hidden', true )
+					.find('[data-role="forums"]')
+						.hide();
+			} else {
+				ips.utils.anim.go( 'fadeIn', category.find('[data-role="forums"]') );
+				ips.utils.db.remove( 'hiddenCategories', category.attr('data-categoryID') );
+				category
+					.removeClass('cForumRow_hidden')
+					.removeAttr( 'data-hidden' );
+			}
+		}
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="forums" javascript_location="front" javascript_path="controllers/forum" javascript_name="ips.forum.forumPage.js" javascript_type="controller" javascript_version="101030" javascript_position="1000050">/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.forum.forumPage.js - Forum page controller
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.register('forums.front.forum.forumPage', {
+
+		initialize: function () {
+			this.on( 'click', '[data-action=&quot;markForumRead&quot;]', this.markForumRead );
+		},
+
+		/**
+		 * Marks all topics in a forum table as read, triggering an event on the table
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		markForumRead: function (e) {
+			e.preventDefault();
+
+			// Trigger event on the table to hide unread markets
+			this.triggerOn( 'core.global.core.table', 'markTableRead' );
+
+			// Hide the link we've just clicked
+			ips.utils.anim.go( 'fadeOut', $( e.currentTarget ) );
+
+			// Do request to do the marking
+			ips.getAjax()( $( e.currentTarget ).attr('href'), {
+				bypassRedirect: true
+			} )
+				.done( function () {
+					ips.ui.flashMsg.show( ips.getString('forumMarkedRead') );
+				});
+		}
+	});
+}(jQuery, _));</file>
+ <file javascript_app="forums" javascript_location="front" javascript_path="controllers/forum" javascript_name="ips.forum.hovercard.js" javascript_type="controller" javascript_version="101030" javascript_position="1000050">/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.forum.hovercard.js - Topic hovercard in forum view
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.register('forums.front.forum.hovercard', {
+
+		initialize: function () {
+			this.on( 'click', '[data-action=&quot;markTopicRead&quot;]', this.markTopicRead );
+		},
+
+		/**
+		 * Marks a topic read from inside a hovercard
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		markTopicRead: function (e) {
+			e.preventDefault();
+
+			// Ignore if we've already done this
+			if( $( e.currentTarget ).attr('data-disabled') ){
+				return;
+			}
+
+			// Trigger event for table to mark the row
+			this.trigger( 'markTableRowRead', {
+				tableID: 'topics',
+				rowID: this.scope.attr('data-topicID')
+			});
+
+			// Let the user know
+			ips.ui.flashMsg.show( ips.getString('topicMarkedRead') );
+
+			// And do the actual request
+			ips.getAjax()( $( e.currentTarget ).attr('href'), {
+				bypassRedirect: true
+			});
+
+			// Hide the link
+			$( e.currentTarget ).addClass('ipsFaded').attr('data-disabled');
+		}
+	});
+}(jQuery, _));</file>
+ <file javascript_app="forums" javascript_location="admin" javascript_path="controllers/settings" javascript_name="ips.settings.archiveRules.js" javascript_type="controller" javascript_version="101030" javascript_position="1000050"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.forums.archiveRules.js - makes the progress bar increase as archive rules settings are changed
+ *
+ * Author: Mark Wade
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('forums.admin.settings.archiveRules', {
+
+		initialize: function () {
+			this.on( 'change', 'input,select', this.changeField );
+			this.on( 'nodeSelectedChanged', '.ipsSelectTree', this.changeField );
+			this.on( 'tokenAdded', '[data-ipsAutocomplete]', this.changeField );
+			this.on( 'tokenDeleted', '[data-ipsAutocomplete]', this.changeField );
+			this.setup();
+		},
+		
+		setup: function () {
+			var currentPercentage = parseInt( this.scope.find('[data-role="percentage"]').text() );
+
+			this.scope
+				.find('.ipsProgressBar')
+					.toggleClass('ipsFaded', !currentPercentage );
+		},
+
+		/**
+		 * Save the keywords
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		changeField: function (e) {			
+			var form = $( e.currentTarget ).closest('form');
+			var self = this;
+			
+			ips.getAjax()( form.attr('action') + '&getCount=1', {
+				data: form.serialize(),
+				type: 'post'
+			}).done( function (response) {									
+
+				var currentPercentage = parseInt( self.scope.find('[data-role="percentage"]').text() );
+
+				self.scope
+					.find('.ipsProgressBar')
+						.toggleClass('ipsFaded', !parseInt( response.percentage ) )
+					.end()
+					.find('[data-role="percentage"]')
+						.text( response.percentage )
+					.end()
+					.find('[data-role="number"]')
+						.text( response.count )
+					.end()
+					.find('[data-role="percentageBar"]')
+						.animate( { 'width': response.percentage + '%' }, 'fast' );
+			}).fail(function(err){
+				// Nothing
+			});
+		},
+	});
+}(jQuery, _));
+]]></file>
+ <file javascript_app="forums" javascript_location="front" javascript_path="controllers/topic" javascript_name="ips.topic.answers.js" javascript_type="controller" javascript_version="101030" javascript_position="1000100"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.topic.answers.js - Profile body controller
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('forums.front.topic.answers', {
+
+		ajaxObj: null,
+
+		/**
+ 		 * Initialize controller events
+		 *
+		 * @returns 	{void}
+		 */
+		initialize: function () {
+			this.on( 'click', 'a.cAnswerRate', this.rate );
+		},
+
+		/**
+		 * Rate answers
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		rate: function (e) {
+			e.preventDefault();
+
+			var self = this;
+			var clicked = $( e.currentTarget );
+			var positive = clicked.hasClass('cAnswerRate_up');
+			var voteCount = this.scope.find('[data-role="voteCount"]');
+			var currentVotes = parseInt( voteCount.attr('data-voteCount') );
+
+			this.scope.find('.cAnswerRate_up').toggleClass( 'ipsType_positive', positive );
+			this.scope.find('.cAnswerRate_down').toggleClass( 'ipsType_negative', !positive );
+			this.scope.toggleClass( 'cRatingColumn_up', positive ).toggleClass( 'cRatingColumn_down', !positive );
+
+			var newVoteCount = 0;
+
+			if( positive ){
+				newVoteCount = currentVotes + 1;
+			}
+			else {
+				newVoteCount = currentVotes - 1;
+			}
+
+			voteCount
+				.toggleClass( 'ipsType_positive', positive )
+				.toggleClass( 'ipsType_negative', !positive )
+				.text( newVoteCount )
+				.attr( 'data-voteCount', newVoteCount );
+
+			// Send request
+			if( this.ajaxObj && _.isFunction( this.ajaxObj.abort ) ){
+				this.ajaxObj.abort();
+			}
+
+			if( positive ){
+				this.scope.find('a.cAnswerRate_up').addClass('ipsHide');
+				this.scope.find('span.cAnswerRate_up').removeClass('ipsHide');
+			} else {
+				this.scope.find('a.cAnswerRate_down').addClass('ipsHide');
+				this.scope.find('span.cAnswerRate_down').removeClass('ipsHide');
+			}
+
+			this.ajaxObj = ips.getAjax()( clicked.attr('href') )
+				.done( function (response) {
+
+					Debug.log( response );
+
+					if( !response.canVoteUp ){
+						self.scope.find('a.cAnswerRate_up').addClass('ipsHide');
+						self.scope.find('span.cAnswerRate_up').removeClass('ipsHide');
+					} else {
+						self.scope.find('a.cAnswerRate_up').removeClass('ipsHide');
+						self.scope.find('span.cAnswerRate_up').addClass('ipsHide');
+					}
+
+					if( !response.canVoteDown ){
+						self.scope.find('a.cAnswerRate_down').addClass('ipsHide');
+						self.scope.find('span.cAnswerRate_down').removeClass('ipsHide');
+					} else {
+						self.scope.find('a.cAnswerRate_down').removeClass('ipsHide');
+						self.scope.find('span.cAnswerRate_down').addClass('ipsHide');
+					}
+
+					voteCount.text( response.votes );
+					self.scope.find('.ipsType_light').text( ips.pluralize( ips.getString( 'votes_no_number' ), response.votes ) );
+				});
+		}
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="forums" javascript_location="front" javascript_path="controllers/topic" javascript_name="ips.topic.reply.js" javascript_type="controller" javascript_version="101030" javascript_position="1000100">/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.topic.reply.js - Topic reply controller for &quot;Reply&quot; button
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.register('forums.front.topic.reply', {
+
+		initialize: function () {
+			this.on( 'click', '[data-action=&quot;replyToTopic&quot;]', this.replyToTopic );
+		},
+
+		/**
+		 * Handles a click on the reply to topic button. Triggers an event caught by the main topic view controller.
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		replyToTopic: function (e) {
+			e.preventDefault();
+			$( document ).trigger( 'replyToTopic' );
+		}
+	});
+}(jQuery, _));</file>
+ <file javascript_app="forums" javascript_location="front" javascript_path="controllers/topic" javascript_name="ips.topic.view.js" javascript_type="controller" javascript_version="101030" javascript_position="1000100">/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.topic.view.js - Topic view controller
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.register('forums.front.topic.view', {
+
+		initialize: function () {
+			$( document ).on( 'replyToTopic', _.bind( this.replyToTopic, this ) );
+		},
+
+		/**
+		 * Triggers the initialize event on the editor
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		replyToTopic: function (e) {
+			var editorID = this.scope.find('[data-role=&quot;replyArea&quot;] [data-role=&quot;contentEditor&quot;]').attr('name');
+
+			if( editorID ){
+				this.trigger('initializeEditor', { editorID: editorID } );
+			}
+		}
+	});
+}(jQuery, _));</file>
+ <order app="global" path="/dev/js//framework/">templates
+common/ui
+common/utils
+common
+controllers</order>
+ <order app="global" path="/dev/js//library/">underscore
+jquery
+mustache
+jstz
+Debug.js
+app.js</order>
+ <order app="global" path="/dev/js//library//jquery">jquery.js
+jquery.history.js
+jquery.transform.js</order>
+</javascript>

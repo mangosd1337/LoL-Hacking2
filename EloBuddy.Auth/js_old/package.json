@@ -1,0 +1,16 @@
+{
+  "name": "ebauth",
+  "version": "1.0.0",
+  "description": "Auth for EloBuddy.net based on NodeJS",
+  "main": "app.js",
+  "dependencies": {
+    "forever": "^0.15.1",
+    "node-rsa": "^0.2.26"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

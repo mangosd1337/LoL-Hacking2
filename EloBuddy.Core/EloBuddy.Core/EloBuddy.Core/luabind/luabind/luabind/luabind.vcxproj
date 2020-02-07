@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B1552EE8-5C63-409F-8FED-8E9F1401B4AE}</ProjectGuid>
+    <RootNamespace>luabind</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\adopt_policy.hpp" />
+    <ClInclude Include="..\src\back_reference.hpp" />
+    <ClInclude Include="..\src\back_reference_fwd.hpp" />
+    <ClInclude Include="..\src\class.hpp" />
+    <ClInclude Include="..\src\class_info.hpp" />
+    <ClInclude Include="..\src\config.hpp" />
+    <ClInclude Include="..\src\container_policy.hpp" />
+    <ClInclude Include="..\src\copy_policy.hpp" />
+    <ClInclude Include="..\src\dependency_policy.hpp" />
+    <ClInclude Include="..\src\discard_result_policy.hpp" />
+    <ClInclude Include="..\src\error.hpp" />
+    <ClInclude Include="..\src\exception_handler.hpp" />
+    <ClInclude Include="..\src\from_stack.hpp" />
+    <ClInclude Include="..\src\function.hpp" />
+    <ClInclude Include="..\src\get_main_thread.hpp" />
+    <ClInclude Include="..\src\get_pointer.hpp" />
+    <ClInclude Include="..\src\handle.hpp" />
+    <ClInclude Include="..\src\iterator_policy.hpp" />
+    <ClInclude Include="..\src\lua502.hpp" />
+    <ClInclude Include="..\src\luabind.hpp" />
+    <ClInclude Include="..\src\lua_include.hpp" />
+    <ClInclude Include="..\src\make_function.hpp" />
+    <ClInclude Include="..\src\nil.hpp" />
+    <ClInclude Include="..\src\no_dependency.hpp" />
+    <ClInclude Include="..\src\object.hpp" />
+    <ClInclude Include="..\src\open.hpp" />
+    <ClInclude Include="..\src\operator.hpp" />
+    <ClInclude Include="..\src\out_value_policy.hpp" />
+    <ClInclude Include="..\src\prefix.hpp" />
+    <ClInclude Include="..\src\raw_policy.hpp" />
+    <ClInclude Include="..\src\return_reference_to_policy.hpp" />
+    <ClInclude Include="..\src\scope.hpp" />
+    <ClInclude Include="..\src\shared_ptr_converter.hpp" />
+    <ClInclude Include="..\src\tag_function.hpp" />
+    <ClInclude Include="..\src\typeid.hpp" />
+    <ClInclude Include="..\src\value_wrapper.hpp" />
+    <ClInclude Include="..\src\vector.hpp" />
+    <ClInclude Include="..\src\version.hpp" />
+    <ClInclude Include="..\src\weak_ref.hpp" />
+    <ClInclude Include="..\src\wrapper_base.hpp" />
+    <ClInclude Include="..\src\yield_policy.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\class.cpp" />
+    <ClCompile Include="..\src\class_info.cpp" />
+    <ClCompile Include="..\src\class_registry.cpp" />
+    <ClCompile Include="..\src\class_rep.cpp" />
+    <ClCompile Include="..\src\create_class.cpp" />
+    <ClCompile Include="..\src\error.cpp" />
+    <ClCompile Include="..\src\exception_handler.cpp" />
+    <ClCompile Include="..\src\function.cpp" />
+    <ClCompile Include="..\src\inheritance.cpp" />
+    <ClCompile Include="..\src\link_compatibility.cpp" />
+    <ClCompile Include="..\src\object_rep.cpp" />
+    <ClCompile Include="..\src\open.cpp" />
+    <ClCompile Include="..\src\pcall.cpp" />
+    <ClCompile Include="..\src\scope.cpp" />
+    <ClCompile Include="..\src\stack_content_by_name.cpp" />
+    <ClCompile Include="..\src\weak_ref.cpp" />
+    <ClCompile Include="..\src\wrapper_base.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

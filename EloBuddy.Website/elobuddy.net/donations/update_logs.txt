@@ -1,0 +1,12 @@
+[05/30/2016 13:02:19]: No users to update. From (i_id): 0 to 16
+[05/30/2016 13:13:57]: No users to update. From (i_id): 16 to 16
+[05/30/2016 13:23:52]: No users to update. From (i_id): 16 to 16
+[05/30/2016 13:28:31]: No users to update. From (i_id): 16 to 16
+[05/30/2016 13:55:44]: Updated total: 1 users (User IDs: 182125). From (i_id): 17 to 19
+[05/30/2016 13:57:00]: No users to update. From (i_id): 19 to 19
+[05/30/2016 14:16:25]: Updated total: 1 users (User IDs: 182125). From (i_id): 19 to 20
+[05/30/2016 14:17:09]: No users to update. From (i_id): 20 to 20
+[05/30/2016 15:11:47]: Updated total: 1 users (User IDs: 182125). From (i_id): 0 to 21
+[05/30/2016 15:11:58]: No users to update. From (i_id): 21 to 21
+[05/30/2016 15:12:01]: No users to update. From (i_id): 21 to 21
+[05/30/2016 15:55:00]: Updated total: 1 users (User IDs: 182125). From (i_id): 20 to 21

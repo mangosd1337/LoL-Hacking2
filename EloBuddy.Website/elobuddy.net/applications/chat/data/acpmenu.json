@@ -1,0 +1,16 @@
+{
+    "chat": {
+        "settings": {
+            "tab": "community",
+            "controller": "settings",
+            "do": "",
+            "restriction": "settings_manage"
+        },
+        "logs": {
+            "tab": "community",
+            "controller": "logs",
+            "do": "",
+            "restriction": "logs_manage"
+        }
+    }
+}

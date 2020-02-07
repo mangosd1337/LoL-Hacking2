@@ -1,0 +1,269 @@
+﻿<Window x:Class="EloBuddy.Loader.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:EloBuddy.Loader.Controls" xmlns:globals="clr-namespace:EloBuddy.Loader.Globals"
+        xmlns:converter="clr-namespace:EloBuddy.Loader.Converter" xmlns:logger="clr-namespace:EloBuddy.Loader.Logger"
+        mc:Ignorable="d" Height="600" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
+        BorderThickness="1" BorderBrush="Black" Loaded="Window_Loaded">
+    <Window.Resources>
+        <globals:MultiLanguage x:Key="MultiLanguage" />
+        <converter:WindowTitleRandomizeConverter x:Key="WindowTitleConverter" />
+        <converter:TupleToTextConverter x:Key="TupleToTextConverter" />
+    </Window.Resources>
+    <Window.Title>
+        <Binding Converter="{StaticResource WindowTitleConverter}" />
+    </Window.Title>
+    <Grid Background="#FFE6E6E6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Background="#FF40A6D1" MouseMove="Grid_MouseMove">
+            <controls:HeaderDecoration />
+            <Label Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.TitleSettings}"
+                   HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="25" FontWeight="SemiBold"
+                   Foreground="White" Margin="10 0 0 0">
+                <Label.Effect>
+                    <DropShadowEffect Opacity="0.2" />
+                </Label.Effect>
+            </Label>
+            <StackPanel Grid.ColumnSpan="2" Grid.Column="2" VerticalAlignment="Center" Orientation="Horizontal"
+                        Margin="0,0,10,0" HorizontalAlignment="Right">
+                <Button Width="40" Height="40" Content="" Style="{DynamicResource CloseMinMaxButtonStyle}"
+                        BorderBrush="Transparent" Background="#FF40A6D1" Foreground="White"
+                        FontFamily="pack://application:,,,/font/#FontAwesome" FontSize="20px"
+                        VerticalContentAlignment="Bottom" Click="CloseButton_OnClick" />
+            </StackPanel>
+        </Grid>
+        <TabControl Grid.Row="1" TabStripPlacement="Left" Style="{DynamicResource SettingsTabControlStyle}"
+                    BorderBrush="{x:Null}">
+            <TabItem Style="{DynamicResource SettingsTabItemStyle}" BorderBrush="{x:Null}">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Label ToolTip="Home" Content="" HorizontalContentAlignment="Center"
+                               FontFamily="pack://application:,,,/font/#FontAwesome" Foreground="#FFB8B8B8"
+                               VerticalAlignment="Center" FontSize="30" />
+                        <Label ToolTip="Home"
+                               Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.TabGeneral}"
+                               HorizontalContentAlignment="Center" Foreground="#FFB8B8B8" VerticalAlignment="Center"
+                               FontSize="15" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
+                    <Grid Margin="30 20 30 10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <GroupBox Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" BorderBrush="{x:Null}">
+                            <GroupBox.Header>
+                                <Label
+                                    Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.GroupLabelFileSettings}"
+                                    FontSize="20" FontWeight="SemiBold" Foreground="#FF40A6D1" />
+                            </GroupBox.Header>
+                            <StackPanel Orientation="Vertical" Margin="20 0 0 0">
+                                <Label
+                                    Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelInstallLocation}"
+                                    Foreground="#FF929292" FontSize="15" BorderThickness="1" />
+                                <DockPanel HorizontalAlignment="Stretch">
+                                    <Button x:Name="BrowseFilesButton" DockPanel.Dock="Right" Content="..."
+                                            Padding="15 0" FontSize="15" Foreground="White" BorderBrush="#FFD6D6D6"
+                                            Background="#FFD6D6D6" AllowDrop="True"
+                                            Style="{DynamicResource SelectFileButtonStyle}"
+                                            Click="BrowseFilesButton_Click" />
+                                    <TextBox x:Name="AssemblyLocationTextBox" VerticalContentAlignment="Center"
+                                             Height="30" Style="{DynamicResource SelectFileTextBoxStyle}"
+                                             Background="#FFF2F2F2" BorderBrush="#FFD6D6D6" BorderThickness="0"
+                                             FontSize="14" />
+                                </DockPanel>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Grid.Row="1" BorderBrush="{x:Null}">
+                            <GroupBox.Header>
+                                <Label
+                                    Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.GroupLabelLanguage}"
+                                    FontSize="20" FontWeight="SemiBold" Foreground="#FF40A6D1" />
+                            </GroupBox.Header>
+                            <ComboBox x:Name="LanguageComboBox" Height="29" VerticalAlignment="Center"
+                                      Style="{DynamicResource ComboBoxStyle}" Background="#FFF2F2F2"
+                                      BorderBrush="#FFD6D6D6" IsEditable="False" FontSize="14" Margin="20,12,0,27" />
+                        </GroupBox>
+                        <GroupBox Grid.Column="0" Grid.Row="2" BorderBrush="{x:Null}" Grid.ColumnSpan="2" Margin="0,0,59,0">
+                            <GroupBox.Header>
+                                <Label
+                                    Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.GroupLabelMiscellaneous}"
+                                    FontSize="20" FontWeight="SemiBold" Foreground="#FF40A6D1" />
+                            </GroupBox.Header>
+                            <StackPanel Orientation="Vertical">
+                                <CheckBox x:Name="TelemetryCheckBox" Style="{DynamicResource RoundedCheckBoxStyle}" FontSize="14"
+                                          Foreground="#FF929292"
+                                          Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelSendAnonymousData}" Margin="19,0,0,0" />
+                                <CheckBox x:Name="DisableAutomaticUpdatesCheckBox" FontSize="14" Foreground="#FF929292"
+                                          Style="{DynamicResource RoundedCheckBoxStyle}"
+                                          Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelDisableAutomaticUpdates}"
+                                          Margin="19,3,0,0" />
+                                <CheckBox x:Name="UpdateAssembliesCheckBox" FontSize="14" Foreground="#FF929292"
+                                          Style="{DynamicResource RoundedCheckBoxStyle}"
+                                          Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelUpdateAddonsStartup}"
+                                          Margin="19,3,0,0" />
+                                <CheckBox x:Name="InjectCheckBox" FontSize="14" Foreground="#FF929292"
+                                          Style="{DynamicResource RoundedCheckBoxStyle}"
+                                          Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelInject}"
+                                          Margin="19,3,0,0" />
+                                <Button Margin="19,15,0,0" HorizontalAlignment="Left" Padding="15 2"
+                                        Style="{DynamicResource RoundedSettingsButtonStyle}" Background="#FF40A6D1"
+                                        Foreground="White" BorderBrush="{x:Null}" BorderThickness="0"
+                                        Click="AppDataButton_OnClick" Width="131.737">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label x:Name="AppDataButton" Content="APPDATA"
+                                               HorizontalContentAlignment="Center" Foreground="White"
+                                               VerticalAlignment="Center" FontSize="15" />
+                                        <Label Content="" HorizontalContentAlignment="Center"
+                                               FontFamily="pack://Application:,,,/font/#FontAwesome" Foreground="White"
+                                               VerticalAlignment="Center" FontSize="15" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </GroupBox>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem Style="{DynamicResource SettingsTabItemStyle}" BorderBrush="{x:Null}">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Label ToolTip="Hotkeys" Content="" HorizontalContentAlignment="Center"
+                               FontFamily="pack://application:,,,/font/#FontAwesome" Foreground="#FFB8B8B8"
+                               VerticalAlignment="Center" FontSize="30" />
+                        <Label ToolTip="Hotkeys"
+                               Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.TabHotkeys}"
+                               HorizontalContentAlignment="Center" Foreground="#FFB8B8B8" VerticalAlignment="Center"
+                               FontSize="15" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid />
+            </TabItem>
+            <TabItem Style="{DynamicResource SettingsTabItemStyle}" BorderBrush="{x:Null}">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Label ToolTip="In-Game Settings" Content="" HorizontalContentAlignment="Center"
+                               FontFamily="pack://application:,,,/font/#FontAwesome" Foreground="#FFB8B8B8"
+                               VerticalAlignment="Center" FontSize="30" />
+                        <Label ToolTip="In-Game Settings"
+                               Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.TabGameSettings}"
+                               HorizontalContentAlignment="Center" Foreground="#FFB8B8B8" VerticalAlignment="Center"
+                               FontSize="15" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
+                    <GroupBox Grid.Column="0" BorderBrush="{x:Null}" Margin="20">
+                        <GroupBox.Header>
+                            <Label
+                                Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.GroupLabelGameSettings}"
+                                FontSize="20" FontWeight="SemiBold" Foreground="#FF40A6D1" />
+                        </GroupBox.Header>
+                        <StackPanel Orientation="Vertical">
+                            <CheckBox FontSize="14" Foreground="#FF929292" x:Name="AntiAfkCheckBox"
+                                      Style="{DynamicResource RoundedCheckBoxStyle}"
+                                      Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelAntiAFK}"
+                                      Margin="19,0,-9,0" Height="23" />
+                            <CheckBox FontSize="14" Foreground="#FF929292" x:Name="ExtendedZoomCheckBox"
+                                      Style="{DynamicResource RoundedCheckBoxStyle}"
+                                      Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelExtendedZoom}"
+                                      Margin="19,3,-9,0" Height="25" />
+                            <!--<CheckBox ToolTip="Allows micro-optimzations for scripts in-game." FontSize="14"
+                                      Foreground="#FF929292" x:Name="MovementHackCheckBox"
+                                      Style="{DynamicResource RoundedCheckBoxStyle}"
+                                      Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelMovementHack}"
+                                      Margin="19,3,-9,0" Height="25" />-->
+                            <CheckBox FontSize="14" Foreground="#FF929292" x:Name="ConsoleCheckBox"
+                                      Style="{DynamicResource RoundedCheckBoxStyle}"
+                                      Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelConsole}"
+                                      Margin="19,3,-9,0" Height="25" />
+                            <CheckBox FontSize="14" Foreground="#FF929292" x:Name="DisableChatCheckBox"
+                                      Style="{DynamicResource RoundedCheckBoxStyle}"
+                                      Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelChatPrints}"
+                                      Margin="19,3,-9,0" Height="25" />
+                            <CheckBox FontSize="14" Foreground="#FF929292" x:Name="TowerRangeCheckBox"
+                                      Style="{DynamicResource RoundedCheckBoxStyle}"
+                                      Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelTowerRange}"
+                                      Margin="19,3,-9,0" Height="25" />
+                            <CheckBox FontSize="14" Foreground="#FF929292" x:Name="DisableRangeIndicatorCheckBox"
+                                      Style="{DynamicResource RoundedCheckBoxStyle}"
+                                      Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelDisableRangeIndicator}"
+                                      Margin="19,3,-9,0" Height="25" />
+                            <CheckBox FontSize="14" Foreground="#FF929292"
+                                      x:Name="DrawWatermarkCheckBox" Style="{DynamicResource RoundedCheckBoxStyle}"
+                                      Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelWatermark}"
+                                      Margin="19,3,-9,0" Height="25" />
+                            <CheckBox FontSize="14" Foreground="#FF929292" x:Name="StreamingModeCheckBox"
+                                      Style="{DynamicResource RoundedCheckBoxStyle}"
+                                      Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelStreamingMode}"
+                                      Margin="19,3,-9,0" Height="25" />
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+            <TabItem Style="{DynamicResource SettingsTabItemStyle}" BorderBrush="{x:Null}">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Label ToolTip="Log" Content="" HorizontalContentAlignment="Center"
+                               FontFamily="pack://application:,,,/font/#FontAwesome" Foreground="#FFB8B8B8"
+                               VerticalAlignment="Center" FontSize="30" />
+                        <Label ToolTip="Log"
+                               Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.TabLogs}"
+                               HorizontalContentAlignment="Center" Foreground="#FFB8B8B8" VerticalAlignment="Center"
+                               FontSize="15" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
+                    <GroupBox Grid.Column="0" BorderBrush="{x:Null}" Margin="20">
+                        <GroupBox.Header>
+                            <Label Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.GroupLabelLogs}"
+                                   FontSize="20" FontWeight="SemiBold" Foreground="#FF40A6D1" />
+                        </GroupBox.Header>
+                        <StackPanel Orientation="Vertical">
+                            <TextBox
+                                Text="{Binding Source={x:Static logger:Log.Instance}, Path=Logs, Converter={StaticResource TupleToTextConverter}, Mode=OneWay}"
+                                Height="350" Foreground="Gray" IsReadOnly="True"
+                                ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"/>
+                            <Button Margin="0,10,10,0" Padding="15 2"
+                                    Style="{DynamicResource RoundedSettingsButtonStyle}" Background="#FF40A6D1"
+                                    Foreground="White" BorderBrush="{x:Null}" BorderThickness="0"
+                                    Click="LogsButton_OnClick" HorizontalAlignment="Right" Width="132">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label x:Name="LogsButton" Content="LOGS" HorizontalContentAlignment="Center"
+                                           Foreground="White" VerticalAlignment="Center" FontSize="15" />
+                                    <Label Content="" HorizontalContentAlignment="Center"
+                                           FontFamily="pack://Application:,,,/font/#FontAwesome" Foreground="White"
+                                           VerticalAlignment="Center" FontSize="15" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <!-- Margin 201: Width of sidebar -->
+        <Border VerticalAlignment="Bottom" Margin="201,0,0,0" Height="60" Background="#FFF7F7F7" Grid.Row="1">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 20 0"
+                        Orientation="Horizontal">
+                <Button x:Name="CancelButton" Style="{DynamicResource RoundedSettingsButtonStyle}"
+                        Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.ButtonCancel}"
+                        FontWeight="Bold" Foreground="#FF40A6D1" Padding="25 8" Background="#FFF7F7F7"
+                        BorderBrush="#FF40A6D1" BorderThickness="2" Click="CancelButton_OnClick" />
+                <Button x:Name="DoneButton" Margin="10 0 0 0" Style="{DynamicResource RoundedSettingsButtonStyle}"
+                        Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.ButtonDone}"
+                        FontWeight="Bold" Foreground="White" Padding="25 8" Background="#FF40A6D1"
+                        BorderBrush="#FF40A6D1" BorderThickness="2" Click="DoneButton_OnClick" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

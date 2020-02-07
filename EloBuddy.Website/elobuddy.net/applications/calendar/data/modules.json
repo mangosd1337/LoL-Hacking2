@@ -1,0 +1,14 @@
+{
+    "admin": {
+        "calendars": {
+            "default_controller": null,
+            "protected": 0
+        }
+    },
+    "front": {
+        "calendar": {
+            "default_controller": "view",
+            "protected": false
+        }
+    }
+}

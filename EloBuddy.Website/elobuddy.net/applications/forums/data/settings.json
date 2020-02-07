@@ -1,0 +1,58 @@
+[
+    {
+        "key": "archive_on",
+        "default": "0"
+    },
+    {
+        "key": "archive_remote_sql_database",
+        "default": ""
+    },
+    {
+        "key": "archive_remote_sql_host",
+        "default": ""
+    },
+    {
+        "key": "archive_remote_sql_pass",
+        "default": ""
+    },
+    {
+        "key": "archive_remote_sql_user",
+        "default": ""
+    },
+    {
+        "key": "archive_sql_port",
+        "default": ""
+    },
+    {
+        "key": "archive_sql_socket",
+        "default": ""
+    },
+    {
+        "key": "archive_sql_tbl_prefix",
+        "default": ""
+    },
+    {
+        "key": "forums_answers_downvote",
+        "default": "1"
+    },
+    {
+        "key": "forums_new_questions",
+        "default": "0"
+    },
+    {
+        "key": "forums_popular_now",
+        "default": "{\"posts\":\"10\",\"minutes\":\"60\"}"
+    },
+    {
+        "key": "forums_posts_per_page",
+        "default": "25"
+    },
+    {
+        "key": "forums_questions_downvote",
+        "default": "0"
+    },
+    {
+        "key": "forums_rss",
+        "default": "1"
+    }
+]

@@ -1,0 +1,22 @@
+{
+    "calendars": {
+        "calendars": {
+            "tab": "community",
+            "controller": "calendars",
+            "do": "",
+            "restriction": "calendars_manage"
+        },
+        "ical": {
+            "tab": "community",
+            "controller": "ical",
+            "do": "",
+            "restriction": "calendar_feeds_manage"
+        },
+        "settings": {
+            "tab": "community",
+            "controller": "settings",
+            "do": "",
+            "restriction": "settings_manage"
+        }
+    }
+}

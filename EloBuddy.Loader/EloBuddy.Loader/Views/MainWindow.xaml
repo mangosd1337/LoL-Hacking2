@@ -1,0 +1,171 @@
+﻿<types:CustomChromeWindow x:Class="Elobuddy.Loader.Views.MainWindow"
+                          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                          xmlns:controls="clr-namespace:EloBuddy.Loader.Controls"
+                          xmlns:converter="clr-namespace:EloBuddy.Loader.Converter"
+                          xmlns:types="clr-namespace:EloBuddy.Loader.Types"
+                          xmlns:globals="clr-namespace:EloBuddy.Loader.Globals" mc:Ignorable="d" MinWidth="1020"
+                          MinHeight="670" Height="720" Width="1200" ResizeMode="CanResizeWithGrip" x:Name="mainWin"
+                          Background="#FF141414" WindowStartupLocation="CenterScreen"
+                          SourceInitialized="mainWin_SourceInitialized" BorderThickness="1" BorderBrush="Black"
+                          Initialized="mainWin_Initialized" SizeChanged="mainWin_SizeChanged"
+                          LocationChanged="mainWin_LocationChanged" Loaded="mainWin_Loaded"
+                          ContentRendered="mainWin_ContentRendered"
+                          Icon="/EloBuddy.Loader;component/resources/favicon.ico">
+    <Window.Resources>
+        <globals:MultiLanguage x:Key="MultiLanguage" />
+        <converter:WindowTitleRandomizeConverter x:Key="WindowTitleConverter" />
+    </Window.Resources>
+    <Window.Title>
+        <Binding Converter="{StaticResource WindowTitleConverter}" />
+    </Window.Title>
+    
+    <Border CornerRadius="3" BorderBrush="Black" BorderThickness="0,0,0,6" Margin="0,0,-1,-7">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="85" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="40" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.Resources>
+                <converter:WindowStateToMinMaxButtonContentConverter x:Key="WinStateConv" />
+            </Grid.Resources>
+            <Grid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Background="#FF40A6D1" MouseMove="Grid_MouseMove"
+                  Margin="0,0,1,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <controls:HeaderDecoration />
+                <Label Content="ELOBUDDY" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="25"
+                       FontWeight="SemiBold" Foreground="White" Margin="10 0 0 0">
+                    <Label.Effect>
+                        <DropShadowEffect Opacity="0.2" />
+                    </Label.Effect>
+                </Label>
+                <StackPanel Grid.ColumnSpan="2" Grid.Column="2" VerticalAlignment="Center" Orientation="Horizontal"
+                            Margin="0,0,10,0" HorizontalAlignment="Right">
+
+
+                    <Image Name="SupportUsButton" MouseDown="SupportUsButton_OnClick" Source="/EloBuddy.Loader;component/resources/donate_final.png" Width="348" Height="51" Margin="0,2,20,0" Cursor="Hand" />
+                    
+                    
+                    <Button Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Style="{DynamicResource CloseMinMaxButtonStyle}" Foreground="White" Background="#FF40A6D1"
+                            BorderBrush="#00707070" Click="MinimizeButton_OnClick">
+                        <Button.Content>
+                            <TextBlock FontFamily="pack://application:,,,/font/#FontAwesome" FontSize="20"
+                                       Margin="0 0 0 -10">
+                                
+                            </TextBlock>
+                        </Button.Content>
+                    </Button>
+                    <Button Width="40" Height="40"
+                            Content="{Binding ElementName=mainWin, Path=WindowState, Converter={StaticResource WinStateConv}}"
+                            Style="{DynamicResource CloseMinMaxButtonStyle}" BorderBrush="Transparent"
+                            Background="#FF40A6D1" Foreground="White"
+                            FontFamily="pack://application:,,,/font/#FontAwesome" FontSize="17"
+                            VerticalContentAlignment="Bottom" Click="MaximizeButton_OnClick" />
+                    <Button Width="40" Height="40" Content="" Style="{DynamicResource CloseMinMaxButtonStyle}"
+                            BorderBrush="Transparent" Background="#FF40A6D1" Foreground="White"
+                            FontFamily="pack://application:,,,/font/#FontAwesome" FontSize="20px"
+                            VerticalContentAlignment="Bottom" Click="CloseButton_OnClick" />
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Background="#FF1F1F1F" Panel.ZIndex="1">
+                <Grid.Effect>
+                    <DropShadowEffect Direction="270" BlurRadius="7" Opacity="0.2" />
+                </Grid.Effect>
+                <Grid.Resources>
+                    <Style TargetType="Label">
+                        <Setter Property="FontSize" Value="13" />
+                    </Style>
+                </Grid.Resources>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="0" />
+                </Grid.ColumnDefinitions>
+                <!--<TextBox Style="{DynamicResource DarkSerachTextBoxStyle}" Background="#FF2E2E2E" BorderBrush="#FF2E2E2E" VerticalContentAlignment="Center" Foreground="White" FontWeight="SemiBold" FontSize="16"/>-->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <!-- Auth release: -->
+                    <Label Visibility="Hidden" x:Name="GamesPlayedLabel" Content="Games played today:"
+                           VerticalAlignment="Center" Foreground="White" />
+                    <Label Visibility="Hidden" x:Name="GamesPlayedCountLabel" Content="100/100"
+                           VerticalAlignment="Center" Foreground="#FF40D151" Margin="0" Padding="0,0,5,0"
+                           FontWeight="SemiBold" />
+                    <controls:Separator Visibility="Hidden" x:Name="StatsSeperator" Foreground="White" Margin="5 0 5 0" />
+                    <Label Visibility="Hidden" Content="Your membership expires in" VerticalAlignment="Center"
+                           Foreground="White" />
+                    <Label Visibility="Hidden" x:Name="DaysLabel" Content="100 days" VerticalAlignment="Center"
+                           Foreground="#FF40D151" Margin="0" Padding="0,0,5,0" FontWeight="SemiBold" />
+                    <!-- No Auth Release: -->
+                    <Label Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelWelcome}"
+                           VerticalAlignment="Center" Foreground="White" />
+                    <controls:Separator Foreground="White" Margin="5 0 5 0" />
+                    <Label Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelEloBuddyStatus}"
+                           VerticalAlignment="Center" Foreground="White" />
+                    <Label x:Name="UpdateStatusLabel" Content="???" VerticalAlignment="Center" Foreground="#FF40D151"
+                           Margin="0,6" MouseLeftButtonDown="UpdateStatusLabel_MouseLeftButtonDown" Cursor="Hand" />
+                </StackPanel>
+                <controls:UserNameControl Grid.Column="0" x:Name="uncUser" Height="60" UserName="username"
+                                          ImageBackgroundBrush="#FF40A6D1" VerticalAlignment="Bottom"
+                                          HorizontalAlignment="Left" Margin="5 0 0 -20" Panel.ZIndex="1"
+                                          Click="uncUser_OnClick" />
+            </Grid>
+            <TabControl Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" TabStripPlacement="Left"
+                        Style="{DynamicResource LeftTabColumnTabControlStyle}" Background="LightGray"
+                        BorderBrush="{x:Null}">
+                <TabItem Style="{DynamicResource LeftTabColumnTabItemStyle}" BorderBrush="{x:Null}">
+                    <TabItem.Header>
+                        <Label ToolTip="Home" Content="" HorizontalContentAlignment="Center"
+                               FontFamily="pack://application:,,,/font/#FontAwesome" Foreground="White"
+                               VerticalAlignment="Center" FontSize="35" Margin="8,4,8,4" />
+                    </TabItem.Header>
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                        <ScrollViewer.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FFC4C4C4" />
+                                <GradientStop Color="#FFEEEEEE" Offset="1" />
+                                <GradientStop Color="#FFE4E4E4" Offset="0.11" />
+                            </LinearGradientBrush>
+                        </ScrollViewer.Background>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="400"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+
+                            <controls:NewsControl Grid.Column="0" />
+                            <controls:CoreControl Grid.Column="1" />
+                        </Grid>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Style="{DynamicResource LeftTabColumnTabItemStyle}" BorderBrush="{x:Null}">
+                    <TabItem.Header>
+                        <Label ToolTip="Installed Addons" HorizontalContentAlignment="Center" Content=""
+                               FontFamily="pack://application:,,,/font/#FontAwesome" Foreground="White"
+                               VerticalAlignment="Center" FontSize="35" Margin="8,4,8,4" />
+                    </TabItem.Header>
+                    <controls:InstalledAddonsDataGrid x:Name="InstalledAddonsGrid" Margin="-2" />
+                </TabItem>
+            </TabControl>
+            <Button Grid.Column="0" Grid.Row="2" VerticalAlignment="Bottom"
+                    Style="{DynamicResource SettingsButtonStyle}" BorderBrush="{x:Null}" Margin="0 0 0 5"
+                    Background="{x:Null}" ToolTip="Settings" Click="SettingsButton_OnClick">
+                <Button.Content>
+                    <TextBlock Text="" FontFamily="pack://application:,,,/font/#FontAwesome" Foreground="White"
+                               VerticalAlignment="Center" FontSize="35" Margin="8,4,8,4" />
+                </Button.Content>
+            </Button>
+        </Grid>
+    </Border>
+</types:CustomChromeWindow>

@@ -1,0 +1,164 @@
+{
+    "payments": {
+        "transactions": {
+            "tab": "nexus",
+            "controller": "transactions",
+            "do": "",
+            "restriction": "transactions_manage"
+        },
+        "invoices": {
+            "tab": "nexus",
+            "controller": "invoices",
+            "do": "",
+            "restriction": "invoices_manage"
+        },
+        "shipping": {
+            "tab": "nexus",
+            "controller": "shipping",
+            "do": "",
+            "restriction": "shiporders_manage"
+        },
+        "donations": {
+            "tab": "nexus",
+            "controller": "donations",
+            "do": "",
+            "restriction": "donations_manage"
+        },
+        "payouts": {
+            "tab": "nexus",
+            "controller": "payouts",
+            "do": "",
+            "restriction": "payouts_manage"
+        },
+        "paymentsettings": {
+            "tab": "nexus",
+            "controller": "paymentsettings",
+            "do": "",
+            "restriction": "paymentsettings_overview"
+        }
+    },
+    "customers": {
+        "search": {
+            "tab": "nexus",
+            "controller": "search",
+            "do": "",
+            "restriction": "customers_view"
+        },
+        "fields": {
+            "tab": "nexus",
+            "controller": "fields",
+            "do": "",
+            "restriction": "fields_manage"
+        },
+        "referrals": {
+            "tab": "nexus",
+            "controller": "referrals",
+            "do": "",
+            "restriction": "referrals_manage"
+        }
+    },
+    "support": {
+        "requests": {
+            "tab": "nexus",
+            "controller": "requests",
+            "do": "",
+            "restriction": "requests_manage"
+        },
+        "reports": {
+            "tab": "nexus",
+            "controller": "reports",
+            "do": "",
+            "restriction": "reports_manage"
+        },
+        "settings": {
+            "tab": "nexus",
+            "controller": "settings",
+            "do": "",
+            "restriction": "settings_manage"
+        },
+        "volume": {
+            "tab": "stats",
+            "controller": "volume",
+            "do": "",
+            "restriction": "volume_manage"
+        }
+    },
+    "store": {
+        "packages": {
+            "tab": "nexus",
+            "controller": "packages",
+            "do": "",
+            "restriction": "packages_manage"
+        },
+        "fields": {
+            "tab": "nexus",
+            "controller": "fields",
+            "do": "",
+            "restriction": "package_fields_manage"
+        },
+        "coupons": {
+            "tab": "nexus",
+            "controller": "coupons",
+            "do": "",
+            "restriction": "coupons_manage"
+        },
+        "settings": {
+            "tab": "nexus",
+            "controller": "settings",
+            "do": "",
+            "restriction": "settings_manage"
+        }
+    },
+    "hosting": {
+        "queues": {
+            "tab": "nexus",
+            "controller": "queues",
+            "do": "",
+            "restriction": "queues_manage"
+        },
+        "servers": {
+            "tab": "nexus",
+            "controller": "servers",
+            "do": "",
+            "restriction": "servers_manage"
+        },
+        "monitoring": {
+            "tab": "nexus",
+            "controller": "monitoring",
+            "do": "",
+            "restriction": null
+        },
+        "errors": {
+            "tab": "nexus",
+            "controller": "errors",
+            "do": "",
+            "restriction": "errors_manage"
+        },
+        "settings": {
+            "tab": "nexus",
+            "controller": "settings",
+            "do": "",
+            "restriction": "settings_manage"
+        }
+    },
+    "reports": {
+        "purchases": {
+            "tab": "stats",
+            "controller": "purchases",
+            "do": "",
+            "restriction": "purchases_manage"
+        },
+        "income": {
+            "tab": "stats",
+            "controller": "income",
+            "do": "",
+            "restriction": "income_manage"
+        },
+        "markets": {
+            "tab": "stats",
+            "controller": "markets",
+            "do": "",
+            "restriction": "markets_manage"
+        }
+    }
+}

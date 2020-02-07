@@ -1,0 +1,63 @@
+From a31266e1e02eaa6ed5cdce4f02b493d8459279b5 Mon Sep 17 00:00:00 2001
+From: Hellsing <matrix11@gmx.net>
+Date: Sat, 6 Feb 2016 14:19:50 +0100
+Subject: [PATCH 11/13] Removed HeroManager
+
+---
+ .../EloBuddy.SDK.csproj            |  1 -
+ EloBuddy.SDK/HeroManager.cs        | 31 ----------------------
+ 2 files changed, 32 deletions(-)
+ delete mode 100644 EloBuddy.SDK/HeroManager.cs
+
+diff --git a/EloBuddy.SDK/EloBuddy.SDK.csproj b/EloBuddy.SDK/EloBuddy.SDK.csproj
+index 0def435..4f2dd44 100644
+--- a/EloBuddy.SDK/EloBuddy.SDK.csproj
++++ b/EloBuddy.SDK/EloBuddy.SDK.csproj
+@@ -64,7 +64,6 @@
+     <Compile Include="Events\Interrupter.cs" />
+     <Compile Include="Events\Teleport.cs" />
+     <Compile Include="Geometry.cs" />
+-   <Compile Include="HeroManager.cs" />
+     <Compile Include="Item.cs" />
+     <Compile Include="Menu\AddonContainer.cs" />
+     <Compile Include="Menu\Button.cs" />
+diff --git a/EloBuddy.SDK/HeroManager.cs b/EloBuddy.SDK/HeroManager.cs
+deleted file mode 100644
+index b348484..0000000
+--- a/EloBuddy.SDK/HeroManager.cs
++++ /dev/null
+@@ -1,31 +0,0 @@
+-﻿using System;
+-using System.Collections.Generic;
+-
+-namespace EloBuddy.SDK.AddonDevelopers
+-{
+-    [Obsolete("HeroManager is deprecated and will be removed soon, use EntityManager.Heroes instead.")]
+-    public class HeroManager
+-    {
+-        /// <summary>
+-        /// A list containing all heroes in the current match
+-        /// </summary>
+-        public static List<AIHeroClient> AllHeroes
+-        {
+-            get { return EntityManager.Heroes.AllHeroes; }
+-        }
+-        /// <summary>
+-        /// A list containing only ally heroes in the current match
+-        /// </summary>
+-        public static List<AIHeroClient> Allies
+-        {
+-            get { return EntityManager.Heroes.Allies; }
+-        }
+-        /// <summary>
+-        /// A list containing only enemy heroes in the current match
+-        /// </summary>
+-        public static List<AIHeroClient> Enemies
+-        {
+-            get { return EntityManager.Heroes.Enemies; }
+-        }
+-    }
+-}
+-- 
+1.9.4.msysgit.2
+

@@ -1,0 +1,25 @@
+From e781fc897c0901b74b09c39f5d2a25df20b5edda Mon Sep 17 00:00:00 2001
+From: Javier <jachicao@uc.cl>
+Date: Sat, 6 Feb 2016 11:30:47 -0300
+Subject: [PATCH 13/13] Fixed vayne's silver bolts damage.
+
+---
+ EloBuddy.SDK/Damage.cs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/EloBuddy.SDK/Damage.cs b/EloBuddy.SDK/Damage.cs
+index 5183477..d2a1ec6 100644
+--- a/EloBuddy.SDK/Damage.cs
++++ b/EloBuddy.SDK/Damage.cs
+@@ -830,7 +830,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+                     if (target.GetBuffCount("vaynesilvereddebuff") == 2)
+                     {
+                         calculatedTrueDamage +=
+-                            Math.Min(
++                            Math.Max(
+                                 (0.045f + 0.015f * fromHero.Spellbook.GetSpell(SpellSlot.W).Level) *
+                                 target.MaxHealth, 20f * fromHero.Spellbook.GetSpell(SpellSlot.W).Level + 20f);
+                     }
+-- 
+1.9.4.msysgit.2
+

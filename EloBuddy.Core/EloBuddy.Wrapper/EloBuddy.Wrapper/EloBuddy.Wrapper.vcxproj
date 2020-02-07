@@ -1,0 +1,336 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A4A27C2C-4365-41C9-AE9E-24DAD9B8D3C9}</ProjectGuid>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <Keyword>ManagedCProj</Keyword>
+    <RootNamespace>EloBuddyWrapper</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>MultiByte</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <OutDir>N:\Dropbox\EloBuddy_Deploy\Release</OutDir>
+    <TargetName>EloBuddy</TargetName>
+    <LinkKeyFile>..\..\Resources\EloBuddy.snk</LinkKeyFile>
+    <EnableManagedIncrementalBuild>true</EnableManagedIncrementalBuild>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <BrowseInformation>true</BrowseInformation>
+      <PreprocessToFile>false</PreprocessToFile>
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+      <DisableSpecificWarnings>4561;4251;4244</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(OutDir)\EloBuddy.Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;N_MANAGED_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PreprocessToFile>false</PreprocessToFile>
+      <DisableSpecificWarnings>4561;4251;4272;4244;4248;4099;4288</DisableSpecificWarnings>
+      <Optimization>Full</Optimization>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <MinimalRebuild>false</MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(OutDir)\EloBuddy.Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
+      <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
+      <CLRUnmanagedCodeCheck>false</CLRUnmanagedCodeCheck>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
+    </Link>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>copy "N:\Dropbox\EloBuddy_Deploy\Release\EloBuddy.dll" "N:\Dropbox\EloBuddy_Deploy\Deploy\EloBuddy.dll"
+#"C:\Users\kappa\Desktop\EloBuddy.Core\ConfuserEx\Debug\bin\Confuser.CLI.exe"  "C:\Users\kappa\Desktop\EloBuddy.Core\EloBuddy-Wrapper.crproj"
+signtool.exe sign /f "C:\Users\kappa\Desktop\EloBuddy.Core\Resources\HOSTPLANET_CERT.p12" /p "G4hKCs3Ye4Sm3Fh7DU33P8nUSb3Sh8" /v /t http://timestamp.comodoca.com/authenticode "N:/Dropbox/EloBuddy_Deploy/Deploy/EloBuddy.dll"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Reference Include="SharpDX">
+      <HintPath>..\..\Dependencies\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D9">
+      <HintPath>..\..\Dependencies\SharpDX.Direct3D9.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AllUnits.h" />
+    <ClInclude Include="BugSplat.h" />
+    <ClInclude Include="CameraZoomEventArgs.h" />
+    <ClInclude Include="GameObjectFloatPropertyChangeEventArgs.h" />
+    <ClInclude Include="GameObjectIntegerPropertyChangeEvent.h" />
+    <ClInclude Include="HashAlgorithm.h" />
+    <ClInclude Include="HeroApplyCooldownEventArgs.h" />
+    <ClInclude Include="OnAggroEventArgs.hpp" />
+    <ClInclude Include="OnAppendObjectEventArgs.hpp" />
+    <ClInclude Include="AttackableUnit.hpp" />
+    <ClInclude Include="AttackableUnitDamageEventArgs.hpp" />
+    <ClInclude Include="AttackableUnitModifyShieldEventArgs.hpp" />
+    <ClInclude Include="AudioManager.h" />
+    <ClInclude Include="AudioManagerEventArgs.h" />
+    <ClInclude Include="BuffEventArgs.hpp" />
+    <ClInclude Include="BuffInstance.hpp" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraLockToggleEventArgs.h" />
+    <ClInclude Include="CameraSnapEventArgs.h" />
+    <ClInclude Include="CameraUpdateEventArgs.h" />
+    <ClInclude Include="CastSpellEventArgs.hpp" />
+    <ClInclude Include="CharData.h" />
+    <ClInclude Include="Chat.h" />
+    <ClInclude Include="DrawFX.hpp" />
+    <ClInclude Include="Drawing.h" />
+    <ClInclude Include="EloBuddy.Wrapper.h" />
+    <ClInclude Include="Experience.h" />
+    <ClInclude Include="FollowerObject.hpp" />
+    <ClInclude Include="FollowerObjectWithLerpMovement.h" />
+    <ClInclude Include="GameAfkEventArgs.hpp" />
+    <ClInclude Include="ChatEventArgs.hpp" />
+    <ClInclude Include="GameEndEventArgs.hpp" />
+    <ClInclude Include="GameNotifyEventArgs.hpp" />
+    <ClInclude Include="GameObjectCreate.hpp">
+      <FileType>CppHeader</FileType>
+      <DeploymentContent>false</DeploymentContent>
+    </ClInclude>
+    <ClInclude Include="GameStartEventArgs.hpp" />
+    <ClInclude Include="GamePacket.h" />
+    <ClInclude Include="GamePacketEventArgs.hpp" />
+    <ClInclude Include="Exceptions.hpp" />
+    <ClInclude Include="Game.hpp" />
+    <ClInclude Include="GameObject.hpp" />
+    <ClInclude Include="GrassObject.hpp" />
+    <ClInclude Include="Hacks.h" />
+    <ClInclude Include="HeroDeathEventArgs.h" />
+    <ClInclude Include="Hud.h" />
+    <ClInclude Include="HudChangeTargetEventArgs.hpp" />
+    <ClInclude Include="InventorySlot.hpp" />
+    <ClInclude Include="ItemData.h" />
+    <ClInclude Include="LevelUpEventArgs.h" />
+    <ClInclude Include="ManagedTexture.h" />
+    <ClInclude Include="Missile.hpp" />
+    <ClInclude Include="MissileClient.hpp" />
+    <ClInclude Include="Obj_Ward.h" />
+    <ClInclude Include="OnDrawHealthbarsEventArgs.h" />
+    <ClInclude Include="OnResetAggroEventArgs.hpp" />
+    <ClInclude Include="PacketHeader.h" />
+    <ClInclude Include="PlayerDoEmoteEventArgs.hpp" />
+    <ClInclude Include="PlayerIssueOrderEventArgs.hpp" />
+    <ClInclude Include="LevelPropAI.hpp" />
+    <ClInclude Include="LevelPropGameObject.hpp" />
+    <ClInclude Include="LevelPropSpawnerPoint.hpp" />
+    <ClInclude Include="Macros.hpp" />
+    <ClInclude Include="MenuGUI.h" />
+    <ClInclude Include="NavMesh.h" />
+    <ClInclude Include="NavMeshCell.h" />
+    <ClInclude Include="NeutralMinionCamp.hpp" />
+    <ClInclude Include="NewPathEventArgs.hpp" />
+    <ClInclude Include="ShopActionEventArgs.hpp" />
+    <ClInclude Include="PlayAnimationEventArgs.hpp" />
+    <ClInclude Include="Player.hpp" />
+    <ClInclude Include="PlayerSwapItemEventArgs.hpp" />
+    <ClInclude Include="ProcessSpellCastEventArgs.hpp" />
+    <ClInclude Include="ObjectManager.hpp" />
+    <ClInclude Include="Obj_AI_Base.hpp" />
+    <ClInclude Include="AIHeroClient.hpp" />
+    <ClInclude Include="Obj_AI_Marker.hpp" />
+    <ClInclude Include="Obj_AI_Minion.hpp" />
+    <ClInclude Include="Obj_AI_Turret.hpp" />
+    <ClInclude Include="Obj_AnimatedBuilding.hpp" />
+    <ClInclude Include="Obj_Barracks.hpp" />
+    <ClInclude Include="Obj_BarracksDampener.hpp" />
+    <ClInclude Include="Obj_Building.hpp" />
+    <ClInclude Include="Obj_GeneralParticleEmitter.hpp" />
+    <ClInclude Include="Obj_HQ.hpp" />
+    <ClInclude Include="Obj_InfoPoint.hpp" />
+    <ClInclude Include="Obj_Lake.hpp" />
+    <ClInclude Include="Obj_LampBulb.hpp" />
+    <ClInclude Include="Obj_Levelsizer.hpp" />
+    <ClInclude Include="Obj_NavPoint.hpp" />
+    <ClInclude Include="Obj_Shop.hpp" />
+    <ClInclude Include="Obj_SpawnPoint.hpp" />
+    <ClInclude Include="Obj_SpellChainMissile.hpp" />
+    <ClInclude Include="Obj_SpellCircleMissile.hpp" />
+    <ClInclude Include="Obj_SpellLineMissile.hpp" />
+    <ClInclude Include="Obj_SpellMissile.hpp" />
+    <ClInclude Include="Obj_Turret.hpp" />
+    <ClInclude Include="OnBeginScene.hpp" />
+    <ClInclude Include="OnDraw.hpp" />
+    <ClInclude Include="OnEndScene.hpp" />
+    <ClInclude Include="OnLevelUpEventArgs.hpp" />
+    <ClInclude Include="OnLevelUpSpellEventArgs.hpp" />
+    <ClInclude Include="OnPresent.hpp" />
+    <ClInclude Include="OnReset.hpp" />
+    <ClInclude Include="OnUnitDashEventArgs.hpp" />
+    <ClInclude Include="GameUpdateEventArgs.hpp" />
+    <ClInclude Include="RADS.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="RiotAsset.h" />
+    <ClInclude Include="RiotString.h" />
+    <ClInclude Include="Shop.hpp" />
+    <ClInclude Include="ShopCloseEventArgs.h" />
+    <ClInclude Include="ShopOpenEventArgs.h" />
+    <ClInclude Include="ShopUndoPurchase.h" />
+    <ClInclude Include="Spellbook.hpp" />
+    <ClInclude Include="SpellData.hpp" />
+    <ClInclude Include="SpellDataInst.hpp" />
+    <ClInclude Include="SpellInfoData.h" />
+    <ClInclude Include="StaticEnums.h" />
+    <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="StopCastEventArgs.hpp" />
+    <ClInclude Include="SurrenderVoteEventArgs.hpp" />
+    <ClInclude Include="TacticalMap.hpp" />
+    <ClInclude Include="TacticalMapPingEventArgs.hpp" />
+    <ClInclude Include="TeleportEventArgs.hpp" />
+    <ClInclude Include="UnrevealedTarget.hpp" />
+    <ClInclude Include="UpdateChargedSpellEventArgs.hpp" />
+    <ClInclude Include="UpdateModelEventArgs.hpp" />
+    <ClInclude Include="UpdatePositionEventArgs.hpp" />
+    <ClInclude Include="Utility.hpp" />
+    <ClInclude Include="Vector3Time.hpp" />
+    <ClInclude Include="GameWndEventArgs.hpp" />
+    <ClInclude Include="Version.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="AttackableUnit.cpp" />
+    <ClCompile Include="AudioManager.cpp" />
+    <ClCompile Include="BuffInstance.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CharData.cpp" />
+    <ClCompile Include="Chat.cpp" />
+    <ClCompile Include="DrawFX.cpp" />
+    <ClCompile Include="Drawing.cpp" />
+    <ClCompile Include="EloBuddy.Wrapper.cpp" />
+    <ClCompile Include="FollowerObject.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GamePacket.cpp" />
+    <ClCompile Include="GamePacketEventArgs.cpp" />
+    <ClCompile Include="GrassObject.cpp" />
+    <ClCompile Include="Hud.cpp" />
+    <ClCompile Include="InventorySlot.cpp" />
+    <ClCompile Include="LevelPropAI.cpp" />
+    <ClCompile Include="LevelPropGameObject.cpp" />
+    <ClCompile Include="LevelPropSpawnerPoint.cpp" />
+    <ClCompile Include="ManagedTexture.cpp" />
+    <ClCompile Include="MenuGUI.cpp" />
+    <ClCompile Include="MissileClient.cpp" />
+    <ClCompile Include="NavMesh.cpp" />
+    <ClCompile Include="NavMeshCell.cpp" />
+    <ClCompile Include="NeutralMinionCamp.cpp" />
+    <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="Obj_AI_Base.cpp" />
+    <ClCompile Include="Obj_AI_Marker.cpp" />
+    <ClCompile Include="Obj_AI_Minion.cpp" />
+    <ClCompile Include="AIHeroClient.cpp" />
+    <ClCompile Include="Obj_AI_Turret.cpp" />
+    <ClCompile Include="Obj_AnimatedBuilding.cpp" />
+    <ClCompile Include="Obj_Barracks.cpp" />
+    <ClCompile Include="Obj_BarracksDampener.cpp" />
+    <ClCompile Include="Obj_Building.cpp" />
+    <ClCompile Include="Obj_GeneralParticleEmitter.cpp" />
+    <ClCompile Include="Obj_HQ.cpp" />
+    <ClCompile Include="Obj_InfoPoint.cpp" />
+    <ClCompile Include="Obj_Lake.cpp" />
+    <ClCompile Include="Obj_LampBulb.cpp" />
+    <ClCompile Include="Obj_Levelsizer.cpp" />
+    <ClCompile Include="Obj_NavPoint.cpp" />
+    <ClCompile Include="Obj_Shop.cpp" />
+    <ClCompile Include="Obj_SpawnPoint.cpp" />
+    <ClCompile Include="Obj_SpellChainMissile.cpp" />
+    <ClCompile Include="Obj_SpellCircleMissile.cpp" />
+    <ClCompile Include="Obj_SpellLineMissile.cpp" />
+    <ClCompile Include="Obj_SpellMissile.cpp" />
+    <ClCompile Include="Obj_Turret.cpp" />
+    <ClCompile Include="PacketHeader.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="RADS.cpp" />
+    <ClCompile Include="RiotAsset.cpp" />
+    <ClCompile Include="RiotString.cpp" />
+    <ClCompile Include="Shop.cpp" />
+    <ClCompile Include="Spellbook.cpp" />
+    <ClCompile Include="SpellData.cpp" />
+    <ClCompile Include="SpellDataInst.cpp" />
+    <ClCompile Include="Stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TacticalMap.cpp" />
+    <ClCompile Include="UnrevealedTarget.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="app.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="app.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

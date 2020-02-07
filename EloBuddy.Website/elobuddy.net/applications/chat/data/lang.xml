@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+ <app key="chat" version="101030">
+  <word key="__app_chat" js="0">Chat</word>
+  <word key="frontnavigation_chat" js="0">Chat</word>
+  <word key="chat_title" js="0">Chat</word>
+  <word key="module__chat_chat" js="0">Chat</word>
+  <word key="menu__chat_chat" js="0">Chat</word>
+  <word key="time_pm" js="0">PM</word>
+  <word key="time_am" js="0">AM</word>
+  <word key="chat_insert_emoticon" js="0">Insert Emoticon</word>
+  <word key="no_users_chatting" js="0">0 users chatting</word>
+  <word key="menu__chat_chat_settings" js="0">Settings</word>
+  <word key="menu__chat_chat_logs" js="0">Logs</word>
+  <word key="r__logs" js="0">Logs</word>
+  <word key="r__logs_manage" js="0">Can view chat logs?</word>
+  <word key="chat_banned" js="0">Can access chat?</word>
+  <word key="chat_access" js="0">Can access chat?</word>
+  <word key="chat_moderate" js="0">Can moderate chats?</word>
+  <word key="chat_private" js="0">Can send private chats?</word>
+  <word key="group__chat_ChatAccess" js="0">Chat</word>
+  <word key="member__chat_ChatBanned" js="0">Chat</word>
+  <word key="ipchat_24hour" js="0">Time format</word>
+  <word key="chat_12hour" js="0">Show times with AM/PM</word>
+  <word key="chat_24hour" js="0">Show times with 24 hour format</word>
+  <word key="ipchat_hide_usermessage" js="0">Show room join messages</word>
+  <word key="ipchat_hide_usermessage_desc" js="0">Shows a message in the chat window when users enter and leave the room</word>
+  <word key="ipchat_inactive_minutes" js="0">Inactivity period</word>
+  <word key="ipchat_inactive_minutes_desc" js="0">When the user has been inactive for this amount of time, they will be automatically kicked from the room</word>
+  <word key="ipchat_max_messages" js="0">Maximum number of displayed chats</word>
+  <word key="ipchat_new_window" js="0">Open in a new window</word>
+  <word key="ipchat_no_buffer" js="0">Show chat history upon joining a room</word>
+  <word key="ipschat_enable_rules" js="0">Show chat rules</word>
+  <word key="ipschat_enable_rules_desc" js="0">The user will be prompted to agree to the rules before being allowed to join the room</word>
+  <word key="ipschat_rules_text" js="0">Chat rules</word>
+  <word key="chat_timeplaceholder" js="0">HH:MM</word>
+  <word key="acplogs__chat_settings" js="0">Updated chat settings</word>
+  <word key="ipschat_online" js="0">Online times</word>
+  <word key="ipschat_online_desc" js="0">Optionally specify a time period that chat will be available</word>
+  <word key="ipschat_no_license" js="0">The chat room is not presently available</word>
+  <word key="ipschat_no_license_admin" js="0">You must supply a license key in order to enable the chat room</word>
+  <word key="ipschat_no_license_access" js="0">Your license does not include access to the chat room</word>
+  <word key="ipschat_no_group_access" js="0">Your group does not have permission to access the chat room</word>
+  <word key="ipschat_no_access" js="0">You do not have permission to access the chat room</word>
+  <word key="ipschat_no_ignore" js="0">This user cannot be ignored</word>
+  <word key="ipschat_no_ban" js="0">You do not have permission to ban users in chat</word>
+  <word key="ipschat_log_archive" js="0">Chat Logs</word>
+  <word key="acplog__chatlog_settings" js="0">Edited chat log prune settings</word>
+  <word key="ipchat_log_prune" js="0">Prune chat logs</word>
+  <word key="chatlog_log_time" js="0">Date</word>
+  <word key="chatlog_log_user" js="0">User</word>
+  <word key="chatlog_log_message" js="0">Message</word>
+  <word key="chatlog__hasentered" js="0">%s entered the room</word>
+  <word key="chatlog__hasleft" js="0">%s left the room</word>
+  <word key="chatlog__kicked" js="0">Kicked: %s</word>
+  <word key="chatlog__private" js="0">Private chat with %s: %s</word>
+  <word key="chat_toggle_sound" js="0">Toggle sound notifications</word>
+  <word key="chat_leave_room" js="0">Leave Chatroom</word>
+  <word key="ipschat_confirm" js="0">I agree to the terms</word>
+  <word key="generic_chatconnect_error" js="0">There was an error joining the chat room. Please try again or contact us.</word>
+  <word key="chat_currently_offline" js="0">The chat room is currently offline but will be back at %s.</word>
+  <word key="chat_offline_admin" js="0"><![CDATA[The chat room is currently offline based upon the ACP configuration available at Community -> Chat -> Settings]]></word>
+  <word key="leave_chat_room" js="0">You have left the chat room</word>
+  <word key="ipchat_private_chat" js="0">Start private chat</word>
+  <word key="ipchat_ignore_chats" js="0">Ignore private chats</word>
+  <word key="ipchat_unignore_chats" js="0">Stop ignoring private chats</word>
+  <word key="ipchat_kick" js="0">Kick user from room</word>
+  <word key="ipchat_ban" js="0">Ban user from room</word>
+  <word key="ipchat_profile" js="0">View user profile</word>
+  <word key="connect_error_1" js="0">The license key used was invalid, or is not correctly associated with a chat account.</word>
+  <word key="connect_error_2" js="0">No username was supplied to connect to the chat room. Please contact technical support for assistance.</word>
+  <word key="connect_error_3" js="0">No room number was supplied to connect to the chat room. Please contact technical support for assistance.</word>
+  <word key="connect_error_5" js="0">The room id supplied is invalid. Please contact technical support for assistance.</word>
+  <word key="connect_error_6" js="0">The license key used was invalid, or is not correctly associated with a chat account. Please contact technical support for assistance.</word>
+  <word key="connect_error_7" js="0">The server the chat room was hosted on is no longer online. Please wait a few moments and try again or contact technical support for assistance.</word>
+  <word key="connect_error_8" js="0">The server the chat room was hosted on is no longer online. Please wait a few moments and try again or contact technical support for assistance.</word>
+  <word key="connect_error_10" js="0">The chat server is offline. Please contact technical support for assistance.</word>
+  <word key="chat_room_full" js="0">The chat room limit has been reached. You will not be able to join the chat room until some users first leave.</word>
+  <word key="license_no_chat" js="0">Your license does not include Chat or has expired. Please contact customer services for assistance.</word>
+  <word key="connect_gw_error_0" js="0">Your server was unable to communicate with our chat servers. Please contact technical support for assistance.</word>
+  <word key="connect_gw_error_1" js="0">The license key used was invalid, or is not correctly associated with a chat account. Please contact technical support for assistance.</word>
+  <word key="connect_gw_error_2" js="0">No username was supplied to connect to the chat room. Please contact technical support for assistance.</word>
+  <word key="connect_gw_error_4" js="0">The room ID supplied was invalid. Please wait a few moments and try again or contact technical support for assistance.</word>
+  <word key="connect_gw_error_5" js="0">The chat room key has expired. Please wait a few moments and try again or contact technical support for assistance.</word>
+  <word key="connect_gw_error_6" js="0">The license key did not match the key for the chat room. Please wait a few moments and try again or contact technical support for assistance.</word>
+  <word key="block_chatwhoschatting" js="0">Who's Chatting</word>
+  <word key="block_chatwhoschatting_desc" js="0">Show the users currently in the chat room</word>
+  <word key="chatters_list_empty" js="0">There are no users currently in the chat room</word>
+  <word key="accept_rules" js="0">Accept and enter chatroom</word>
+  <word key="chatroom_rules" js="0">Chatroom Rules</word>
+  <word key="modcp_members_chatBanned" js="0">Chat Banned</word>
+  <word key="leftRoom" js="1">{{username}} left the room</word>
+  <word key="enteredRoom" js="1">{{username}} entered the room</word>
+  <word key="privateChatWith" js="1">Private chat with {{user}}</word>
+  <word key="privateChat" js="1">Private Chat</word>
+  <word key="soundEnabled" js="1">Notification sounds have been enabled</word>
+  <word key="soundDisabled" js="1">Notification sounds have been disabled</word>
+  <word key="usersChatting" js="1">{# [1:user][?:users]} chatting</word>
+  <word key="cantChatWithSelf" js="1">You can't start a private chat with yourself!</word>
+  <word key="cantIgnoreUser" js="1">{{user}} can't be ignored</word>
+  <word key="closeThisTab" js="1">Close this chat</word>
+  <word key="insertEmoticon" js="1">Insert Emoticon</word>
+  <word key="sendChat" js="1">Send</word>
+  <word key="noUsersChatting" js="1">No users chatting</word>
+  <word key="chatroom" js="1">Chat</word>
+  <word key="chatroomTooltip" js="1">Public Chat</word>
+  <word key="system" js="1">System</word>
+  <word key="kickedFromServer" js="1">You have been kicked from the chatroom.</word>
+  <word key="time_am" js="1">AM</word>
+  <word key="time_pm" js="1">PM</word>
+  <word key="hideImage" js="1">Toggle image</word>
+  <word key="imageHidden" js="1">Image hidden</word>
+ </app>
+</language>

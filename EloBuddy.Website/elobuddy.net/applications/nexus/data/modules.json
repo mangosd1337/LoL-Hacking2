@@ -1,0 +1,50 @@
+{
+    "front": {
+        "store": {
+            "default_controller": "store",
+            "protected": 0
+        },
+        "checkout": {
+            "default_controller": null,
+            "protected": 1
+        },
+        "support": {
+            "default_controller": "home",
+            "protected": 0
+        },
+        "clients": {
+            "default_controller": "splash",
+            "protected": 0
+        },
+        "promotion": {
+            "default_controller": "",
+            "protected": false
+        }
+    },
+    "admin": {
+        "payments": {
+            "default_controller": "transactions",
+            "protected": 0
+        },
+        "customers": {
+            "default_controller": null,
+            "protected": 0
+        },
+        "support": {
+            "default_controller": "",
+            "protected": 0
+        },
+        "store": {
+            "default_controller": "",
+            "protected": 0
+        },
+        "hosting": {
+            "default_controller": "",
+            "protected": 0
+        },
+        "reports": {
+            "default_controller": "",
+            "protected": 0
+        }
+    }
+}

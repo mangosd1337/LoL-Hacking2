@@ -1,0 +1,58 @@
+.ipsMessage {
+	padding: 15px 15px 15px 45px;
+	border-radius: 2px;
+	position: relative;
+	margin-bottom: 10px;
+	color: #fff;
+}
+
+	.ipsMessage:before {
+		font-family: 'FontAwesome';
+		position: absolute;
+		top: 15px;
+		left: 15px;
+		font-size: 20px;
+	}
+
+.ipsMessage_error {
+	background: #b52b38;
+}
+
+	.ipsMessage_error:before {
+		content: '\f06a';
+	}
+
+.ipsMessage_success {
+	background: #53902f;
+}
+
+	.ipsMessage_success:before {
+		content: '\f00c';
+	}
+
+.ipsMessage_warning {
+	background: #c48712;
+}
+
+	.ipsMessage_warning:before {
+		content: '\f071';
+	}
+
+.ipsMessage_info, .ipsMessage_information {
+	background: #447a9a;
+}
+
+	.ipsMessage_info:before, .ipsMessage_information:before {
+		content: '\f05a';
+	}
+
+.ipsMessage_code {
+	padding: 7px;
+	display: inline-block;
+	background: rgba(0,0,0,0.2);
+	border-radius: 3px;
+	float: right;
+	margin-top: -7px;
+	margin-right: -7px;
+	color: rgba(255,255,255,0.8);
+}

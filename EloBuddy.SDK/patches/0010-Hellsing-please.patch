@@ -1,0 +1,264 @@
+From c8839b198718ee7fdf066271f7f901267452de54 Mon Sep 17 00:00:00 2001
+From: Hellsing <matrix11@gmx.net>
+Date: Sat, 6 Feb 2016 13:33:52 +0100
+Subject: [PATCH 10/13] Hellsing please...
+
+---
+ EloBuddy.SDK/Constants/AutoAttacks.cs            | 2 +-
+ EloBuddy.SDK/Constants/ObjectNames.cs            | 2 +-
+ EloBuddy.SDK/Damage.cs                           | 2 +-
+ EloBuddy.SDK/DamageLibrary.cs                    | 2 +-
+ EloBuddy.SDK/DefaultSettings.cs                  | 2 +-
+ EloBuddy.SDK/EloBuddy.SDK.csproj | 4 ++--
+ EloBuddy.SDK/EntityManager.cs                    | 2 +-
+ EloBuddy.SDK/Extensions.cs                       | 2 +-
+ EloBuddy.SDK/HeroManager.cs                      | 2 +-
+ EloBuddy.SDK/Item.cs                             | 4 ++--
+ EloBuddy.SDK/Orbwalker.cs                        | 4 ++--
+ EloBuddy.SDK/Prediction.cs                       | 4 ++--
+ EloBuddy.SDK/Program.cs                          | 2 +-
+ EloBuddy.SDK/Properties/Resources.Designer.cs    | 4 ++--
+ EloBuddy.SDK/TargetSelector.cs                   | 4 ++--
+ 15 files changed, 21 insertions(+), 21 deletions(-)
+
+diff --git a/EloBuddy.SDK/Constants/AutoAttacks.cs b/EloBuddy.SDK/Constants/AutoAttacks.cs
+index e7c9d30..f6d82b4 100644
+--- a/EloBuddy.SDK/Constants/AutoAttacks.cs
++++ b/EloBuddy.SDK/Constants/AutoAttacks.cs
+@@ -1,7 +1,7 @@
+ ﻿using System.Collections.Generic;
+ using System.Linq;
+ 
+-namespace EloBuddy.SDK.Constants
++namespace EloBuddy.SDK.AddonDevelopers.Constants
+ {
+     public static class AutoAttacks
+     {
+diff --git a/EloBuddy.SDK/Constants/ObjectNames.cs b/EloBuddy.SDK/Constants/ObjectNames.cs
+index 9f8abfe..0ec520c 100644
+--- a/EloBuddy.SDK/Constants/ObjectNames.cs
++++ b/EloBuddy.SDK/Constants/ObjectNames.cs
+@@ -1,6 +1,6 @@
+ ﻿using System.Linq;
+ 
+-namespace EloBuddy.SDK.Constants
++namespace EloBuddy.SDK.AddonDevelopers.Constants
+ {
+     public static class ObjectNames
+     {
+diff --git a/EloBuddy.SDK/Damage.cs b/EloBuddy.SDK/Damage.cs
+index 39624c5..5183477 100644
+--- a/EloBuddy.SDK/Damage.cs
++++ b/EloBuddy.SDK/Damage.cs
+@@ -3,7 +3,7 @@ using System.Collections.Generic;
+ using System.Linq;
+ using EloBuddy.SDK.Menu.Values;
+ 
+-namespace EloBuddy.SDK
++namespace EloBuddy.SDK.AddonDevelopers
+ {
+     internal class PrecalculatedAutoAttackDamage
+     {
+diff --git a/EloBuddy.SDK/DamageLibrary.cs b/EloBuddy.SDK/DamageLibrary.cs
+index 6f9c657..28245f4 100644
+--- a/EloBuddy.SDK/DamageLibrary.cs
++++ b/EloBuddy.SDK/DamageLibrary.cs
+@@ -7,7 +7,7 @@ using EloBuddy.SDK.Utils;
+ using Newtonsoft.Json;
+ using Newtonsoft.Json.Converters;
+ 
+-namespace EloBuddy.SDK
++namespace EloBuddy.SDK.AddonDevelopers
+ {
+     public static class DamageLibrary
+     {
+diff --git a/EloBuddy.SDK/DefaultSettings.cs b/EloBuddy.SDK/DefaultSettings.cs
+index 9e6b2e1..f49c48a 100644
+--- a/EloBuddy.SDK/DefaultSettings.cs
++++ b/EloBuddy.SDK/DefaultSettings.cs
+@@ -1,7 +1,7 @@
+ ﻿using System;
+ using System.IO;
+ 
+-namespace EloBuddy.SDK
++namespace EloBuddy.SDK.AddonDevelopers
+ {
+     public static class DefaultSettings
+     {
+diff --git a/EloBuddy.SDK/EloBuddy.SDK.csproj b/EloBuddy.SDK/EloBuddy.SDK.csproj
+index 6cb138c..0def435 100644
+--- a/EloBuddy.SDK/EloBuddy.SDK.csproj
++++ b/EloBuddy.SDK/EloBuddy.SDK.csproj
+@@ -7,8 +7,8 @@
+     <ProjectGuid>{A9FA1E1A-A88E-4085-B278-90DE9A9566E4}</ProjectGuid>
+     <OutputType>Exe</OutputType>
+     <AppDesignerFolder>Properties</AppDesignerFolder>
+-    <RootNamespace>EloBuddy.SDK</RootNamespace>
+-    <AssemblyName>EloBuddy.SDK</AssemblyName>
++    <RootNamespace>EloBuddy.SDK.AddonDevelopers</RootNamespace>
++    <AssemblyName>EloBuddy.SDK.AddonDevelopers</AssemblyName>
+     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+     <FileAlignment>512</FileAlignment>
+   </PropertyGroup>
+diff --git a/EloBuddy.SDK/EntityManager.cs b/EloBuddy.SDK/EntityManager.cs
+index aaa80e5..c795bc1 100644
+--- a/EloBuddy.SDK/EntityManager.cs
++++ b/EloBuddy.SDK/EntityManager.cs
+@@ -6,7 +6,7 @@ using SharpDX;
+ 
+ // ReSharper disable MemberHidesStaticFromOuterClass
+ 
+-namespace EloBuddy.SDK
++namespace EloBuddy.SDK.AddonDevelopers
+ {
+     public static class EntityManager
+     {
+diff --git a/EloBuddy.SDK/Extensions.cs b/EloBuddy.SDK/Extensions.cs
+index b1e619b..5db4531 100644
+--- a/EloBuddy.SDK/Extensions.cs
++++ b/EloBuddy.SDK/Extensions.cs
+@@ -3,7 +3,7 @@ using System.Collections.Generic;
+ using System.Linq;
+ using SharpDX;
+ 
+-namespace EloBuddy.SDK
++namespace EloBuddy.SDK.AddonDevelopers
+ {
+     public static partial class Extensions
+     {
+diff --git a/EloBuddy.SDK/HeroManager.cs b/EloBuddy.SDK/HeroManager.cs
+index 655b735..b348484 100644
+--- a/EloBuddy.SDK/HeroManager.cs
++++ b/EloBuddy.SDK/HeroManager.cs
+@@ -1,7 +1,7 @@
+ ﻿using System;
+ using System.Collections.Generic;
+ 
+-namespace EloBuddy.SDK
++namespace EloBuddy.SDK.AddonDevelopers
+ {
+     [Obsolete("HeroManager is deprecated and will be removed soon, use EntityManager.Heroes instead.")]
+     public class HeroManager
+diff --git a/EloBuddy.SDK/Item.cs b/EloBuddy.SDK/Item.cs
+index ab172bf..e913060 100644
+--- a/EloBuddy.SDK/Item.cs
++++ b/EloBuddy.SDK/Item.cs
+@@ -1,6 +1,6 @@
+ ﻿using System.Collections.Generic;
+ using System.Linq;
+-using EloBuddy.SDK.Properties;
++using EloBuddy.SDK.AddonDevelopers.Properties;
+ using Newtonsoft.Json;
+ using SharpDX;
+ 
+@@ -9,7 +9,7 @@ using SharpDX;
+ // ReSharper disable ClassCannotBeInstantiated
+ // ReSharper disable InconsistentNaming
+ 
+-namespace EloBuddy.SDK
++namespace EloBuddy.SDK.AddonDevelopers
+ {
+     public sealed class Item
+     {
+diff --git a/EloBuddy.SDK/Orbwalker.cs b/EloBuddy.SDK/Orbwalker.cs
+index 8f09fe0..e0c3387 100644
+--- a/EloBuddy.SDK/Orbwalker.cs
++++ b/EloBuddy.SDK/Orbwalker.cs
+@@ -1,14 +1,14 @@
+ using System;
+ using System.Collections.Generic;
+ using System.Linq;
+-using EloBuddy.SDK.Constants;
++using EloBuddy.SDK.AddonDevelopers.Constants;
+ using EloBuddy.SDK.Events;
+ using EloBuddy.SDK.Menu;
+ using EloBuddy.SDK.Menu.Values;
+ using EloBuddy.SDK.Rendering;
+ using SharpDX;
+ 
+-namespace EloBuddy.SDK
++namespace EloBuddy.SDK.AddonDevelopers
+ {
+     public static class Orbwalker
+     {
+diff --git a/EloBuddy.SDK/Prediction.cs b/EloBuddy.SDK/Prediction.cs
+index feb4880..49a73f6 100644
+--- a/EloBuddy.SDK/Prediction.cs
++++ b/EloBuddy.SDK/Prediction.cs
+@@ -1,7 +1,7 @@
+ using System;
+ using System.Collections.Generic;
+ using System.Linq;
+-using EloBuddy.SDK.Constants;
++using EloBuddy.SDK.AddonDevelopers.Constants;
+ using EloBuddy.SDK.Enumerations;
+ using EloBuddy.SDK.Menu;
+ using EloBuddy.SDK.Menu.Values;
+@@ -9,7 +9,7 @@ using SharpDX;
+ 
+ // ReSharper disable MemberHidesStaticFromOuterClass
+ 
+-namespace EloBuddy.SDK
++namespace EloBuddy.SDK.AddonDevelopers
+ {
+     public static class Prediction
+     {
+diff --git a/EloBuddy.SDK/Program.cs b/EloBuddy.SDK/Program.cs
+index 9f37277..848f95f 100644
+--- a/EloBuddy.SDK/Program.cs
++++ b/EloBuddy.SDK/Program.cs
+@@ -1,6 +1,6 @@
+ ﻿using EloBuddy.SDK.Events;
+ 
+-namespace EloBuddy.SDK
++namespace EloBuddy.SDK.AddonDevelopers
+ {
+     public static class Program
+     {
+diff --git a/EloBuddy.SDK/Properties/Resources.Designer.cs b/EloBuddy.SDK/Properties/Resources.Designer.cs
+index 26736b5..2082fab 100644
+--- a/EloBuddy.SDK/Properties/Resources.Designer.cs
++++ b/EloBuddy.SDK/Properties/Resources.Designer.cs
+@@ -8,7 +8,7 @@
+ // </auto-generated>
+ //------------------------------------------------------------------------------
+ 
+-namespace EloBuddy.SDK.Properties {
++namespace EloBuddy.SDK.AddonDevelopers.Properties {
+     using System;
+     
+     
+@@ -39,7 +39,7 @@ namespace EloBuddy.SDK.Properties {
+         internal static global::System.Resources.ResourceManager ResourceManager {
+             get {
+                 if (object.ReferenceEquals(resourceMan, null)) {
+-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("EloBuddy.SDK.Properties.Resources", typeof(Resources).Assembly);
++                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("EloBuddy.SDK.AddonDevelopers.Properties.Resources", typeof(Resources).Assembly);
+                     resourceMan = temp;
+                 }
+                 return resourceMan;
+diff --git a/EloBuddy.SDK/TargetSelector.cs b/EloBuddy.SDK/TargetSelector.cs
+index 998c6ce..00c5002 100644
+--- a/EloBuddy.SDK/TargetSelector.cs
++++ b/EloBuddy.SDK/TargetSelector.cs
+@@ -1,7 +1,7 @@
+ ﻿using System;
+ using System.Collections.Generic;
+ using System.Linq;
+-using EloBuddy.SDK.Properties;
++using EloBuddy.SDK.AddonDevelopers.Properties;
+ using EloBuddy.SDK.Enumerations;
+ using EloBuddy.SDK.Menu;
+ using EloBuddy.SDK.Menu.Values;
+@@ -10,7 +10,7 @@ using EloBuddy.SDK.Utils;
+ using Newtonsoft.Json;
+ using SharpDX;
+ 
+-namespace EloBuddy.SDK
++namespace EloBuddy.SDK.AddonDevelopers
+ {
+     public static class TargetSelector
+     {
+-- 
+1.9.4.msysgit.2
+

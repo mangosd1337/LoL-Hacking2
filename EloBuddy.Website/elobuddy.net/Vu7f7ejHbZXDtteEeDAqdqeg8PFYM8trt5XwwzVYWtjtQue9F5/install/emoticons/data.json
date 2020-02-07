@@ -1,0 +1,86 @@
+{
+  ">:(": {
+    "image": "angry.png",
+    "image_2x": "angry@2x.png"
+  },
+  ":D": {
+    "image": "biggrin.png",
+    "image_2x": "biggrin@2x.png"
+  },
+  "O.o": {
+    "image": "blink.png",
+    "image_2x": "blink@2x.png"
+  },
+  ":$": {
+    "image": "blush.png",
+    "image_2x": "blush@2x.png"
+  },
+  "B|": {
+    "image": "cool.png",
+    "image_2x": "cool@2x.png"
+  },
+  "¬¬": {
+    "image": "dry.png",
+    "image_2x": "dry@2x.png"
+  },
+  "^_^": {
+    "image": "happy.png",
+    "image_2x": "happy@2x.png"
+  },
+  "o.O": {
+    "image": "huh.png",
+    "image_2x": "huh@2x.png"
+  },
+  "xD": {
+    "image": "laugh.png",
+    "image_2x": "laugh@2x.png"
+  },
+  ":|": {
+    "image": "mellow.png",
+    "image_2x": "mellow@2x.png"
+  },
+  ":o": {
+    "image": "ohmy.png",
+    "image_2x": "ohmy@2x.png"
+  },
+  ":ph34r:": {
+    "image": "ph34r.png",
+    "image_2x": "ph34r@2x.png"
+  },
+  "9_9": {
+    "image": "rolleyes.gif",
+    "image_2x": "rolleyes@2x.png"
+  },
+  ":(": {
+    "image": "sad.png",
+    "image_2x": "sad@2x.png"
+  },
+  "-_-": {
+    "image": "sleep.png",
+    "image_2x": "sleep@2x.png"
+  },
+  ":)": {
+    "image": "smile.png",
+    "image_2x": "smile@2x.png"
+  },
+  ":P": {
+    "image": "tongue.png",
+    "image_2x": "tongue@2x.png"
+  },
+  ":/": {
+    "image": "unsure.png",
+    "image_2x": "unsure@2x.png"
+  },
+  ":S": {
+    "image": "wacko.png",
+    "image_2x": "wacko@2x.png"
+  },
+  ";)": {
+    "image": "wink.png",
+    "image_2x": "wink@2x.png"
+  },
+  ":x": {
+    "image": "wub.png",
+    "image_2x": "wub@2x.png"
+  }
+}

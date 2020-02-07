@@ -1,0 +1,255 @@
+[*] League of Legends Client Update Tool
+[*] By finndev for EloBuddy
+[*] Started at: 2015-10-21 15:23:34.594000
+----------------------------
+enum class ClientFacade
+{
+   NetApiClient = 0x01549064,
+   NetApiNode = 0x00000000, // Unknown
+   GameState = 0x0154e718,
+   ProcessWorldEvent = 0x00bca860,
+};
+
+
+enum class Game
+{
+   Hud_OnDisconnect = 0x00e2d800,
+   Hud_OnAfk = 0x00c811b0,
+   ClientMainLoop = 0x005f0080,
+   DispatchEvent = 0x0098ce1a,
+
+   BuildDate = 0x00000000, // Unknown
+   BuildTime = BuildDate + 0xC,
+   BuildVersion = BuildTime + 0xC,
+   BuildType = BuildVersion + 0xC,
+   MovementCheck = 0x00000000, // Unknown
+   IsWindowFocused = 0x00000000, // Unknown
+
+   OnWndProc = 0x00000000, // Unknown
+   CRepl32InfoUpdatePacket = 0x00000000, // Unknown
+
+   PingNOP1 = 0x00000000, // Unknown
+   PingNOP2 = 0x00000000, // Unknown
+};
+
+
+enum class MissionInfo
+{
+   MissionInfoInst = 0x01548d40,
+   DrawTurretRange = 0x00713720,
+};
+
+
+enum class RiotClock
+{
+   RiotClockInst = 0x031df840,
+};
+
+
+enum class ObjectManager
+{
+   LocalPlayer = 0x00000000, // Unknown
+
+   ObjectList = 0x031cb808,
+   MaxSize = ObjectList + 0x4,
+   UsedIndexes = ObjectList + 0x8,
+   HighestObjectId = ObjectList + 0xC,
+   HighestPlayerObjectId = ObjectList + 0x10,
+
+   CreateObject = 0x00a57d70,
+   AssignNetworkId = 0x00bd4bb0,
+   DestroyObject = 0x008048e0,
+   ApplySkin = 0x00e9b6c0,
+};
+
+
+enum class Actor_Common
+{
+   SetPath = 0x0084e7a0,
+   CreatePath = 0x00f601e0,
+   CreatePathInner = 0x0107bac0,
+   SmoothPath = 0x00b720d0,
+};
+
+
+enum class NavMesh
+{
+   NavMeshController = 0x00000000, // Unknown
+   GetHeightForPosition = 0x007bae90,
+   IsWallOfGrass = 0x00970a00,
+};
+
+
+enum class GameObjectFunctions
+{
+   OnDamage = 0x00f3de50,
+   GetBaseDrawPosition = 0x0098f0a0,
+   FOWRecall = 0x00c02a10,
+   OnLevelUp = 0x009bfc10,
+   SetSkin = 0x00000000, // Unknown
+   IssueOrder = 0x00a06020,
+   PlayAnimation = 0x00dcbd80,
+   OnDoCast = 0x00ece8f0,
+   CaptureTurret = 0x00c2b0a0,
+};
+
+
+enum class SpellHelper
+{
+   ComputeCharacterAttackCastDelay = 0x007c0300,
+   ComputeCharacterAttackDelay = 0x0095d1c0,
+   GetBasicAttack = 0x00db72e0,
+};
+
+
+enum class BuffManager
+{
+   BuffManagerInst = 0x00000000, // Unknown
+   BaseScriptbuff = 0x00d447b0,
+};
+
+
+enum class Spellbook
+{
+   SpellbookstInst = 0x00000000, // Unknown
+   Client_DoCastSpell = 0x00698710,
+   Client_LevelSpell = 0x00584b20,
+   Client_GetSpellstate = 0x0104d410,
+   Client_UpdateChargeableSpell = 0x0069ab60,
+   Client_ForceStop = 0x00b8dad0,
+   Client_SpellSlotCanBeUpgraded = 0x006d3320,
+
+   ProcessCastSpell = 0x0104da60,
+   OnCommonAutoAttack = 0x0104dbc0,
+   OnApplyCD = 0x00bc20d0,
+};
+
+
+enum class HeroInventory
+{
+   Inventory = 0x00000000, // Unknown
+   BuyItem = 0x00986660,
+   SellItem = 0x009b1990,
+   SwapItem = 0x00c45d40,
+   InventoryPointer = 0x00000198,
+};
+
+
+enum class pwHud
+{
+   pwHud_Instance = 0x01548d5c,
+   pwHud_OnDraw = 0x0099f370,
+   SetUISelectedObjId = 0x00a2b770,
+
+   NOP_pwHud_DisableDrawing = 0x00cf00f7,
+   NOP_pwHud_DisableHPBarDrawing = 0x0099f4b8,
+   NOP_MenuGUI_DisableDrawing = 0x0103ef00,
+   NOP_MenuGUI_DisableMiniMap = 0x0103ee9f,
+};
+
+
+enum class MenuGUI
+{
+   MenuGUI_Instance = 0x031cc278,
+   DoEmote = 0x006424c0,
+   PingMiniMap = 0x00ba3110,
+   CallCurrentPing = 0x00c0ba80,
+};
+
+
+enum class pwConsole
+{
+   ShowClientSideMessage = 0x008b44e0,
+   OnInput = 0x00a34760,
+   ProcessCommand = 0x00f48380,
+   pwClose = 0x00a473d0,
+   pwOpen = 0x00db5520,
+};
+
+
+enum class HudManager
+{
+   HudManagerInst = 0x0154eba0,
+};
+
+
+enum class HeroStats
+{
+   HeroStatsInst = 0x00000000, // Unknown
+   GetHeroStats = 0x00e546f0,
+};
+
+
+enum class r3dRenderer
+{
+   r3dRendererInstance = 0x00000000, // Unknown
+   DrawCircularRangeIndicator = 0x005b4120,
+   r3dScreenTo3D = 0x00edeea0,
+   r3dProjectToScreen = 0x00bd37e0,
+};
+
+
+enum class TacticalMap
+{
+   ToWorldCoord = 0x0070f240,
+   ToMapCoord = 0x008bf940,
+};
+
+
+enum class RiotAsset
+{
+   AssetExists = 0x00f87a20,
+};
+
+
+enum class BuffHost
+{
+   BuffAddRemove = 0x00eedef0,
+};
+
+
+enum class Experience
+{
+   XPToNextLevel = 0x00f51220,
+   XPToCurrentLevel = 0x007f7fe0,
+};
+
+
+enum class HudGameChatObject
+{
+   HudGameChatObject = 0x00813770,
+   SetScale = 0x005d83a0,
+};
+
+
+enum class RiotString
+{
+   TranslateString = 0x00c44410,
+};
+
+
+enum class AudioManager
+{
+   PlaySound = 0x00726910,
+};
+
+
+enum class RiotX3D
+{
+   Reset = 0x0081e4a0,
+   BeginScene = 0x00c705a0,
+   Present = 0x00b14120,
+   EndScene = 0x00a34cd0,
+   SetRenderTarget = 0x00c06600,
+};
+
+
+enum class TeemoClient
+{
+   ComputeChecksum = 0x00a3cdb0,
+   B_ModulesVerified = 0x00000000, // Unknown
+};
+
+
+----------------------------
+[*] Finished

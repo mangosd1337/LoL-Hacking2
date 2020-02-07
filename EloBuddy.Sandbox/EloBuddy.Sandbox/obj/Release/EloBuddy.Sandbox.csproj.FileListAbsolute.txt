@@ -1,0 +1,7 @@
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Sandbox\workspace\EloBuddy.Sandbox\bin\Release\EloBuddy.Sandbox.dll.config
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Sandbox\workspace\EloBuddy.Sandbox\bin\Release\EloBuddy.Sandbox.dll
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Sandbox\workspace\EloBuddy.Sandbox\bin\Release\EloBuddy.Sandbox.pdb
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Sandbox\workspace\EloBuddy.Sandbox\bin\Release\EloBuddy.dll
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Sandbox\workspace\EloBuddy.Sandbox\obj\Release\EloBuddy.Sandbox.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Sandbox\workspace\EloBuddy.Sandbox\obj\Release\EloBuddy.Sandbox.dll
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Sandbox\workspace\EloBuddy.Sandbox\obj\Release\EloBuddy.Sandbox.pdb

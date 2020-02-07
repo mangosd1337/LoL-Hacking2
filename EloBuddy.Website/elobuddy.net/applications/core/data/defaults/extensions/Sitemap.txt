@@ -1,0 +1,70 @@
+<?php
+/**
+ * @brief		Support {class} in sitemaps
+ * @author		<a href='http://www.invisionpower.com'>Invision Power Services, Inc.</a>
+ * @copyright	(c) 2001 - 2016 Invision Power Services, Inc.
+ * @license		http://www.invisionpower.com/legal/standards/
+ * @package		IPS Community Suite
+{subpackage}
+ * @since		{date}
+ * @version		SVN_VERSION_NUMBER
+ */
+
+namespace IPS\{app}\extensions\core\Sitemap;
+
+/* To prevent PHP errors (extending class does not exist) revealing path */
+if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) )
+{
+	header( ( isset( $_SERVER['SERVER_PROTOCOL'] ) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0' ) . ' 403 Forbidden' );
+	exit;
+}
+
+/**
+ * Support {class} in sitemaps
+ */
+class _{class}
+{
+	/**
+	 * @brief	Recommended Settings
+	 */
+	public $recommendedSettings = array();
+
+	/**
+	 * Add settings for ACP configuration to the form
+	 *
+	 * @return	array
+	 */
+	public function settings()
+	{
+	}
+
+	/**
+	 * Check to see if any settings this extension provides options for have been modified from their default values
+	 *
+	 * @return	bool
+	 */
+	public function hasModifiedSettings()
+	{
+	}
+
+	/**
+	 * Get the sitemap filename(s)
+	 *
+	 * @return	array
+	 */
+	public function getFilenames()
+	{
+		return array( 'sitemap_' . mb_strtolower('{class}') );
+	}
+
+	/**
+	 * Generate the sitemap
+	 *
+	 * @param	string			$filename	The sitemap file to build (should be one returned from getFilenames())
+	 * @param	\IPS\Sitemap	$sitemap	Sitemap object reference
+	 * @return	void
+	 */
+	public function generateSitemap( $filename, $sitemap )
+	{
+	}
+}

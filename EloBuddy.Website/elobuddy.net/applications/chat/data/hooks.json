@@ -1,0 +1,14 @@
+{
+    "tabCountLoad": {
+        "type": "C",
+        "class": "\\IPS\\Data\\Store\\Database"
+    },
+    "tabNewWindow": {
+        "type": "C",
+        "class": "\\IPS\\Dispatcher\\Front"
+    },
+    "tabCount": {
+        "type": "C",
+        "class": "\\IPS\\Dispatcher\\Front"
+    }
+}

@@ -1,0 +1,82 @@
+Build started 9/15/2015 12:17:16 PM.
+__________________________________________________
+Project "C:\Users\Administrator\AppData\Roaming\EloBuddy\Temp\temp_project_EloBuddy.TestRepo_30126F75\EloBuddy.TestRepo.csproj" (default targets):
+
+Target PrepareForBuild:
+    Creating directory "bin\Release\".
+    Creating directory "obj\Release\".
+Target ResolveAssemblyReferences:
+    Primary reference "EloBuddy".
+    C:\Windows\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.targets(1605,5): warning MSB3245: Could not resolve this reference. Could not locate the assembly "EloBuddy". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.
+            For SearchPath "{HintPathFromItem}".
+            Considered "C:\Users\Administrator\AppData\Roaming\EloBuddy\Assemblies\EloBuddy.dll", but it didn't exist.
+            For SearchPath "{TargetFrameworkDirectory}".
+            Considered "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\EloBuddy.winmd", but it didn't exist.
+            Considered "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\EloBuddy.dll", but it didn't exist.
+            Considered "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\EloBuddy.exe", but it didn't exist.
+            Considered "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\EloBuddy.winmd", but it didn't exist.
+            Considered "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\EloBuddy.dll", but it didn't exist.
+            Considered "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Facades\EloBuddy.exe", but it didn't exist.
+            For SearchPath "{Registry:Software\Microsoft\.NETFramework,v4.5,AssemblyFoldersEx}".
+            Considered AssemblyFoldersEx locations.
+            For SearchPath "{AssemblyFolders}".
+            Considered "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\v3.0\EloBuddy.winmd", but it didn't exist.
+            Considered "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\v3.0\EloBuddy.dll", but it didn't exist.
+            Considered "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\v3.0\EloBuddy.exe", but it didn't exist.
+            Considered "C:\Program Files (x86)\Microsoft SQL Server\110\SDK\Assemblies\EloBuddy.winmd", but it didn't exist.
+            Considered "C:\Program Files (x86)\Microsoft SQL Server\110\SDK\Assemblies\EloBuddy.dll", but it didn't exist.
+            Considered "C:\Program Files (x86)\Microsoft SQL Server\110\SDK\Assemblies\EloBuddy.exe", but it didn't exist.
+            Considered "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\v3.5\EloBuddy.winmd", but it didn't exist.
+            Considered "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\v3.5\EloBuddy.dll", but it didn't exist.
+            Considered "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\v3.5\EloBuddy.exe", but it didn't exist.
+            For SearchPath "{GAC}".
+            Considered "EloBuddy", which was not found in the GAC.
+            For SearchPath "{RawFileName}".
+            Considered treating "EloBuddy" as a file name, but it didn't exist.
+            For SearchPath "bin\Release\".
+            Considered "bin\Release\EloBuddy.winmd", but it didn't exist.
+            Considered "bin\Release\EloBuddy.dll", but it didn't exist.
+            Considered "bin\Release\EloBuddy.exe", but it didn't exist.
+    AssemblyFoldersEx location: "{Registry:Software\Microsoft\.NETFramework,v4.5,AssemblyFoldersEx}"
+            C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\ReferenceAssemblies\v4.5\
+            C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\PublicAssemblies\
+            C:\Program Files (x86)\Microsoft.NET\Primary Interop Assemblies\
+            C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\.NETFramework\v4.0\4.3.0.0\Type Providers\
+            C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\.NETFramework\v4.0\4.3.0.0\
+            C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\.NETFramework\v4.0\4.3.1.0\
+            C:\Program Files (x86)\Microsoft SDKs\Expression\Blend\.NETFramework\v4.5\Prototyping\Libraries\
+            C:\Program Files (x86)\Microsoft SDKs\Expression\Blend\.NETFramework\v4.5\Libraries\
+            C:\Program Files (x86)\Microsoft WCF Data Services\5.6\bin\.NETFramework\
+            C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\ReferenceAssemblies\v4.0\
+            c:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\Platforms\x64\
+            c:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\Platforms\Win32\
+            c:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\Platforms\Itanium\
+            C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V110\
+            C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\.NETFramework\v4.0\4.3.0.0\Type Providers\
+            C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\.NETFramework\v4.0\4.3.0.0\
+            C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\.NETFramework\v4.0\4.3.1.0\
+            C:\Program Files (x86)\Microsoft SDKs\Expression\Blend\.NETFramework\v4.0\Prototyping\Libraries\
+            C:\Program Files (x86)\Microsoft SDKs\Expression\Blend\.NETFramework\v4.0\Libraries\
+            
+            C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\ReferenceAssemblies\v2.0\
+            C:\Program Files (x86)\Common Files\Microsoft Shared\MSEnv\PublicAssemblies\
+            C:\Program Files (x86)\Microsoft Chart Controls\Assemblies
+            C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\.NETFramework\v2.0\2.3.0.0\
+Done building target "ResolveAssemblyReferences" in project "EloBuddy.TestRepo.csproj".
+Target GenerateTargetFrameworkMonikerAttribute:
+  Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+Target CoreCompile:
+    C:\Windows\Microsoft.NET\Framework\v4.0.30319\Csc.exe /noconfig /nowarn:1701,1702 /nostdlib+ /platform:anycpu32bitpreferred /errorreport:prompt /warn:4 /define:TRACE /highentropyva+ /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Microsoft.CSharp.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\mscorlib.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Core.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.DataSetExtensions.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.Linq.dll" /debug:pdbonly /filealign:512 /optimize+ /out:obj\Release\EloBuddy.TestRepo.exe /subsystemversion:6.00 /target:exe /utf8output Program.cs Properties\AssemblyInfo.cs "C:\Users\Administrator\AppData\Local\Temp\2\.NETFramework,Version=v4.5.AssemblyAttributes.cs"
+    Program.cs(14,13): error CS0103: The name 'Chat' does not exist in the current context
+Done building target "CoreCompile" in project "EloBuddy.TestRepo.csproj" -- FAILED.
+
+Done building project "EloBuddy.TestRepo.csproj" -- FAILED.
+
+Build FAILED.
+
+C:\Windows\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.targets(1605,5): warning MSB3245: Could not resolve this reference. Could not locate the assembly "EloBuddy". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.
+Program.cs(14,13): error CS0103: The name 'Chat' does not exist in the current context
+    1 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:00.04

@@ -1,0 +1,15 @@
+[
+    {
+        "sc_key": "forum_layout",
+        "sc_type": "Select",
+        "sc_multiple": 0,
+        "sc_content": "[{\"key\":\"grid\",\"value\":\"Grid View\"},{\"key\":\"traditional\",\"value\":\"Traditional List\"}]",
+        "sc_app": "forums",
+        "sc_default": "traditional",
+        "sc_tab_key": "custom",
+        "sc_show_in_vse": 1,
+        "sc_title": "themesetting_forum_layout",
+        "sc_order": 5,
+        "sc_condition": null
+    }
+]

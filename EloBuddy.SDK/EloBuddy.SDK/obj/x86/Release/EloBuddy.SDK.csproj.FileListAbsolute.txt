@@ -1,0 +1,12 @@
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.SDK\workspace\EloBuddy.SDK\bin\Release\EloBuddy.SDK.dll
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.SDK\workspace\EloBuddy.SDK\bin\Release\EloBuddy.SDK.pdb
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.SDK\workspace\EloBuddy.SDK\bin\Release\EloBuddy.dll
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.SDK\workspace\EloBuddy.SDK\bin\Release\Newtonsoft.Json.dll
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.SDK\workspace\EloBuddy.SDK\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.SDK\workspace\EloBuddy.SDK\bin\Release\SharpDX.dll
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.SDK\workspace\EloBuddy.SDK\obj\x86\Release\EloBuddy.SDK.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.SDK\workspace\EloBuddy.SDK\obj\x86\Release\EloBuddy.SDK.Properties.Resources.resources
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.SDK\workspace\EloBuddy.SDK\obj\x86\Release\EloBuddy.SDK.csproj.GenerateResource.Cache
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.SDK\workspace\EloBuddy.SDK\obj\x86\Release\EloBuddy.SDK.dll
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.SDK\workspace\EloBuddy.SDK\obj\x86\Release\EloBuddy.SDK.pdb
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.SDK\workspace\EloBuddy.SDK\bin\Release\EloBuddy.Sandbox.dll

@@ -1,0 +1,16 @@
+<ips:template parameters="$title, $message, $code, $backtrace, $showContinueUrl=false, $retryUrl=false" />
+{{$mr = isset( \IPS\Request::i()->mr ) ? json_decode( urldecode( base64_decode( \IPS\Request::i()->mr ) ), true ) : array();}}
+<div class='ipsMessage ipsMessage_error'>
+	<span class="ipsMessage_code">{$code}</span>
+	{lang="$message"}
+	<br />
+	{{if is_array($mr) and count($mr)}}
+	<small>{lang="location"}: {lang="step" sprintf="\IPS\Dispatcher::i()->step ?: 1"} {$mr[0]}. {lang="application"}: {expression="ucfirst($mr[1])"}</small>
+	{{endif}}
+</div>
+{{if $retryUrl}}
+<a href="$retryUrl" class='ipsButton'>{lang="retry"}</a>
+{{endif}}
+{{if $showContinueUrl}}
+<a href="$showContinueUrl" class='ipsButton'>{lang="continue"}</a>
+{{endif}}

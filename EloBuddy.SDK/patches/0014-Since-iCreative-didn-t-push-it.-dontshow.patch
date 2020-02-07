@@ -1,0 +1,115 @@
+From fe3ae350c2e2beef2f892a998d18a0ea8251dd27 Mon Sep 17 00:00:00 2001
+From: Hellsing <matrix11@gmx.net>
+Date: Sun, 7 Feb 2016 03:48:36 +0100
+Subject: [PATCH 14/14] Since iCreative didn't push it... #dontshow
+
+---
+ EloBuddy.SDK/Damage.cs | 66 +++-------------------------------
+ 1 file changed, 4 insertions(+), 62 deletions(-)
+
+diff --git a/EloBuddy.SDK/Damage.cs b/EloBuddy.SDK/Damage.cs
+index d2a1ec6..2ac8633 100644
+--- a/EloBuddy.SDK/Damage.cs
++++ b/EloBuddy.SDK/Damage.cs
+@@ -18,16 +18,8 @@ namespace EloBuddy.SDK.AddonDevelopers
+ 
+     public static class Damage
+     {
+-        private static readonly Dictionary<float, Tuple<float, float>> CachedPhysicalAutoAttackDamage = new Dictionary<float, Tuple<float, float>>();
+-        private static readonly Dictionary<float, Tuple<float, float>> CachedMagicalAutoAttackDamage = new Dictionary<float, Tuple<float, float>>();
+-
+         static Damage()
+         {
+-            Game.OnTick += delegate
+-            {
+-                CachedPhysicalAutoAttackDamage.Clear();
+-                CachedMagicalAutoAttackDamage.Clear();
+-            };
+         }
+ 
+         internal static bool IsSiegeMinion(this Obj_AI_Base minion)
+@@ -234,8 +226,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+                     if (fromHero.GetBuffCount("dianapassivemarker") == 2)
+                     {
+                         precalculated.RawMagical +=
+-                            (new[]
+-                            { 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 105, 120, 135, 155, 175, 200, 225, 250 })[
++                            (new[] { 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 105, 120, 135, 155, 175, 200, 225, 250 })[
+                                 fromHero.Level - 1] + 0.8f * fromHero.FlatMagicDamageMod;
+                     }
+                     break;
+@@ -475,8 +466,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+                     if (fromHero.HasBuff("sonapassiveattack"))
+                     {
+                         precalculated.RawMagical +=
+-                            new[]
+-                            { 13, 20, 27, 35, 43, 52, 62, 72, 82, 92, 102, 112, 122, 132, 147, 162, 177, 192 }[
++                            new[] { 13, 20, 27, 35, 43, 52, 62, 72, 82, 92, 102, 112, 122, 132, 147, 162, 177, 192 }[
+                                 fromHero.Level - 1] + 0.2f * fromHero.FlatMagicDamageMod;
+                     }
+                     break;
+@@ -912,59 +902,11 @@ namespace EloBuddy.SDK.AddonDevelopers
+             }
+             if (rawPhysicalDamage > 0f)
+             {
+-                if (fromHero.IsMe)
+-                {
+-                    if (!CachedPhysicalAutoAttackDamage.ContainsKey(target.MaxHealth))
+-                    {
+-                        CachedPhysicalAutoAttackDamage.Add(target.MaxHealth,
+-                            new Tuple<float, float>(rawPhysicalDamage, fromHero.CalculateDamageOnUnit(target, DamageType.Physical, rawPhysicalDamage, false,
+-                                precalculated.AutoAttackDamageType == DamageType.Physical)));
+-                        calculatedPhysicalDamage += CachedPhysicalAutoAttackDamage[target.MaxHealth].Item2;
+-                    }
+-                    else
+-                    {
+-                        if (Math.Abs(CachedPhysicalAutoAttackDamage[target.MaxHealth].Item1 - rawPhysicalDamage) < float.Epsilon)
+-                        {
+-                            calculatedPhysicalDamage += CachedPhysicalAutoAttackDamage[target.MaxHealth].Item2;
+-                        }
+-                        else
+-                        {
+-                            calculatedPhysicalDamage += fromHero.CalculateDamageOnUnit(target, DamageType.Physical, rawPhysicalDamage, false, precalculated.AutoAttackDamageType == DamageType.Physical);
+-                        }
+-                    }
+-                }
+-                else
+-                {
+-                    calculatedPhysicalDamage += fromHero.CalculateDamageOnUnit(target, DamageType.Physical, rawPhysicalDamage, false, precalculated.AutoAttackDamageType == DamageType.Physical);
+-                }
++                calculatedPhysicalDamage += fromHero.CalculateDamageOnUnit(target, DamageType.Physical, rawPhysicalDamage, false, precalculated.AutoAttackDamageType == DamageType.Physical);
+             }
+             if (rawMagicalDamage > 0f)
+             {
+-                if (fromHero.IsMe)
+-                {
+-                    if (!CachedMagicalAutoAttackDamage.ContainsKey(target.MaxHealth))
+-                    {
+-                        CachedMagicalAutoAttackDamage.Add(target.MaxHealth,
+-                            new Tuple<float, float>(rawMagicalDamage,
+-                                fromHero.CalculateDamageOnUnit(target, DamageType.Magical, rawMagicalDamage, false, precalculated.AutoAttackDamageType == DamageType.Magical)));
+-                        calculatedMagicalDamage += CachedMagicalAutoAttackDamage[target.MaxHealth].Item2;
+-                    }
+-                    else
+-                    {
+-                        if (Math.Abs(CachedMagicalAutoAttackDamage[target.MaxHealth].Item1 - rawMagicalDamage) < float.Epsilon)
+-                        {
+-                            calculatedMagicalDamage += CachedMagicalAutoAttackDamage[target.MaxHealth].Item2;
+-                        }
+-                        else
+-                        {
+-                            calculatedMagicalDamage += fromHero.CalculateDamageOnUnit(target, DamageType.Magical, rawMagicalDamage, false, precalculated.AutoAttackDamageType == DamageType.Magical);
+-                        }
+-                    }
+-                }
+-                else
+-                {
+-                    calculatedMagicalDamage += fromHero.CalculateDamageOnUnit(target, DamageType.Magical, rawMagicalDamage, false, precalculated.AutoAttackDamageType == DamageType.Magical);
+-                }
++                calculatedMagicalDamage += fromHero.CalculateDamageOnUnit(target, DamageType.Magical, rawMagicalDamage, false, precalculated.AutoAttackDamageType == DamageType.Magical);
+             }
+             var percentMod = 1f;
+             if (Math.Abs(fromHero.FlatCritChanceMod - 1f) < float.Epsilon || guaranteedCriticalStrike)
+-- 
+1.9.4.msysgit.2
+

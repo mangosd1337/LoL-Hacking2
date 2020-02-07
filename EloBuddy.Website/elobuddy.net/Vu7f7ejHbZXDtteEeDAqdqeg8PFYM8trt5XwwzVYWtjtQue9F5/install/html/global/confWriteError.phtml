@@ -1,0 +1,15 @@
+<ips:template parameters="$form, $path" />
+<div class='ipsMessage ipsMessage_error'>
+	{lang="confglobal_make" sprintf="$path"}
+</div>
+{{if ! file_exists( $path . '/conf_global.php')}}
+<p>
+{lang="confglobal_note" sprintf="$path"}
+<br />{lang="confglobal_write"}
+</p>
+{{else}}
+<p>
+{lang="confglobal_777"}
+</p>
+{{endif}}
+{$form|raw}

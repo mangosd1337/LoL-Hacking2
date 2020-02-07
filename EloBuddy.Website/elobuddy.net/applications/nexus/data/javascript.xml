@@ -1,0 +1,1501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<javascript app="nexus">
+ <file javascript_app="nexus" javascript_location="front" javascript_path="controllers/checkout" javascript_name="ips.checkout.billingForm.js" javascript_type="controller" javascript_version="101030" javascript_position="1000050"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.checkout.billingAddress.js
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('nexus.front.checkout.billingForm', {
+		
+		initialize: function () {
+			this.on( 'click', '[data-action="changeShippingAddress"]', this.newShippingAddress );
+			//this.setup();
+		},
+		
+		setup: function () {
+			
+		},
+
+		newShippingAddress: function (e) {
+			e.preventDefault();
+			var url = this.scope.attr('data-new-billing-address-url');
+
+			var dialogRef = ips.ui.dialog.create({
+				title: ips.getString('changeShippingAddress'),
+				fixed: false,
+			    url: url,
+			    size: 'medium'
+			});
+			dialogRef.show();
+		},
+		
+		updateSelectedAddress: function ( val, dialogUrl ) {
+			if ( val == 0 ) {
+				
+				var dialogRef = ips.ui.dialog.create({
+					title: '',
+					fixed: false,
+				    url: dialogUrl
+				});
+				dialogRef.show();
+				
+			} else {
+				window.location = window.location + '&shipping_address=' + val;
+			}
+		}
+		
+				
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="nexus" javascript_location="front" javascript_path="controllers/checkout" javascript_name="ips.checkout.register.js" javascript_type="controller" javascript_version="101030" javascript_position="1000050">/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.checkout.register.js - Register form during checkout
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.register('nexus.front.checkout.register', {
+
+		initialize: function () {
+			this.on( 'click', '[data-action=&quot;newMember&quot;]', this.showRegistrationForm );
+			if ( $(this.scope).attr('data-regform') ) {
+				this._showRegistrationForm();
+			} else {
+				console.log(this.scope);
+			}
+		},
+
+		showRegistrationForm: function (e) {
+			e.preventDefault();
+			this._showRegistrationForm();
+		},
+		
+		_showRegistrationForm: function() {
+			this.scope.find('[data-role=&quot;memberChoice&quot;]').hide();
+			this.scope.find('[data-role=&quot;newCustomerForm&quot;]').show();
+		}
+	});
+}(jQuery, _));</file>
+ <file javascript_app="nexus" javascript_location="front" javascript_path="controllers/checkout" javascript_name="ips.checkout.review.js" javascript_type="controller" javascript_version="101030" javascript_position="1000050">/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.checkout.review.js - Review page in checkout process
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.register('nexus.front.checkout.review', {
+
+		initialize: function () {
+			this.on( 'submit', '[data-role=&quot;couponForm&quot;]', this.submitCoupon );
+			this.setup();
+		},
+
+		setup: function () {
+			var button = this.scope.find('[data-role=&quot;couponForm&quot;] button[type=&quot;submit&quot;]');
+			var textbox = this.scope.find('[data-role=&quot;couponForm&quot;] input[type=&quot;text&quot;]');
+
+			button.prop('disabled', true);
+			textbox.on('keyup', function (e) {
+				button.prop( 'disabled', false );
+			});
+		},
+
+		submitCoupon: function (e) {
+			e.preventDefault();
+		}
+	});
+}(jQuery, _));</file>
+ <file javascript_app="nexus" javascript_location="front" javascript_path="controllers/checkout" javascript_name="ips.checkout.shippingForm.js" javascript_type="controller" javascript_version="101030" javascript_position="1000050">/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.checkout.shippingForm.js - Address book for shipping form
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.register('nexus.front.checkout.shippingForm', {
+
+		initialize: function () {
+			this.on( 'change', 'select', this.selectNew );
+			this.on( 'keypress', 'input[type=&quot;text&quot;]', this.selectNew );
+		},
+
+		selectNew: function () {
+			this.scope.find('[name=&quot;shipping_address&quot;][value=&quot;0&quot;]').prop( 'checked', true );
+		}
+	});
+}(jQuery, _));</file>
+ <file javascript_app="nexus" javascript_location="front" javascript_path="controllers/clients" javascript_name="ips.clients.referrals.js" javascript_type="controller" javascript_version="101030" javascript_position="1000100">/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.clients.referrals.js - Referrals section
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.register('nexus.front.clients.referrals', {
+
+		initialize: function () {
+			this.on( 'focus', 'input[type=&quot;text&quot;]', this.focusText );
+		},
+
+		/**
+		 * Focus in a txt field
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		focusText: function (e) {
+			e.preventDefault();
+			e.currentTarget.select();
+		}
+	});
+}(jQuery, _));</file>
+ <file javascript_app="nexus" javascript_location="global" javascript_path="controllers/gateways" javascript_name="ips.gateways.authorizenet.js" javascript_type="controller" javascript_version="101030" javascript_position="1000050"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.gateways.authorizenet.js - Authorize.Net DPM controller
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('nexus.global.gateways.authorizenet', {
+		
+		/**
+		 * Init
+		 */
+		initialize: function () {
+			this.on( $(this.scope).closest('form')[0], 'submit', this.submitForm );
+			this.setup();
+		},
+		
+		/**
+		 * Init
+		 */
+		setup: function(){
+			this.scope.show();
+		},
+		
+		/**
+		 * Submit form action
+		 *
+		 * @param		{event} 	e 		Event object
+		 * @returns 	{void}
+		 */
+		submitForm: function(e) {
+			if ( !$(e.currentTarget).find( 'input[name="payment_method"]' ).length || $(e.currentTarget).find( 'input[name="payment_method"][value="' + $(this.scope).attr('data-id') + '"]' ).is(':checked') ) {
+				
+				e.stopPropagation();
+				
+				var data = $.parseJSON( $(this.scope).attr('data-fields') );
+				var i;
+				for ( i in data )
+				{
+					$( e.currentTarget ).append( $('<input type="hidden">').attr( 'name', i ).attr( 'value', data[i] ) );
+				}
+				
+				var expmonth = $(this.scope).find('[data-card="exp_month"]').val();
+				if ( expmonth && expmonth.length == 1 ) {
+					expmonth = '0' + expmonth;
+				}
+				$( e.currentTarget ).append( $('<input type="hidden">').attr( 'name', 'x_card_num' ).attr( 'value', $(this.scope).find('[data-card="number"]').val() ) );
+				$( e.currentTarget ).append( $('<input type="hidden">').attr( 'name', 'x_exp_date' ).attr( 'value', expmonth + '-' + $(this.scope).find('[data-card="exp_year"]').val() ) );
+				$( e.currentTarget ).append( $('<input type="hidden">').attr( 'name', 'x_card_code' ).attr( 'value', $(this.scope).find('[data-card="ccv"]').val() ) );
+				
+				$( e.currentTarget ).attr( 'action', $(this.scope).attr('data-url') );
+			}
+		}
+		
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="nexus" javascript_location="global" javascript_path="controllers/gateways" javascript_name="ips.gateways.stripe.js" javascript_type="controller" javascript_version="101030" javascript_position="1000050"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.gateways.stripe.js - Stripe controller
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('nexus.global.gateways.stripe', {
+		
+		/**
+		 * Init
+		 */
+		initialize: function () {
+			this.on( $(this.scope).closest('form')[0], 'submit', this.submitForm );
+			this.setup();
+		},
+		
+		/**
+		 * Init
+		 */
+		setup: function(){
+			ips.loader.get( ['https://js.stripe.com/v2/'] );
+			this.scope.show();
+		},
+		
+		/**
+		 * Submit form action
+		 *
+		 * @param		{event} 	e 		Event object
+		 * @returns 	{void}
+		 */
+		submitForm: function(e) {
+									
+			if ( !$(e.currentTarget).find( 'input[type="radio"][name="payment_method"]' ).length || $(e.currentTarget).find( 'input[name="payment_method"][value="' + $(this.scope).attr('data-id') + '"]' ).is(':checked') ) {
+					
+				/* Already submitted */
+				if ( $(e.currentTarget).find('input[name="'+$(this.scope).attr('data-id')+'_card[token]"]').length ) {
+					return;
+				}
+								
+				/* If we're using a stored card, carry on */
+				if ( $(this.scope).find('input[name="'+$(this.scope).attr('data-id')+'_card[stored]"]:checked').length && !$(this.scope).find('[data-card="number"]').val().length ) {
+					return;
+				}
+				
+				/* Stop the form from actually submitting */
+				e.preventDefault();
+				e.stopPropagation();
+				var scope = $(this.scope);
+				
+				/* Hide any previous errors */
+				scope.find('[data-warning]').text('');
+				
+				/* Show the loading icon */
+				var loading = scope.closest('[data-ipswizard]').find('[data-role="loading"]');
+				var wizardContainer = scope.closest('[data-ipswizard]').find('[data-role="wizardContent"]');
+				if( !loading.length ){
+					loading = $('<div/>').attr('data-role', 'loading').addClass('ipsLoading').hide();
+					scope.closest('[data-ipswizard]').append( loading );
+				}
+				var dims = {
+					width: wizardContainer.outerWidth(),
+					height: wizardContainer.outerHeight()
+				};
+				loading
+					.css({
+						width: dims.width + 'px',
+						height: dims.height + 'px'
+					})
+					.show();
+				wizardContainer
+					.hide()
+					.after( loading.show() );
+				
+				/* Send to Stripe */
+				var expmonth = scope.find('[data-card="exp_month"]').val();
+				if ( expmonth && expmonth.length == 1 ) {
+					expmonth = '0' + expmonth;
+				}
+				Stripe.setPublishableKey( scope.attr('data-key') );
+				Stripe.card.createToken({
+					number: scope.find('[data-card="number"]').val(),
+					cvc: scope.find('[data-card="ccv"]').val(),
+					exp_month: expmonth,
+					exp_year: scope.find('[data-card="exp_year"]').val(),
+				}, function(status,response){
+					loading.remove();
+					wizardContainer.show();
+					if ( response.error ) {
+						if ( response.error.type == 'card_error' ) {
+							if ( response.error.param ) {
+								switch ( response.error.param ) {
+									case 'number':
+										scope.find('[data-warning="number"]').text( response.error.message );
+										break;
+									case 'exp_month':
+									case 'exp_year':
+										scope.find('[data-warning="exp"]').text( response.error.message );
+										break;
+									case 'cvc':
+										scope.find('[data-warning="ccv"]').text( response.error.message );
+										break;
+								}
+							} else {
+								ips.ui.alert.show({
+									type: 'alert',
+									icon: 'warn',
+									message: response.error.message,
+								});
+							}
+						} else {
+							ips.ui.alert.show({
+								type: 'alert',
+								icon: 'warn',
+								message: ips.getString('payment_error')
+							});
+						}
+					} else {
+						scope.closest('form').append( $('<input type="hidden" />').attr( 'name', scope.attr('data-id') + '_card[token]' ).val( response.id ) );
+						scope.closest('form').submit();
+					}
+				});
+			}
+		}
+		
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="nexus" javascript_location="admin" javascript_path="controllers/hosting" javascript_name="ips.nexus.hosting.accountform.js" javascript_type="controller" javascript_version="101030" javascript_position="1000050">/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.nexus.hosting.accountform.js
+ *
+ * Author: Mark Wade
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.register('nexus.admin.hosting.accountform', {
+		
+		/**
+		 * Init
+		 */
+		initialize: function () {
+			$( document ).on( 'nodeItemSelected', function(){
+				$('#form_account_server_warning').show();
+			});
+			
+			$('[data-role=&quot;editWarning&quot;]').hide();
+			$( 'input[name^=&quot;account_&quot;], input[name^=&quot;p_&quot;]' ).change(function(){
+				$(this).parent().find('[data-role=&quot;editWarning&quot;]').show();
+				$('[data-role=&quot;editWarningBox&quot;]').show();
+			});
+			
+			$('#form_account_server_warning').hide();
+		},
+				
+	});
+}(jQuery, _));</file>
+ <file javascript_app="nexus" javascript_location="global" javascript_path="controllers/misc" javascript_name="ips.misc.print.js" javascript_type="controller" javascript_version="101030" javascript_position="1000100">/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.misc.print.js - Makes the page print
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.register('nexus.global.misc.print', {
+		
+		/**
+		 * Init
+		 */
+		initialize: function () {
+			window.print();
+		},
+				
+	});
+}(jQuery, _));</file>
+ <file javascript_app="nexus" javascript_location="front" javascript_path="controllers/store" javascript_name="ips.store.cartReview.js" javascript_type="controller" javascript_version="101030" javascript_position="1000150">/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.store.cartReview.js - Cart review screen
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.register('nexus.front.store.cartReview', {
+
+		initialize: function () {
+			this.on( 'click', '[data-action=&quot;removeFromCart&quot;]', this.removeFromCart );
+			this.on( 'submit', '[data-role=&quot;quantityForm&quot;]', this.quantityForm );
+			this.on( 'click', '[data-action=&quot;checkout&quot;]', this.checkout );
+		},
+		
+		/**
+		 * Prevent checkout button being clicked more than once
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		checkout: function (e) {
+			if ( $(e.target).hasClass('ipsButton_disabled') ) {
+				e.preventDefault();
+			} else {
+				$(e.target).addClass('ipsButton_disabled');
+			}
+		},
+
+		/**
+		 * Removes the item from the cart
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		removeFromCart: function (e) {
+			e.preventDefault();
+			var self = this;
+			var url = $( e.currentTarget ).attr('href');
+
+			ips.ui.alert.show({
+				type: 'confirm',
+				message: ips.getString('confirmRemoveItem'),
+				icon: 'warn',
+				callbacks: {
+					ok: function () {
+						ips.getAjax()( url )
+							.done( function (response) {
+								self.scope.find('[data-role=&quot;cart&quot;]').html( response );
+							});
+					}
+				}
+			});
+		},
+
+		/**
+		 * Handles submitting the quantity form
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		quantityForm: function (e) {
+			e.preventDefault();
+			var self = this;
+			var form = $( e.currentTarget );
+			var menu = form.closest('.ipsMenu');
+
+			// Set menu to loading and hide form
+			menu
+				.css({
+					height: menu.outerHeight() + 'px'
+				})
+				.addClass('ipsLoading');
+
+			form.hide();
+
+			// Do ajax request to update it
+			ips.getAjax()( form.attr('action'), {
+				data: form.serialize()
+			})
+				.done( function (response) {
+					self.scope.find('[data-role=&quot;cart&quot;]').html( response );
+				})
+				.fail(function(response){
+					menu.removeClass( 'ipsLoading' );
+					form.show();
+					ips.ui.alert.show( {
+						type: 'alert',
+						icon: 'warn',
+						message: response.responseJSON
+					});
+
+				});
+		}
+	});
+}(jQuery, _));</file>
+ <file javascript_app="nexus" javascript_location="front" javascript_path="controllers/store" javascript_name="ips.store.currencySelect.js" javascript_type="controller" javascript_version="101030" javascript_position="1000150">/**
+ * IPS Community Suite 4
+ * (c) 2015 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.store.currencySelect.js - Alert when changing currency
+ *
+ * Author: Mark Wade
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.register('nexus.front.store.currencySelect', {
+
+		initialize: function () {
+			this.on( 'click', 'a', this.currencyChangeWarning );
+		},
+		
+		/**
+		 * Prevent checkout button being clicked more than once
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		currencyChangeWarning: function (e) {
+			e.preventDefault();
+			ips.ui.alert.show({
+				type: 'confirm',
+				message: ips.getString('store_currency_change_warning'),
+				icon: 'warn',
+				callbacks: {
+					ok: function () {
+						window.location = $(e.currentTarget).attr('href');
+					}
+				}
+			});
+			
+			
+		}
+	});
+}(jQuery, _));</file>
+ <file javascript_app="nexus" javascript_location="front" javascript_path="controllers/store" javascript_name="ips.store.giftCard.js" javascript_type="controller" javascript_version="101030" javascript_position="1000150"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.store.giftCard.js - Gift card purchase screen
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('nexus.front.store.giftCard', {
+
+		initialize: function () {
+			this.on( 'click', '[data-color]', this.toggleColor );
+			this.on( 'change', '[name="gift_voucher_amount"], [name="x_gift_voucher_amount"]', this.changeAmount );
+			this.setup();
+		},
+
+		setup: function () {
+			this.changeAmount();
+			if ( $('input[name="gift_voucher_color"]').val() ) {
+				this.setColor( $('input[name="gift_voucher_color"]').val() );
+			}
+		},
+
+		/**
+		 * Event handler for changing the amount of the gift card
+		 *
+		 * @returns {void}
+		 */
+		changeAmount: function () {
+			var amountVal = this.scope.find('[name="gift_voucher_amount"]:checked').val();
+			var customVal = this.scope.find('[name="x_gift_voucher_amount"]').val();
+			var amount = 0;
+
+			if( amountVal == 'x' ){
+				if( !_.isUndefined( customVal ) && customVal != '' && customVal != 'x' ){
+					amount = customVal;
+				} 
+				
+				var scope = this.scope;
+				ips.getAjax()( this.scope.attr('data-formatCurrencyUrl') + '&amount=' + amount )
+					.done( function (response) {
+						scope.find('[data-role="value"]').text( response );
+					});
+			} else {
+				amount = amountVal;				
+				this.scope.find('[data-role="value"]').text( this.scope.find( 'label[for="' + this.scope.find('[name="gift_voucher_amount"]:checked').attr('id') + '"]' ).text() );
+			}
+		},
+
+		/**
+		 * Toggles the color being used for the gift card
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		toggleColor: function (e) {
+			e.preventDefault();
+			var swatch = $( e.currentTarget );
+			var color = swatch.attr('data-color');
+			this.setColor(color);
+		},
+		
+		/**
+		 * Sets being used for the gift card
+		 *
+		 * @param 	{string} 	color	The color
+		 * @returns {void}
+		 */
+		setColor: function (color) {
+			this.scope
+				.find('[data-role="giftCard"]').css({
+					backgroundColor: '#' + color
+				})
+				.end()
+				.find('input[type="hidden"][name="gift_voucher_color"]')
+					.val( '#' + color )
+				.end()
+				.find('[data-color]')
+					.closest('li')
+					.removeAttr('data-selected');
+
+			$(this.scope).find('[data-color="' + color + '"]').closest('li').attr( 'data-selected', true );
+		}
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="nexus" javascript_location="front" javascript_path="controllers/store" javascript_name="ips.store.packagePage.js" javascript_type="controller" javascript_version="101030" javascript_position="1000150"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.store.packagePage.js
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('nexus.front.store.packagePage', {
+		
+		initialize: function () {
+			this.on( 'change', 'select, input[type="radio"], [name="quantity"], [name="renewal_term"]', this.updatePriceAndStock );
+			this.on( 'submit', 'form', this.submitForm );
+			this.on( 'click', '[data-action="toggleImage"]', this.toggleScreenshot );
+			this.on( document, 'addToCart.nexus', this.addToCart );
+			this.setup();
+		},
+		
+		/**
+		 * Setup method
+		 *
+		 * @returns {void}
+		 */
+		setup: function () {
+			// Select first image if it's there
+			this.scope.find('.cNexusProduct_images [data-action="toggleImage"]').first().addClass('cNexusProduct_imageSelected');
+			
+			if ( $(this.scope).find('select,input[type="radio"]').length ) {
+				this.updatePriceAndStock();
+			}
+		},
+
+		/**
+		 * Switches the screenshot being shown for a product
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		toggleScreenshot: function (e) {
+			e.preventDefault();
+
+			var clickedImage = $( e.currentTarget );
+			var thumbImage = clickedImage.find('img').attr('src');
+			var fullImage = clickedImage.attr('href');
+
+			var html = ips.templates.render('nexus.store.productImage', {
+				fullURL: fullImage,
+				thumbURL: thumbImage
+			});
+
+			this.scope
+				.find('.cNexusProduct_primaryImage')
+					.replaceWith( html )
+				.end()
+				.find('[data-action="toggleImage"]')
+					.removeClass('cNexusProduct_imageSelected');
+
+			clickedImage.addClass('cNexusProduct_imageSelected');
+
+			$( document ).trigger('contentChange', [ this.scope.find('.cNexusProduct_primaryImage').parent() ] ); 
+		},
+
+		/**
+		 * Event handler for submitting the form, triggering an event that we can capture
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		submitForm: function (e) {
+
+			var self = this;
+			var form = this.scope.find('form');
+			
+			if ( form.attr('data-noajax') ) {
+				return true;
+			}
+			e.preventDefault();
+			e.stopPropagation();
+
+			// Set form to loading
+			var formDims = ips.utils.position.getElemDims( form );
+			var formPos = ips.utils.position.getElemPosition( form );
+			var loadingElem = $('<div/>').addClass('ipsLoading');
+			form.after( loadingElem );
+
+			loadingElem.css({
+				top: formPos.offsetPos.top + 'px',
+				left: formPos.offsetPos.left + 'px',
+				width: formDims.outerWidth + 'px',
+				height: formDims.outerHeight + 'px'
+			});
+
+			// Trigger an event for adding to cart, so that we can capture it
+			// and do something else with it if necessary
+			this.trigger( 'addToCart.nexus', {
+				url: form.attr('action'),
+				formData: form.serialize()
+			});
+		},
+
+		/**
+		 * Adds the item to cart via ajax, and creates a dialog to let the user know
+		 *
+		 * @param 	{event} 	e 		Event object
+		 * @param 	{object} 	data 	Event data object
+		 * @returns {void}
+		 */
+		addToCart: function (e, data) {
+						
+			var self = this;
+			
+			ips.getAjax()( data.url, {
+				data: data.formData,
+				type: 'post'
+			})
+				.done( function (response) {
+					// Are we already running inside of a dialog?
+					if( self.scope.closest('.ipsDialog').length ){
+						var dialogContent = self.scope.closest('.ipsDialog').find('.ipsDialog_content');
+						//see https://community.invisionpower.com/4bugtrack/active-reports/4013-adding-consecutive-items-from-the-list-to-the-cart-increases-number-of-continuecheckout-windows-r8137/
+						// We need to destroy this controller before updating the content so that event handlers are unregistered,
+						// otherwise this controller will continue listening for addToCart events and trigger multiple dialogs.
+						self.trigger('destroy');						
+						dialogContent.html( response ).show();
+						$( document ).trigger( 'contentChange', [ dialogContent ] );
+					} else {
+						var contentElem = $('<div/>').html( response );
+						var loadingElem = self.scope.find('form').next('.ipsLoading');
+
+						ips.getContainer().append( contentElem );
+
+						// Show a dialog
+						var dialogRef = ips.ui.dialog.create({
+							title: ips.getString('cartReview'),
+							content: contentElem,
+							forceReload: true,
+							size: 'medium'
+						});
+
+						dialogRef.show();
+
+						$( document ).trigger( 'contentChange', [ contentElem ] );
+
+						// Remove loading elem
+						loadingElem.remove();
+						self.updatePriceAndStock();
+					}
+				})
+				.fail(function(response){
+					var form = $(e.target).find('form');
+					var newForm = form.replaceWith( $(response.responseText) );
+					
+					var loadingElem = self.scope.find('form').next('.ipsLoading');
+					loadingElem.remove();
+					
+					$( document ).trigger('contentChange' ); 
+				});
+		},
+
+		/**
+		 * Updates the stock and price information when custom fields change
+		 *
+		 * @returns {void}
+		 */
+		updatePriceAndStock: function () {
+						
+			var self = this;
+			var form = this.scope.find('form');
+
+			ips.getAjax()( form.attr('action'), {
+				dataType: 'json',
+				data: form.serialize() + '&stockCheck=1',
+				type: 'post'
+			})
+				.done( function (response) {
+										
+					self.scope.find('[data-role="price"]').html( response.price );
+					self.scope.find('[data-role="stock"]').html( response.stock );
+					self.scope.find('[data-role="renewalTerm"]').html( response.renewal );
+
+					if( response.okay ){
+						self.scope.find('button').removeAttr('disabled').text( ips.getString('add_to_cart_js') );
+					} else {
+						self.scope.find('button').attr( 'disabled','disabled' ).text( ips.getString('out_of_stock') );
+					}
+				});
+		}
+				
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="nexus" javascript_location="admin" javascript_path="controllers/store" javascript_name="ips.store.productoptions.js" javascript_type="controller" javascript_version="101030" javascript_position="1000100"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.store.productoptions.js
+ *
+ * Author: Mark Wade
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('nexus.admin.store.productoptions', {
+		
+		/**
+		 * Init
+		 */
+		initialize: function () {
+			var self = this;
+			this.on( 'change', '[data-role="field"]', this.refresh );
+			$('input[name="p_renews_checkbox"]').change(function(){
+				self.refresh();
+			});
+			
+			if ( $('input[name="p_images_primary_image"]').length ) {
+				$('input[name="p_images_primary_image"]:first').attr('checked', true);
+			}
+			
+			this.refresh();
+		},
+		
+		/**
+		 * Refresh
+		 */
+		refresh: function () {
+			var ids = [];
+			$(this.scope).find('[data-role="field"]:checked').each(function(){
+				ids.push( $(this).attr('data-id') );
+			});
+			
+			if ( $('input[name="p_renews_checkbox"]').is(':checked') ) {
+				var renews = 1;
+			} else {
+				var renews = 0;
+			}
+						
+			var scope = $(this.scope);
+			ips.getAjax()( scope.attr('data-url') + '&fields=' + ids.join(',') + '&renews=' + renews )
+				.done(function(response){
+					scope.find('[data-role="table"]').html( response );
+					$( document ).trigger( 'contentChange', [ scope ] );
+				});
+		},
+				
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="nexus" javascript_location="admin" javascript_path="controllers/store" javascript_name="ips.store.productselector.js" javascript_type="controller" javascript_version="101030" javascript_position="1000100"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.store.productselector.js
+ *
+ * Author: Mark Wade
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('nexus.admin.store.productselector', {
+		
+		/**
+		 * Init
+		 */
+		initialize: function () {
+			this.url = $(this.scope).attr('data-url');
+			this.on( 'click', '[data-role="group"]', this.expandCollapse );
+			this.on( 'click', '[data-role="product"]', this.increaseQty );
+		},
+		
+		/**
+		 * Expand/Collapse Group
+		 */
+		expandCollapse: function (e) {
+			var row = $( e.currentTarget );
+			var list = row.next();
+			
+			if ( row.hasClass('ipsTree_open') ) {
+				row.removeClass('ipsTree_open');
+				list.hide();		
+				
+			} else {
+				row.addClass('ipsTree_open');
+				list.show();
+				if ( !list.data('_childrenLoaded') ) {					
+					list.html( ips.templates.render('core.trees.childWrapper', {
+						content: ips.templates.render('core.trees.loadingRow')
+					} ) );
+										
+					ips.getAjax()( this.url + '&id=' + row.attr('data-groupId') ).done(function(response){
+						list.html(response);
+						list.data('_childrenLoaded', 'true');
+					})
+				}
+			}
+		},
+		
+		/**
+		 * Increase Qty
+		 */
+		increaseQty: function (e) {
+			if( !$(e.target).is('input') ) {
+				$( e.currentTarget ).find('input').val( parseInt( $( e.currentTarget ).find('input').val() ) + 1 );
+			}
+		}
+				
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="nexus" javascript_location="front" javascript_path="controllers/store" javascript_name="ips.store.register.js" javascript_type="controller" javascript_version="101030" javascript_position="1000150"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.store.register.js - Register screen in Nexus
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('nexus.front.store.register', {
+
+		_infoPaneWrapper: null,
+		_infoPane: null,
+
+		initialize: function () {
+			this.on( 'click', '[data-role="productCarousel"] .cNexusProduct', this.selectProduct );
+			this.on( 'click', '[data-action="closeInfo"]', this.closeInfo );
+			this.on( 'addToCart.nexus', this.addToCart );
+			this.setup();
+		},
+
+		/**
+		 * Setup method
+		 *
+		 * @returns {void}
+		 */
+		setup: function () {
+			this._infoPaneWrapper = this.scope.find('[data-role="productInformationWrapper"]');
+			this._infoPane = this.scope.find('[data-role="productInformation"]');
+		},
+
+		/**
+		 * Event handler for closing the info panel
+		 *
+		 * @param 	{event} 	e 		Event object
+		 * @returns {void}
+		 */
+		closeInfo: function (e) {
+			e.preventDefault();
+
+			this.scope.find('[data-role="productCarousel"] .cNexusProduct').removeClass('cNexusProduct_selected');
+
+			this._infoPaneWrapper
+				.hide()
+				.find('[data-action="closeInfo"]')
+					.hide();
+		},
+
+		/**
+		 * Highlights a product on the registration screen and loads its overview to display
+		 *
+		 * @param 	{event} 	e 		Event object
+		 * @returns {void}
+		 */
+		selectProduct: function (e) {
+			e.preventDefault();
+			var selectedProduct = $( e.currentTarget );
+			var self = this;
+
+			this.scope.find('[data-role="productCarousel"] .cNexusProduct').removeClass('cNexusProduct_selected');
+			selectedProduct.addClass('cNexusProduct_selected');
+
+			// Get the URL of the selected product
+			var url = selectedProduct.find('[data-role="productLink"]').attr('href');
+			var height = 200;
+
+			// Set info area to loading
+			if( this._infoPaneWrapper.is(':visible') ){
+				height = this._infoPane.height();
+			}
+			
+			this._infoPaneWrapper
+				.show()
+				.find('[data-action="closeInfo"]')
+					.hide();
+
+			this._infoPane
+				.css({
+					height: height + 'px'
+				})
+				.html('')
+				.addClass('ipsLoading');
+
+			// Now load
+			ips.getAjax()( url )
+				.done( function (response) {
+						
+					self._infoPaneWrapper
+						.find('[data-action="closeInfo"]')
+							.show();
+
+					self._infoPane
+						.removeClass('ipsLoading')
+						.css({
+							height: 'auto'
+						})
+						.html( response );
+
+					$( document ).trigger( 'contentChange', [ self._infoPane ] );
+				});
+		},
+
+		/**
+		 * Adds the item to cart via ajax, and creates a dialog to let the user know
+		 *
+		 * @param 	{event} 	e 		Event object
+		 * @param 	{object} 	data 	Event data object
+		 * @returns {void}
+		 */
+		addToCart: function (e, data) {
+			e.stopPropagation();
+			var self = this;
+
+			ips.getAjax()( data.url, {
+				data: data.formData + '&registerCheckout=1',
+				type: 'post'
+			})
+				.done( function (response) {
+					self._infoPane.html( response );
+					$( document ).trigger( 'contentChange', [ self._infoPane ] );
+				});
+		},
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="nexus" javascript_location="admin" javascript_path="controllers/support" javascript_name="ips.support.emailsetup.js" javascript_type="controller" javascript_version="101030" javascript_position="1000150">/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.support.emailsetup.js
+ *
+ * Author: Mark Wade
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.register('nexus.admin.support.emailsetup', {
+		
+		/**
+		 * Init
+		 */
+		initialize: function () {
+			var self = this;
+			var scope = $(this.scope);
+			scope.find('[data-role=&quot;toggleView&quot;]').click(function(e){
+				e.preventDefault();
+				var height = scope.height();
+				scope.html('').css( 'min-height', height ).addClass('ipsLoading');
+				ips.getAjax()( $(e.currentTarget).attr('href') )
+					.done(function( response ){
+						scope.removeClass('ipsLoading').css( 'min-height', 0 ).html( response );
+						self.initialize();
+					})
+					.fail(function(){
+						window.location = $(e.currentTarget).attr('href');
+					});
+			});
+		},
+				
+	});
+}(jQuery, _));</file>
+ <file javascript_app="nexus" javascript_location="admin" javascript_path="controllers/support" javascript_name="ips.support.message.js" javascript_type="controller" javascript_version="101030" javascript_position="1000150"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.support.staffreply.js - Support reply processing
+ *
+ * Author: Mark Wade
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('nexus.admin.support.message', {
+		
+		/**
+		 * Init
+		 */
+		initialize: function () {
+			this.setup();
+		},
+
+		/**
+		 * Setup method
+		 *
+		 * @returns {void}
+		 */
+		setup: function () {
+			this.scope.find('a').each( this._obscureLink );
+		},
+
+		/**
+		 * Takes a link and makes it safe to show in the AdminCP, adding an icon to text links
+		 *
+		 * @returns {void}
+		 */
+		_obscureLink: function () {
+			var elem = $( this );
+			var realUrl = decodeURIComponent( ips.utils.url.getParam( 'url', elem.attr('href') ) );
+			elem.attr('target', '_blank');
+			
+			if( realUrl !== 'undefined' && realUrl != elem.text() ){
+								
+				var icon = $('<i class="fa fa-external-link ipsCursor_pointer ipsType_medium" title="' + ips.getString('click_to_show_url') + '" data-ipsTooltip></i>');
+				
+				icon.on( 'click', function () {
+					ips.ui.alert.show( {
+						type: 'alert',
+						icon: 'info',
+						message: _.escape( realUrl ),
+					});
+				});
+				
+				elem.after( icon ).after(' ');
+			}
+		}
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="nexus" javascript_location="admin" javascript_path="controllers/support" javascript_name="ips.support.metamenu.js" javascript_type="controller" javascript_version="101030" javascript_position="1000150"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.support.metamenu.js - Makes the page print
+ *
+ * Author: Mark Wade
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('nexus.admin.support.metamenu', {
+		
+		/**
+		 * Init
+		 */
+		initialize: function () {
+			var scope = this.scope;
+			this.scope.parent().find('li a').on( 'click', function(e){
+				e.preventDefault();
+				var target = $( e.currentTarget );
+				
+				if ( !target.parent().attr('data-noSet') ) {
+					scope.find('[data-role="title"]').text( target.find('[data-role="title"]').text() );
+				}
+				
+				if ( target.parent().attr('data-group') ) {
+					var siblings = target.parent().parent().find( 'li[data-group="'+target.parent().attr('data-group')+'"]' );
+				} else {
+					var siblings = target.parent().parent().find( 'li' );
+				}
+				
+				siblings.removeClass( 'ipsMenu_itemChecked' );
+				target.parent().addClass( 'ipsMenu_itemChecked' );
+
+				ips.getAjax()( target.attr('href') )	
+					.done(function(response){
+						console.log(response);
+						var i;
+						for ( i in response ) {
+							if ( i == 'alert' ) {
+								ips.ui.alert.show( {
+									type: 'alert',
+									icon: 'warn',
+									message: response[i],
+								});
+							} else if ( i == 'staff' ) {
+								var staffMenu = $('[data-role="staffMenu"]');
+								staffMenu.find('[data-role="title"]').text( response[i].name );
+								$( 'li[data-group="staff"]' ).removeClass('ipsMenu_itemChecked');								
+								$( 'li[data-group="staff"][data-id="'+response[i].id+'"]' ).addClass('ipsMenu_itemChecked');
+							} else if ( i == 'stockActions' ) {
+								$('#elSelect_stock_action').children().remove();
+								var j;
+								for ( j in response[i] ) {
+									$('#elSelect_stock_action').append( $('<option>').attr( 'value', j ).text( response[i][j] ) );
+								}
+							} else if ( i == 'requiresPurchase' ) {
+								if ( response[i] ) {
+									$('[data-role="noPurchaseWarning"]').addClass('ipsType_warning ipsType_bold');
+								} else {
+									$('[data-role="noPurchaseWarning"]').removeClass('ipsType_warning ipsType_bold');
+								}
+							} else {
+								$('[name="' + i + '"]').val( response[i] ); 
+							}
+						}
+					})
+					.fail(function(){
+						window.href = target.attr('href');
+					})
+			} );
+		},
+				
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="nexus" javascript_location="admin" javascript_path="controllers/support" javascript_name="ips.support.pendingalert.js" javascript_type="controller" javascript_version="101030" javascript_position="1000150">/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.support.pendingalert.js - Shows an alert
+ *
+ * Author: Mark Wade
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.register('nexus.admin.support.pendingalert', {
+		
+		/**
+		 * Init
+		 */
+		initialize: function () {
+			ips.ui.alert.show( {
+				type: 'alert',
+				icon: 'warn',
+				message: $(this.scope).text(),
+			});
+			$(this.scope).remove();
+		},
+				
+	});
+}(jQuery, _));</file>
+ <file javascript_app="nexus" javascript_location="front" javascript_path="controllers/support" javascript_name="ips.support.rate.js" javascript_type="controller" javascript_version="101030" javascript_position="1000200">/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.support.rate.js
+ *
+ * Author: Mark Wade
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.register('nexus.front.support.rate', {
+
+		initialize: function () {
+			this.on( 'submitDialog', this.update );
+		},
+		
+		update: function (e, data) {
+			$(this.scope).html( data.response );
+		}
+	});
+}(jQuery, _));</file>
+ <file javascript_app="nexus" javascript_location="admin" javascript_path="controllers/support" javascript_name="ips.support.replyArea.js" javascript_type="controller" javascript_version="101030" javascript_position="1000150"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.support.replyArea.js - Support request reply area
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('nexus.admin.support.replyArea', {
+
+		initialize: function () {
+			this.on( 'tabChanged', this.tabChanged );
+			this.on( 'click', '[data-action="showCCForm"]', this.showCCForm );
+			this.on( 'change', '#elSelect_stock_action', this.stockAction );
+		},
+
+		/**
+		 * Shows the form fields for to/cc/bcc
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		showCCForm: function (e) {
+			e.preventDefault();
+			this.scope.find('[data-role="sendToInfo"]').hide();
+			this.scope.find('[data-role="sendToForm"]').show();
+			this.scope.find('#elInput_cc_wrapper').click();
+		},
+
+		/**
+		 * When the reply form tabs are toggled between reply/note, toggles a class to enable styling on the nore form
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @param 	{object} 	e 	Event data object from the tab widget
+		 * @returns {void}
+		 */
+		tabChanged: function (e, data) {
+			if( data.tab.attr('data-role') == 'noteTab' ){
+				this.scope.addClass('cNexusSupportForm_note');
+			} else {
+				this.scope.removeClass('cNexusSupportForm_note');
+			}
+		},
+
+		/**
+		 * Stock action event handler - adds a reply and/or changes the form controls automatically
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		stockAction: function (e) {
+			var self = this;
+			var val = $( e.currentTarget ).val();
+			var action = this.scope.find('#elSupportReplyForm').attr('action');
+
+			ips.getAjax()( action + '&stockActionData=' + val, { showLoading: true } )
+				.done( function (response) {
+					if( _.isObject( response ) ){
+						_.each( response, function (value, key) {
+							if( key === 'message' ){
+								CKEDITOR.instances.message.setData( value );
+							} else {
+								self.scope.find( '[name="' + key + '"]' ).val( value );
+							}
+						});
+
+						// Set the focus to the submit button for ease of use
+						self.scope.find('[data-role="primarySubmit"]').focus();
+					}
+				})
+				.fail( function (response) {
+					ips.ui.alert.show( {
+						type: 'alert',
+						icon: 'warn',
+						message: ips.getString('support_ajax_error'),
+					});
+				});
+
+		}
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="nexus" javascript_location="admin" javascript_path="mixins" javascript_name="ips.support.requestTable.js" javascript_type="mixins" javascript_version="101030" javascript_position="1000200">/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.support.requestTable.js - Mixin for support request table
+ *
+ * Author: Rikki Tissier
+ */
+;( function($, _, undefined){
+	&quot;use strict&quot;;
+
+	ips.controller.mixin('support.requestTable', 'core.global.core.table', false, function () {
+
+		/**
+		 * Before setup, add our two custom filters to the params list so they are built into URLs
+		 *
+		 * @returns {void}
+		 */
+		this.before('setup', function () {
+			this._otherParams.push('department');
+			this._otherParams.push('statuses');
+
+			this._sideMenu = this.scope.find('#elSupport_menu');
+		});
+
+		/**
+		 * Before setup, add our two custom filters to the params list so they are built into URLs
+		 *
+		 * @returns {void}
+		 */
+		this.after('initialize', function () {
+			this.on( 'itemClicked.sideMenu', this.changeRequestView );
+		});
+		
+		/**
+		 * Returns the current sort by and sort order value
+		 *
+		 * @returns {object}	Object containing by and order keys
+		 */
+		this._getSortValue = function () {
+			return { by: $('#elSortMenu_menu .ipsMenu_itemChecked').attr('data-ipsmenuvalue'), order: $('#elOrderMenu_menu .ipsMenu_itemChecked').attr('data-ipsmenuvalue') };
+		};
+
+		this.changeRequestView = function (e, data) {
+			// Get the selected departments
+			
+			var types = { department: [], status: [], assigned: false, tracked: false, replied: false };
+
+			if( data.selectedElem.attr('data-filter') ){
+				// Unselect everything else
+				this._sideMenu.find('.ipsSideMenu_itemActive').not( data.selectedElem ).removeClass('ipsSideMenu_itemActive');
+			}
+
+			var selected = this._sideMenu.find('.ipsSideMenu_itemActive');
+
+			if( selected.length ){
+				selected.each( function (i, elem) {
+					var elem = $( elem );
+					if( elem.attr('data-type') ){
+						types[ elem.attr('data-type') ].push( elem.attr('data-ipsMenuValue') );
+					} else if( elem.attr('data-support-filter') ){
+						types[ elem.attr('data-support-filter') ] = true;
+					}
+				});
+			}
+			
+			this.updateURL( { 
+				departments: types.department.join(','),
+				statuses: types.status.join(','),
+				assigned: types.assigned,
+				tracked: types.tracked,
+				replied: types.replied,
+				page: 1
+			});
+		}
+	});
+}(jQuery, _));</file>
+ <file javascript_app="nexus" javascript_location="front" javascript_path="templates" javascript_name="ips.templates.store.js" javascript_type="template" javascript_version="101030" javascript_position="1000250"><![CDATA[ips.templates.set('nexus.store.productImage', " \
+	<a href='{{fullURL}}' data-fullURL='{{fullURL}}' class='cNexusProduct_primaryImage ipsContained' data-ipsLightbox data-ipsLightbox-group='product' data-ipsProductZoom>\
+		<img src='{{thumbURL}}' class='ipsImage ipsImage_thumb'>\
+	</a>\
+");]]></file>
+ <file javascript_app="nexus" javascript_location="admin" javascript_path="templates" javascript_name="ips.templates.store.js" javascript_type="template" javascript_version="101030" javascript_position="1000250"><![CDATA[ips.templates.set('nexus.store.images', " \
+	<div class='ipsGrid_span3 ipsAttach ipsImageAttach ipsPad_half ipsAreaBackground_light' id='{{id}}' data-role='file' data-fileid='{{id}}' data-fullsizeurl='{{imagesrc}}' data-thumbnailurl='{{thumbnail}}' data-isImage='1'>\
+		<ul class='ipsList_inline ipsImageAttach_controls'>\
+			<li><input type='radio' name='{{field_name}}_primary_image' value='{{id}}' title='{{#lang}}makePrimaryProductImage{{/lang}}' data-ipsTooltip></li>\
+			<li class='ipsPos_right' data-role='deleteFileWrapper'>\
+				<input type='hidden' name='{{field_name}}_keep[{{id}}]' value='1'>\
+				<a href='#' data-role='deleteFile' class='ipsButton ipsButton_verySmall ipsButton_light' data-ipsTooltip title='{{#lang}}removeProductImage{{/lang}}'><i class='fa fa-trash-o'></i></a>\
+			</li>\
+		</ul>\
+		<div class='ipsImageAttach_thumb ipsType_center' data-role='preview' data-grid-ratio='65' data-action='insertFile' {{#thumb}}style='background-image: url( {{thumbnail_for_css}} )'{{/thumb}}>\
+			{{#status}}\
+				<span class='ipsImageAttach_status ipsType_light' data-role='status'>{{{status}}}</span>\
+				<span class='ipsAttachment_progress'><span data-role='progressbar'></span></span>\
+			{{/status}}\
+			{{#thumb}}\
+				{{{thumb}}}\
+			{{/thumb}}\
+		</div>\
+		<h2 class='ipsType_reset ipsAttach_title ipsType_medium ipsTruncate ipsTruncate_line' data-role='title'>{{title}}</h2>\
+		<p class='ipsType_light'>{{size}} &middot; <span data-role='status'>{{statusText}}</span></p>\
+	</div>\
+");
+]]></file>
+ <order app="global" path="/dev/js//framework/">templates
+common/ui
+common/utils
+common
+controllers</order>
+ <order app="global" path="/dev/js//library/">underscore
+jquery
+mustache
+jstz
+Debug.js
+app.js</order>
+ <order app="global" path="/dev/js//library//jquery">jquery.js
+jquery.history.js
+jquery.transform.js</order>
+</javascript>

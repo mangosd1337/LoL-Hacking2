@@ -1,0 +1,73 @@
+<?php
+/**
+ * @brief		Member Filter Extension
+ * @author		<a href='http://www.invisionpower.com'>Invision Power Services, Inc.</a>
+ * @copyright	(c) 2001 - 2016 Invision Power Services, Inc.
+ * @license		http://www.invisionpower.com/legal/standards/
+ * @package		IPS Community Suite
+{subpackage}
+ * @since		{date}
+ * @version		SVN_VERSION_NUMBER
+ */
+
+namespace IPS\{app}\extensions\core\MemberFilter;
+
+/* To prevent PHP errors (extending class does not exist) revealing path */
+if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) )
+{
+	header( ( isset( $_SERVER['SERVER_PROTOCOL'] ) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0' ) . ' 403 Forbidden' );
+	exit;
+}
+
+/**
+ * Member Filter Extension
+ */
+class _{class}
+{
+	/** 
+	 * Get Setting Field
+	 *
+	 * @param	mixed	$criteria	Value returned from the save() method
+	 * @return	array 	Array of form elements
+	 */
+	public function getSettingField( $criteria )
+	{
+		return array();
+	}
+	
+	/**
+	 * Save the filter data
+	 *
+	 * @param	array	$post	Form values
+	 * @return	mixed			False, or an array of data to use later when filtering the members
+	 * @throws \LogicException
+	 */
+	public function save( $post )
+	{
+		return FALSE;
+	}
+	
+	/**
+	 * Get where clause to add to the member retrieval database query
+	 *
+	 * @param	mixed				$data	The array returned from the save() method
+	 * @return	string|array|NULL	Where clause
+	 */
+	public function getQueryWhereClause( $data )
+	{
+		return NULL;
+	}
+	
+	/**
+	 * Callback for member retrieval database query
+	 * Can be used to set joins
+	 *
+	 * @param	mixed			$data	The array returned from the save() method
+	 * @param	\IPS\Db\Query	$query	The query
+	 * @return	void
+	 */
+	public function queryCallback( $data, &$query )
+	{
+		return NULL;
+	}
+}

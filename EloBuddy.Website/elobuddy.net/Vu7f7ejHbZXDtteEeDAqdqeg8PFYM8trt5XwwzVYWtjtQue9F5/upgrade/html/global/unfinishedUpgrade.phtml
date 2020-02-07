@@ -1,0 +1,27 @@
+<ips:template parameters="$json, $time" />
+<section>
+	<h2 class="ipsType_sectionHead">{lang="upgrade_unfinished"}</h2>
+	<ul class="ipsPad ipsType_large ipsList_checks">
+		<li class="advisory">{lang="unfinished_upgrade_info" sprintf="(string) \IPS\DateTime::ts($time)"}</li>
+		<li>
+			<strong>{lang="upgrade_applications"}</strong>
+			<ul>
+				{{foreach( $json['session']['apps'] ) as $app}}
+					<li>{expression="ucfirst( $app )"}</li>
+				{{endforeach}}
+			</ul>
+		</li>
+		<li>
+			<strong>{lang="upgrade_status"}</strong>
+			<ul>
+				<li>{lang="status"}: {$json['step']}</li>
+				<li>{lang="application"}: {{if isset( $json['data'][1] )}}{$json['data'][1]}{{else}}<em>{lang="continue_not_set"}</em>{{endif}}
+				<li>{lang="current_version"}: {{if isset( $json['data']['extra']['_current'] )}}{$json['data']['extra']['_current']}{{else}}<em>{lang="continue_not_set"}</em>{{endif}}
+			</ul>
+		</li>
+	</ul>
+</section>
+<div class='ipsPad_double ipsType_center'>
+	<a href='{url="controller=continueupgrade&key={$_SESSION['uniqueKey']}"}' class='ipsButton ipsButton_large ipsButton_primary ipsButton_positive'>{lang="continue_upgrade"}</a>
+	<a href='{url="controller=systemcheck&key={$_SESSION['uniqueKey']}&skippreviousupgrade=1"}' class='ipsButton ipsButton_large ipsButton_primary'>{lang="start_fresh_upgrade"}</a>
+</div>

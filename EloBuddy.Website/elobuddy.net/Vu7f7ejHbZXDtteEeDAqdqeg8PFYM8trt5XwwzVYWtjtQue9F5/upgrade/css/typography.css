@@ -1,0 +1,66 @@
+/* HEADINGS */
+.ipsType_pageTitle {
+	font-size: 24px;
+	font-weight: 400;
+	line-height: 1.2;
+}
+
+.ipsType_pageTitle .fa{
+	font-size: 18px;
+}
+
+.ipsType_pageTitle a {
+	color: inherit;
+}
+
+.ipsType_sectionHead {
+	font-size: 18px;
+	color: #333333;
+	line-height: 24px;
+	font-weight: 500;
+	display: inline-block;
+}
+
+/* ALIGNMENT */
+.ipsType_center { text-align: center; }
+.ipsType_left {	text-align: left; }
+.ipsType_right { text-align: right; }
+
+/* MISC */
+.ipsType_noBreak { white-space: nowrap !important; }
+a.ipsType_blendLinks, .ipsType_blendLinks a { color: inherit; }
+
+/* SIZING */
+.ipsType_small {
+	font-size: 11px;
+	line-height: 20px;
+}
+
+.ipsType_medium {
+	font-size: 13px;
+	line-height: 20px;
+}
+
+.ipsType_normal {
+	font-size: 14px;
+	line-height: 22px;
+}
+
+.ipsType_large {
+	font-size: 16px;
+	line-height: 24px;
+}
+
+/* COLORS */
+.ipsType_light {
+	color: #adadad;
+}
+
+.ipsType_warning {
+	color: #a52638;
+}
+
+/* WEIGHTS */
+.ipsType_unbold {
+	font-weight: normal;
+}

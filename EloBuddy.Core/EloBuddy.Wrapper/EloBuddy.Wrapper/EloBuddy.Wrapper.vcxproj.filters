@@ -1,0 +1,841 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{5e869738-0cc4-4e0e-b6d2-cfa02023e93b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Global">
+      <UniqueIdentifier>{a0d6a89e-3284-4d26-9825-ef1d1bd2f670}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{c8afc0b0-f540-4eb6-b2b5-0ef81920002b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Drawing">
+      <UniqueIdentifier>{ec4b74a8-a4a2-4941-a0cf-77df14648007}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drawing">
+      <UniqueIdentifier>{7911db80-f85c-4b3c-a846-c8c429163a2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events">
+      <UniqueIdentifier>{9b9168d4-93b1-44a1-97d4-172b87ac0d25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MenuGUI">
+      <UniqueIdentifier>{16908a17-f0b9-494a-a60c-1a4563340676}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MenuGUI">
+      <UniqueIdentifier>{9942013a-9cdb-4013-af14-57bed620dcb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\NavMesh">
+      <UniqueIdentifier>{48db92d5-b98b-419e-b7ac-498bb74c28b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NavMesh">
+      <UniqueIdentifier>{eab7cce4-d9e5-4056-b2ac-b8108f5fb0fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Vector3">
+      <UniqueIdentifier>{7edcb299-4660-48e5-aa73-19b31fb1fee3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects">
+      <UniqueIdentifier>{680d81d9-9032-4db8-b83e-179c9285cee2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\ObjectManager">
+      <UniqueIdentifier>{14b854ce-458f-4ae0-bca1-27e5a1cf9a6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\ObjectManager\Objects">
+      <UniqueIdentifier>{5323470c-1540-4fea-8945-8b6b1cd5517c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\ObjectManager\Objects\GameObject">
+      <UniqueIdentifier>{fbe5d359-9ea9-4f2d-bc5a-e45101613efb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit">
+      <UniqueIdentifier>{5b773490-c701-45bc-8a67-3edcbc45e7e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base">
+      <UniqueIdentifier>{62675ab8-635b-4c80-bca7-5e0727cc222e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_Building">
+      <UniqueIdentifier>{186239c0-2ace-40cf-977b-1f58bea6bf73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_Building\AnimatedBuilding">
+      <UniqueIdentifier>{576aaa2e-e1d1-46d7-adc4-da0e435f577b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\ObjectManager\Objects\GameObject\Obj_SpellMissile">
+      <UniqueIdentifier>{89d4c451-f8a0-4cba-8302-37b6697fc478}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\Spellbook">
+      <UniqueIdentifier>{586223b1-f124-4eee-a00e-2eae5e18b038}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\BuffInstance">
+      <UniqueIdentifier>{a77a9b61-8c0b-4f64-b491-e45ff1ae2102}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\HeroInventory">
+      <UniqueIdentifier>{a2030f1c-08fb-4731-aaf3-cda76fe62921}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects">
+      <UniqueIdentifier>{181b1c12-b9d0-4bd6-bc4e-5fdb37259991}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\Spellbook">
+      <UniqueIdentifier>{531bd307-b0e9-404f-9ce4-e64f2bc090b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\BuffInstance">
+      <UniqueIdentifier>{d5d6474a-f73e-4d02-a98b-44fdebbca66e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\ObjectManager">
+      <UniqueIdentifier>{f68a436c-e95d-404d-aca0-0d3df84c17ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\ObjectManager\Objects">
+      <UniqueIdentifier>{e1c60a8a-32a7-4999-b221-c02a75e2e282}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\ObjectManager\Objects\GameObject">
+      <UniqueIdentifier>{dc6d4a54-4744-4a5d-b86d-1dc10ae76617}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit">
+      <UniqueIdentifier>{9f0e7dc3-4cb6-4a29-bd83-d31529a7217b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base">
+      <UniqueIdentifier>{0a9e8900-0604-44df-8b9e-434ca520a6f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\ObjectManager\Objects\GameObject\Obj_SpellMissile">
+      <UniqueIdentifier>{1d366824-d246-4ac9-82db-f5b2a1242ca8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\HeroInventory">
+      <UniqueIdentifier>{cb6b4150-fe47-4a7d-8b3b-f32a39b5d977}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\Game">
+      <UniqueIdentifier>{efc8534b-e481-43e7-b724-8852f597ae0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\Drawing">
+      <UniqueIdentifier>{235b8f1b-ad3b-4598-b00e-505a3a03b2cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\GameObject">
+      <UniqueIdentifier>{c6ac4ac9-18fc-4fd5-8657-4564b4fea722}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\ENet">
+      <UniqueIdentifier>{0a78f2eb-dc90-4e31-adb5-e5814f73bc7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\Spellbook">
+      <UniqueIdentifier>{eb6ea4ce-3b73-425e-a85c-a9e55235f016}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\Obj_AI_Base">
+      <UniqueIdentifier>{92024a74-2220-42a1-8093-c50d02ef092f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\TacticalMap">
+      <UniqueIdentifier>{71fde343-e810-4e9c-a60f-f80a6e93163b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TacticalMap">
+      <UniqueIdentifier>{99209ea8-d24d-4620-ab6d-0f996ca0ee3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\Player">
+      <UniqueIdentifier>{8fbcb17a-5a68-484d-85ed-e4c080f5ffc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\AttackableUnit">
+      <UniqueIdentifier>{0de94673-86ba-4747-b8b6-206162af3339}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Hud">
+      <UniqueIdentifier>{84ac6eee-94df-4936-96bf-b92b3aa03b4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Hud">
+      <UniqueIdentifier>{496e2b98-ee6d-4631-80a2-d30b92f38c39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\RiotAsset">
+      <UniqueIdentifier>{53da658f-2555-4c62-9922-f0cb5dba10f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\RiotAsset">
+      <UniqueIdentifier>{bdb5e3a8-38a2-4b00-8f37-d8209d7759c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Camera">
+      <UniqueIdentifier>{6fedf59c-7f52-4da1-be05-db310b40da95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{23ab7c50-bd0d-42c0-bc6b-a292fc0ceac3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\TacticalMap">
+      <UniqueIdentifier>{800ac2fd-f65d-473c-974c-e6ffe46c3e2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\RiotString">
+      <UniqueIdentifier>{e94de2a1-8b55-430f-8446-34b063e07e64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\RiotString">
+      <UniqueIdentifier>{6c10be81-f416-4422-897f-6898e8aff83e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\Experience">
+      <UniqueIdentifier>{4ca700df-0ccf-47fc-86c5-55dfdfe274db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Hacks">
+      <UniqueIdentifier>{f7d69678-11f8-4f3f-a1ba-1195835a1f4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Chat">
+      <UniqueIdentifier>{3b83b9f3-a283-4171-a7d8-92a4959bcf27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\Chat">
+      <UniqueIdentifier>{8400313e-dcc2-4660-806b-9cc1b28e0a28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Chat">
+      <UniqueIdentifier>{692aeed4-ed92-4a19-991d-f40d412b819b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\Obj_AI_Hero">
+      <UniqueIdentifier>{0c9c8e55-c262-48d8-9267-c7f5987b8a48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\Hud">
+      <UniqueIdentifier>{6a9b0420-27c7-4e40-8659-7cfe5a478381}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AudioManager">
+      <UniqueIdentifier>{e8fe06f5-96bd-44a7-b356-d4e8891e5740}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\AudioManager">
+      <UniqueIdentifier>{91ca78e7-363b-436f-a37a-82f771ac7d1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AudioManager">
+      <UniqueIdentifier>{23fca766-33b9-4249-ae1a-1b050699dcdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Shop">
+      <UniqueIdentifier>{3ce2d7fc-e57a-4fb8-abe9-b327a407a230}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shop">
+      <UniqueIdentifier>{98942230-cbd5-4976-a008-6c1ca9f80c6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\Shop">
+      <UniqueIdentifier>{557f28f8-d90e-4a3b-b045-374525c98719}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Camera">
+      <UniqueIdentifier>{682e798a-9295-4d61-9789-609bfccb8880}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\Camera">
+      <UniqueIdentifier>{c9cbf43c-fbbe-4615-b81d-8c5bc69ca0a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ManagedTexture">
+      <UniqueIdentifier>{2ae45e7c-2ae5-4da2-9178-6561577beb10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ManagedTexture">
+      <UniqueIdentifier>{1a4e1fd4-55b7-4bdf-a4e8-4452fe207d19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Events\ObjectManager">
+      <UniqueIdentifier>{942f0e59-58de-4659-a1ce-89b2249b424a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Diagnostics">
+      <UniqueIdentifier>{0562386f-c534-4866-a318-f5c0698efea4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Networking">
+      <UniqueIdentifier>{94d949f3-ea1b-4229-9a10-4e8b2b6bafb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Networking">
+      <UniqueIdentifier>{69c52641-d258-43cc-a9c1-77a96835db39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Event">
+      <UniqueIdentifier>{a59f1fd1-32a1-4c32-b7f7-5dc67ebc7d96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base\Obj_Building">
+      <UniqueIdentifier>{a134e178-d350-4c34-b319-258f924af405}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base\Obj_Building\AnimatedBuilding">
+      <UniqueIdentifier>{fc6e48b2-bb42-4e4c-94dc-7cc99b255e4e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EloBuddy.Wrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectManager.hpp">
+      <Filter>Header Files\Objects\ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Exceptions.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.hpp">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticEnums.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Spellbook.hpp">
+      <Filter>Header Files\Objects\Spellbook</Filter>
+    </ClInclude>
+    <ClInclude Include="BuffInstance.hpp">
+      <Filter>Header Files\Objects\BuffInstance</Filter>
+    </ClInclude>
+    <ClInclude Include="AttackableUnit.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_AI_Base.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_AI_Minion.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_Barracks.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_Building</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_Building.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_Building</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_Lake.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_Building</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_Shop.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_Building</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_SpawnPoint.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_Building</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_AnimatedBuilding.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_Building\AnimatedBuilding</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_HQ.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_Building\AnimatedBuilding</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_Turret.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_Building\AnimatedBuilding</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_SpellMissile.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\Obj_SpellMissile</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_SpellChainMissile.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\Obj_SpellMissile</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_SpellCircleMissile.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\Obj_SpellMissile</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_SpellLineMissile.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\Obj_SpellMissile</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_AI_Turret.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="OnLevelUpSpellEventArgs.hpp">
+      <Filter>Header Files\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="OnLevelUpEventArgs.hpp">
+      <Filter>Header Files\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="OnUnitDashEventArgs.hpp">
+      <Filter>Header Files\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Drawing.h">
+      <Filter>Header Files\Drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="OnBeginScene.hpp">
+      <Filter>Header Files\Events\Drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="OnEndScene.hpp">
+      <Filter>Header Files\Events\Drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="OnReset.hpp">
+      <Filter>Header Files\Events\Drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="OnPresent.hpp">
+      <Filter>Header Files\Events\Drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="OnDraw.hpp">
+      <Filter>Header Files\Events\Drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="SpellDataInst.hpp">
+      <Filter>Header Files\Objects\Spellbook</Filter>
+    </ClInclude>
+    <ClInclude Include="SpellData.hpp">
+      <Filter>Header Files\Objects\Spellbook</Filter>
+    </ClInclude>
+    <ClInclude Include="GamePacket.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuGUI.h">
+      <Filter>Header Files\MenuGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="NavMesh.h">
+      <Filter>Header Files\NavMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="NavMeshCell.h">
+      <Filter>Header Files\MenuGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3Time.hpp">
+      <Filter>Header Files\Vector3</Filter>
+    </ClInclude>
+    <ClInclude Include="InventorySlot.hpp">
+      <Filter>Header Files\Objects\HeroInventory</Filter>
+    </ClInclude>
+    <ClInclude Include="GameUpdateEventArgs.hpp">
+      <Filter>Header Files\Events\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStartEventArgs.hpp">
+      <Filter>Header Files\Events\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="GameWndEventArgs.hpp">
+      <Filter>Header Files\Events\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_AI_Marker.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_GeneralParticleEmitter.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_BarracksDampener.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_Building\AnimatedBuilding</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_InfoPoint.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_LampBulb.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_Levelsizer.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_NavPoint.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectCreate.hpp">
+      <Filter>Header Files\Events\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawFX.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="GrassObject.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelPropGameObject.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelPropSpawnerPoint.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="UnrevealedTarget.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelPropAI.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="FollowerObject.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="GamePacketEventArgs.hpp">
+      <Filter>Header Files\Events\ENet</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessSpellCastEventArgs.hpp">
+      <Filter>Header Files\Events\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="NeutralMinionCamp.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="CastSpellEventArgs.hpp">
+      <Filter>Header Files\Events\Spellbook</Filter>
+    </ClInclude>
+    <ClInclude Include="TeleportEventArgs.hpp">
+      <Filter>Header Files\Events\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="StopCastEventArgs.hpp">
+      <Filter>Header Files\Events\Spellbook</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateChargedSpellEventArgs.hpp">
+      <Filter>Header Files\Events\Spellbook</Filter>
+    </ClInclude>
+    <ClInclude Include="NewPathEventArgs.hpp">
+      <Filter>Header Files\Events\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayAnimationEventArgs.hpp">
+      <Filter>Header Files\Events\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="AllUnits.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="TacticalMap.hpp">
+      <Filter>Header Files\TacticalMap</Filter>
+    </ClInclude>
+    <ClInclude Include="GameEndEventArgs.hpp">
+      <Filter>Header Files\Events\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerIssueOrderEventArgs.hpp">
+      <Filter>Header Files\Events\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="AttackableUnitDamageEventArgs.hpp">
+      <Filter>Header Files\Events\AttackableUnit</Filter>
+    </ClInclude>
+    <ClInclude Include="AttackableUnitModifyShieldEventArgs.hpp">
+      <Filter>Header Files\Events\AttackableUnit</Filter>
+    </ClInclude>
+    <ClInclude Include="GameAfkEventArgs.hpp">
+      <Filter>Header Files\Events\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Hud.h">
+      <Filter>Header Files\Hud</Filter>
+    </ClInclude>
+    <ClInclude Include="RiotAsset.h">
+      <Filter>Header Files\RiotAsset</Filter>
+    </ClInclude>
+    <ClInclude Include="Missile.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="MissileClient.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Version.hpp">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerSwapItemEventArgs.hpp">
+      <Filter>Header Files\Events\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="RADS.h">
+      <Filter>Header Files\RiotAsset</Filter>
+    </ClInclude>
+    <ClInclude Include="TacticalMapPingEventArgs.hpp">
+      <Filter>Header Files\Events\TacticalMap</Filter>
+    </ClInclude>
+    <ClInclude Include="GameNotifyEventArgs.hpp">
+      <Filter>Header Files\Events\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="BuffEventArgs.hpp">
+      <Filter>Header Files\Events\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="RiotString.h">
+      <Filter>Header Files\RiotString</Filter>
+    </ClInclude>
+    <ClInclude Include="Experience.h">
+      <Filter>Header Files\Objects\Experience</Filter>
+    </ClInclude>
+    <ClInclude Include="Hacks.h">
+      <Filter>Header Files\Hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="Chat.h">
+      <Filter>Header Files\Chat</Filter>
+    </ClInclude>
+    <ClInclude Include="ChatEventArgs.hpp">
+      <Filter>Header Files\Events\Chat</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelUpEventArgs.h">
+      <Filter>Header Files\Events\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemData.h">
+      <Filter>Header Files\Objects\HeroInventory</Filter>
+    </ClInclude>
+    <ClInclude Include="CharData.h">
+      <Filter>Header Files\Objects\ObjectManager\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="SpellInfoData.h">
+      <Filter>Header Files\Objects\ObjectManager\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="FollowerObjectWithLerpMovement.h">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="HeroDeathEventArgs.h">
+      <Filter>Header Files\Events\Obj_AI_Hero</Filter>
+    </ClInclude>
+    <ClInclude Include="HudChangeTargetEventArgs.hpp">
+      <Filter>Header Files\Events\Hud</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioManager.h">
+      <Filter>Header Files\AudioManager</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioManagerEventArgs.h">
+      <Filter>Header Files\Events\AudioManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_Ward.h">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateModelEventArgs.hpp">
+      <Filter>Header Files\Events\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Shop.hpp">
+      <Filter>Header Files\Shop</Filter>
+    </ClInclude>
+    <ClInclude Include="ShopActionEventArgs.hpp">
+      <Filter>Header Files\Events\Shop</Filter>
+    </ClInclude>
+    <ClInclude Include="ShopOpenEventArgs.h">
+      <Filter>Header Files\Events\Shop</Filter>
+    </ClInclude>
+    <ClInclude Include="ShopCloseEventArgs.h">
+      <Filter>Header Files\Events\Shop</Filter>
+    </ClInclude>
+    <ClInclude Include="ShopUndoPurchase.h">
+      <Filter>Header Files\Events\Shop</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraSnapEventArgs.h">
+      <Filter>Header Files\Events\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraLockToggleEventArgs.h">
+      <Filter>Header Files\Events\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraUpdateEventArgs.h">
+      <Filter>Header Files\Events\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="ManagedTexture.h">
+      <Filter>Header Files\ManagedTexture</Filter>
+    </ClInclude>
+    <ClInclude Include="OnAppendObjectEventArgs.hpp">
+      <Filter>Header Files\Events\ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraZoomEventArgs.h">
+      <Filter>Header Files\Events\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="AIHeroClient.hpp">
+      <Filter>Header Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="HeroApplyCooldownEventArgs.h">
+      <Filter>Header Files\Events\Obj_AI_Hero</Filter>
+    </ClInclude>
+    <ClInclude Include="BugSplat.h">
+      <Filter>Header Files\Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdatePositionEventArgs.hpp">
+      <Filter>Header Files\Events\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectFloatPropertyChangeEventArgs.h">
+      <Filter>Header Files\Events\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectIntegerPropertyChangeEvent.h">
+      <Filter>Header Files\Events\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerDoEmoteEventArgs.hpp">
+      <Filter>Header Files\Events\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="OnDrawHealthbarsEventArgs.h">
+      <Filter>Header Files\Events\Drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="Macros.hpp">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHeader.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="HashAlgorithm.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="SurrenderVoteEventArgs.hpp">
+      <Filter>Header Files\Events\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="OnAggroEventArgs.hpp">
+      <Filter>Header Files\Events\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="OnResetAggroEventArgs.hpp">
+      <Filter>Header Files\Events\Obj_AI_Base</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="EloBuddy.Wrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssemblyInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BuffInstance.cpp">
+      <Filter>Source Files\Objects\BuffInstance</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectManager.cpp">
+      <Filter>Source Files\Objects\ObjectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_AI_Minion.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_AI_Turret.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_AnimatedBuilding.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base\Obj_Building\AnimatedBuilding</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_HQ.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base\Obj_Building\AnimatedBuilding</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_Turret.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base\Obj_Building\AnimatedBuilding</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_Barracks.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base\Obj_Building</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_Lake.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base\Obj_Building</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_Shop.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base\Obj_Building</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_SpawnPoint.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base\Obj_Building</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="AttackableUnit.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_SpellMissile.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\Obj_SpellMissile</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_SpellChainMissile.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\Obj_SpellMissile</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_SpellCircleMissile.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\Obj_SpellMissile</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_SpellLineMissile.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\Obj_SpellMissile</Filter>
+    </ClCompile>
+    <ClCompile Include="Drawing.cpp">
+      <Filter>Source Files\Drawing</Filter>
+    </ClCompile>
+    <ClCompile Include="Spellbook.cpp">
+      <Filter>Source Files\Objects\Spellbook</Filter>
+    </ClCompile>
+    <ClCompile Include="SpellDataInst.cpp">
+      <Filter>Source Files\Objects\Spellbook</Filter>
+    </ClCompile>
+    <ClCompile Include="SpellData.cpp">
+      <Filter>Source Files\Objects\Spellbook</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuGUI.cpp">
+      <Filter>Source Files\MenuGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="NavMesh.cpp">
+      <Filter>Source Files\NavMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="NavMeshCell.cpp">
+      <Filter>Source Files\NavMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="InventorySlot.cpp">
+      <Filter>Source Files\Objects\HeroInventory</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_BarracksDampener.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base\Obj_Building\AnimatedBuilding</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_GeneralParticleEmitter.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_InfoPoint.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_LampBulb.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_Levelsizer.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_NavPoint.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawFX.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="GrassObject.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelPropAI.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelPropGameObject.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelPropSpawnerPoint.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="UnrevealedTarget.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="FollowerObject.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_Building.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base\Obj_Building</Filter>
+    </ClCompile>
+    <ClCompile Include="NeutralMinionCamp.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_AI_Marker.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="TacticalMap.cpp">
+      <Filter>Source Files\TacticalMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Hud.cpp">
+      <Filter>Source Files\Hud</Filter>
+    </ClCompile>
+    <ClCompile Include="RiotAsset.cpp">
+      <Filter>Source Files\RiotAsset</Filter>
+    </ClCompile>
+    <ClCompile Include="RADS.cpp">
+      <Filter>Source Files\RiotAsset</Filter>
+    </ClCompile>
+    <ClCompile Include="MissileClient.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="RiotString.cpp">
+      <Filter>Source Files\RiotString</Filter>
+    </ClCompile>
+    <ClCompile Include="Chat.cpp">
+      <Filter>Source Files\Chat</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioManager.cpp">
+      <Filter>Source Files\AudioManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Shop.cpp">
+      <Filter>Source Files\Shop</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="ManagedTexture.cpp">
+      <Filter>Source Files\ManagedTexture</Filter>
+    </ClCompile>
+    <ClCompile Include="AIHeroClient.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_AI_Base.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="GamePacket.cpp">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketHeader.cpp">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="GamePacketEventArgs.cpp">
+      <Filter>Source Files\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="CharData.cpp">
+      <Filter>Source Files\Objects\ObjectManager\Objects</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="app.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="app.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

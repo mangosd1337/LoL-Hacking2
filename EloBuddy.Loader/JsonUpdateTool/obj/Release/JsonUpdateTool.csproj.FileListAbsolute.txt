@@ -1,0 +1,9 @@
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Loader\workspace\JsonUpdateTool\bin\Release\JsonUpdateTool.exe.config
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Loader\workspace\JsonUpdateTool\bin\Release\JsonUpdateTool.exe
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Loader\workspace\JsonUpdateTool\bin\Release\JsonUpdateTool.pdb
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Loader\workspace\JsonUpdateTool\obj\Release\JsonUpdateTool.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Loader\workspace\JsonUpdateTool\obj\Release\JsonUpdateTool.MainForm.resources
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Loader\workspace\JsonUpdateTool\obj\Release\JsonUpdateTool.Properties.Resources.resources
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Loader\workspace\JsonUpdateTool\obj\Release\JsonUpdateTool.csproj.GenerateResource.Cache
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Loader\workspace\JsonUpdateTool\obj\Release\JsonUpdateTool.exe
+C:\Users\Administrator\.jenkins\jobs\EloBuddy.Loader\workspace\JsonUpdateTool\obj\Release\JsonUpdateTool.pdb

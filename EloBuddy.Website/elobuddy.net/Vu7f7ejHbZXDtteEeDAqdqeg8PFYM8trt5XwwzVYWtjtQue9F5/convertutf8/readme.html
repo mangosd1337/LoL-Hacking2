@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>IPS Converter Read Me</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="css/jumbotron.css" rel="stylesheet" media="screen">
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h3 class="text-muted">IPS UTF8 Converter Read Me</h3>
+      </div>
+      <div class="jumbotron">
+	  	   <h1>Welcome!</h1>
+	  	   <p class="lead">
+	  	   	This utility will convert all the tables in your community database to UTF-8 without deleting or overwriting your existing data.
+	  	   </p>
+      </div>
+      <h3>Installing</h3>
+      <p>
+      	Simply upload the directory <code>utf8convert</code> to your community root directory.
+      </p>
+      <h3>How it works</h3>
+      <p>
+      	The converter will create new tables with the prefix "x_utf_". The converter will read your existing data, convert it to UTF-8 and then save it into the "x_utf_" prefixed tables.
+      </p>
+      <p>
+      	Once the data conversion has taken place, you can test the conversion by editing your <code>conf_global.php</code> file to alter the <code>sql_tbl_prefix</code> and to make sure that the <code>sql_charset</code> is set to <code>utf8</code>. The exact instructions for this
+      	are shown when the conversion has finished.
+      </p>
+      <p>
+      	Once you are happy that the conversion is correct, you are prompted to <strong>finish</strong> the conversion. This will rename your existing database tables with the prefix "orig_" and the UTF-8 tables
+      	will be renamed to your existing prefix. You are then prompted again to edit your <code>conf_global.php</code> file to alter the <code>sql_tbl_prefix</code>.
+      </p>
+      <p>
+      	You can then delete the "orig_" prefixed tables when you are happy that the conversion is complete and the original unconverted data is no longer required.
+      </p>
+      <h3>Web or command line?</h3>
+      <p>
+      	This converter is available with two interfaces. There is a <strong>web</strong> version that you can launch using the button below.
+      	<br />
+      	The preferred method is to use the command line version. If you have shell access with your hosting account, then please launch the shell converter interface by using <code>cd</code> to navigate to
+      	your community root and then run <code>php cli.php</code> and follow the onscreen prompts. If you are running from the Windows command prompt or your shell client does not support colors, then run <code>php cli.php --basic</code>.
+      </p> 
+	  <h3>Getting Help</h3>
+	  <p>
+	  	If you encounter any issues while using this converter, please report the issue to our <a href="https://invisionpower.com/4bugtrack/">bug tracker</a>. When creating a new
+	  	bug report please copy and paste the "info" from the converter output.
+	  	<br />
+	  	Active IP.Board license holders can also request support via the <a href="https://invisionpower.com/clientarea">client center</a>.
+	  	<br />
+	  	If you're using the command line version, please run <code>php cli.php --info</code>. If you're using the web version, please click on the "Tools" button at the top. This information
+	  	will help us debug the issue. No sensitive data is ever revealed with this tool.
+	  </p>
+	  <p><a class="btn btn-lg btn-info" href="index.php?controller=browser">Start Web Converter</a></p>
+      <div class="footer">
+        <p>&copy; <script type="text/javascript">document.write( new Date().getFullYear() );</script><noscript>2015</noscript> Invision Power Services, Inc.</p>
+      </div>
+    </div>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+  </body>
+</html>

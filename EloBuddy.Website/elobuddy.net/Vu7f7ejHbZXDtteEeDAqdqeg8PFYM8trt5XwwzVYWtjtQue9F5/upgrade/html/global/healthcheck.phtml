@@ -1,0 +1,44 @@
+<ips:template parameters="$requirements, $designerMode" />
+{{$canProceed = TRUE;}}
+<section>
+	{{if $designerMode}}
+		<h2 class="ipsType_sectionHead">{lang="hc_designers_mode"}</h2>
+		<ul class="ipsPad ipsType_large ipsList_checks">
+			{{$canProceed = FALSE;}}
+			<li class="fail inline">
+				{lang="hc_designers_enabled"}
+			</li>
+			<li class='ipsType_normal'>
+				<a href="{url="controller=systemcheck&key={$_SESSION['uniqueKey']}&disableDesignersMode=1"}" class="ipsButton ipsButton_negative">{lang="hc_disable_designers"}</a>
+				<div class='ipsType_light ipsType_small'>{lang="hc_designers_dis_info"}</div>
+			</li>
+		</ul>
+	{{endif}}
+	{{foreach $requirements['requirements'] as $k => $_requirements}}
+		<h2 class="ipsType_sectionHead">{lang="hc_requirements" sprintf="$k"}</h2>
+		<ul class="ipsPad ipsType_large ipsList_checks">
+			{{foreach $_requirements as $item}}
+				{{if !$item['success']}}{{$canProceed = FALSE;}}{{endif}}
+				<li class="{{if $item['success']}}success{{else}}fail{{endif}}">{$item['message']}</li>
+			{{endforeach}}
+		</ul>
+	{{endforeach}}
+	{{if isset( $requirements['advice'] ) and count( $requirements['advice'] )}}
+		<h2 class="ipsType_sectionHead">{lang="hc_recommendations"}</h2>
+		<br><br>
+		<p class="ipsType_normal">{lang="hc_recommendations_info"}</p>
+		<ul class="ipsPad ipsType_large ipsList_checks">
+			{{foreach $requirements['advice'] as $key => $item}}
+				<li class="{{if $key === 'php'}}ipsMessage ipsMessage_warning{{else}}advisory{{endif}}">{$item}</li>
+			{{endforeach}}
+		</ul>
+	{{endif}}
+</section>
+
+<div class='ipsPad_double ipsType_center'>
+	{{if $canProceed}}
+		<a href='{url="controller=license&key={$_SESSION['uniqueKey']}"}' class='ipsButton ipsButton_large ipsButton_primary'>{lang="continue"}</a>
+	{{else}}
+		<a href='' class='ipsButton ipsButton_large ipsButton_primary ipsButton_disabled'>{lang="hc_no_continue"}</a>
+	{{endif}}
+</div>

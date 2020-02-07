@@ -1,0 +1,1977 @@
+From 96de537cecbd684b38f1aa3bedf79e596f97a65d Mon Sep 17 00:00:00 2001
+From: stefsot <stefsot@windowslive.com>
+Date: Sat, 20 Feb 2016 16:49:25 +0200
+Subject: [PATCH 28/28] Improved Prediction
+
+---
+ EloBuddy.SDK/Extensions.cs |   10 +
+ EloBuddy.SDK/Geometry.cs   |  117 ++-
+ EloBuddy.SDK/Prediction.cs | 1550 ++++++++++++----------------
+ 3 files changed, 773 insertions(+), 904 deletions(-)
+
+diff --git a/EloBuddy.SDK/Extensions.cs b/EloBuddy.SDK/Extensions.cs
+index 5db4531..6c6294c 100644
+--- a/EloBuddy.SDK/Extensions.cs
++++ b/EloBuddy.SDK/Extensions.cs
+@@ -796,6 +796,16 @@ namespace EloBuddy.SDK
+             return CountAlliesInRange(baseObject != null ? baseObject.ServerPosition : target.Position, range);
+         }
+ 
++        public static bool IsWall(this Vector2 vector)
++        {
++            return NavMesh.GetCollisionFlags(vector.X, vector.Y).HasFlag(CollisionFlags.Wall);
++        }
++
++        public static bool IsWall(this Vector3 vector)
++        {
++            return IsWall(vector.To2D());
++        }
++
+         public static bool IsUnderTurret(this Vector2 position)
+         {
+             return EntityManager.Turrets.AllTurrets.Any(turret => turret.Distance(position, true) <= turret.GetAutoAttackRange().Pow());
+diff --git a/EloBuddy.SDK/Geometry.cs b/EloBuddy.SDK/Geometry.cs
+index 0ce170e..db2ae40 100644
+--- a/EloBuddy.SDK/Geometry.cs
++++ b/EloBuddy.SDK/Geometry.cs
+@@ -162,8 +162,8 @@ namespace EloBuddy.SDK
+             var ay = segmentStart.Y;
+             var bx = segmentEnd.X;
+             var by = segmentEnd.Y;
+-            var rL = ((cx - ax) * (bx - ax) + (cy - ay) * (by - ay)) / ((bx - ax).Pow() + (by - ay).Pow());
+-            var pointLine = new Vector2(ax + rL * (bx - ax), ay + rL * (by - ay));
++            var rL = ((cx - ax) * (bx - ax) + (cy - ay) * (@by - ay)) / ((bx - ax).Pow() + (@by - ay).Pow());
++            var pointLine = new Vector2(ax + rL * (bx - ax), ay + rL * (@by - ay));
+             float rS;
+             if (rL < 0)
+             {
+@@ -311,6 +311,115 @@ namespace EloBuddy.SDK
+             return new object[] { t1, (!float.IsNaN(t1)) ? new Vector2(sP1x + S * t1, sP1y + K * t1) : new Vector2() };
+         }
+ 
++        public static bool PointInLineSegment(Vector2 segmentStart, Vector2 segmentEnd, Vector2 point)
++        {
++            var distanceStartEnd = segmentStart.Distance(segmentEnd, true);
++            var distanceStartPoint = segmentStart.Distance(point, true);
++            var distanceEndPoint = segmentEnd.Distance(point, true);
++            return !(distanceEndPoint > distanceStartEnd || distanceStartPoint > distanceStartEnd);
++        }
++
++        [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
++        public static int LineCircleIntersection(float cX, float cY, float radius, Vector2 segmentStart, Vector2 segmentEnd, out Vector2 intersection1, out Vector2 intersection2)
++        {
++            float t;
++
++            var dx = segmentEnd.X - segmentStart.X;
++            var dy = segmentEnd.Y - segmentStart.Y;
++
++            var a = dx * dx + dy * dy;
++            var b = 2 * (dx * (segmentStart.X - cX) + dy * (segmentStart.Y - cY));
++            var c = (segmentStart.X - cX) * (segmentStart.X - cX) + (segmentStart.Y - cY) * (segmentStart.Y - cY) - radius * radius;
++            var det = b * b - 4 * a * c;
++
++            if (Math.Abs(a) <= float.Epsilon || (det < 0))
++            {
++                intersection1 = new Vector2(float.NaN, float.NaN);
++                intersection2 = new Vector2(float.NaN, float.NaN);
++
++                return 0;
++            }
++            if (det == 0)
++            {
++                t = -b / (2 * a);
++                intersection1 = new Vector2(segmentStart.X + t * dx, segmentStart.Y + t * dy);
++                intersection2 = new Vector2(float.NaN, float.NaN);
++
++                return 1;
++            }
++
++            t = (float) ((-b + Math.Sqrt(det)) / (2 * a));
++            intersection1 = new Vector2(segmentStart.X + t * dx, segmentStart.Y + t * dy);
++            t = (float) ((-b - Math.Sqrt(det)) / (2 * a));
++            intersection2 = new Vector2(segmentStart.X + t * dx, segmentStart.Y + t * dy);
++
++            return 2;
++        }
++
++        public static int LineSegmentCircleIntersection(float cX, float cY, float radius, Vector2 segmentStart, Vector2 segmentEnd, out Vector2 intersection1, out Vector2 intersection2)
++        {
++            var count = LineCircleIntersection(cX, cY, radius, segmentStart, segmentEnd, out intersection1, out intersection2);
++            var nan = new Vector2(float.NaN, float.NaN);
++
++            if (!PointInLineSegment(segmentStart, segmentEnd, intersection2))
++            {
++                intersection2 = nan;
++                count--;
++            }
++
++            if (!PointInLineSegment(segmentStart, segmentEnd, intersection1))
++            {
++                intersection1 = intersection2;
++                count--;
++            }
++
++            return count;
++        }
++
++        public static int SegmentCircleIntersectionPriority(Vector2 segmentStart, Vector2 segmentEnd, Vector2 circlePos1, float radius1, Vector2 circlePos2, float radius2)
++        {
++            Vector2 aIntersection1;
++            Vector2 aIntersection2;
++            Vector2 bIntersection1;
++            Vector2 bIntersection2;
++
++            var aCount = Geometry.LineSegmentCircleIntersection(circlePos1.X, circlePos1.Y, radius1, segmentStart, segmentEnd, out aIntersection1, out aIntersection2);
++            var bCount = Geometry.LineSegmentCircleIntersection(circlePos2.X, circlePos2.Y, radius2, segmentStart, segmentEnd, out bIntersection1, out bIntersection2);
++
++            if (aCount == 0 && bCount == 0)
++                return 0;
++
++            if (bCount == 0 && aCount > 0)
++                return 1;
++
++            if (aCount == 0 && bCount > 0)
++                return 2;
++
++            var aPoint = aCount == 1
++                ? aIntersection1
++                : (segmentEnd.Distance(aIntersection1, true) > segmentEnd.Distance(aIntersection2, true)
++                    ? aIntersection1
++                    : aIntersection2);
++
++            var bPoint = bCount == 1
++                ? bIntersection1
++                : (segmentEnd.Distance(bIntersection1, true) > segmentEnd.Distance(bIntersection2, true)
++                    ? bIntersection1
++                    : bIntersection2);
++
++            return segmentEnd.Distance(aPoint, true) > segmentEnd.Distance(bPoint, true) ? 1 : 2;
++        }
++
++        public static Vector2 CenterPoint(this Vector2[] points)
++        {
++            if (points.Length == 0)
++            {
++                return Vector2.Zero;
++            }
++
++            return new Vector2(points.Sum(v => v.X) / points.Length, points.Sum(v => v.Y) / points.Length);
++        }
++
+         public static bool Close(float a, float b, float eps)
+         {
+             if (Math.Abs(eps) < float.Epsilon)
+@@ -423,10 +532,10 @@ namespace EloBuddy.SDK
+             {
+                 var from = self2[i];
+                 var to = self2[i + 1];
+-                var d = (int) to.Distance(from);
++                var d = (int) to.Distance(@from);
+                 if (d > distance)
+                 {
+-                    return from + distance * (to - from).Normalized();
++                    return @from + distance * (to - @from).Normalized();
+                 }
+                 distance -= d;
+             }
+diff --git a/EloBuddy.SDK/Prediction.cs b/EloBuddy.SDK/Prediction.cs
+index 49a73f6..b722cce 100644
+--- a/EloBuddy.SDK/Prediction.cs
++++ b/EloBuddy.SDK/Prediction.cs
+@@ -3,8 +3,10 @@ using System.Collections.Generic;
+ using System.Linq;
+ using EloBuddy.SDK.Constants;
+ using EloBuddy.SDK.Enumerations;
++using EloBuddy.SDK.Events;
+ using EloBuddy.SDK.Menu;
+ using EloBuddy.SDK.Menu.Values;
++using EloBuddy.SDK.Utils;
+ using SharpDX;
+ 
+ // ReSharper disable MemberHidesStaticFromOuterClass
+@@ -272,1120 +274,863 @@ namespace EloBuddy.SDK
+ 
+         public static class Position
+         {
+-            #region "Constants"
++            internal static Menu.Menu Menu { get; set; }
+ 
+-            private const int SpeedHuge = 50000000;
+-
+-            private const int BaseImmunityTime = 100;
+-            private const int BaseExtraRadius = 25;
+-            private const int ReactTimeHumanAverage = 250;
+-
+-            private const float HitchanceAdjustmentScale = 0.015F;
+-            private const int HitchanceAdjustmentMax = 10;
+-
+-            private const float LinearHitchanceBase = 100;
+-            private const float LinearHitchanceReactionMaxPenalty = 75;
+-            private const float LinearHitchancePathChangeMaxBonus = 20;
+-
+-            private const float ReactTimeMovingScale = 0.021909F;
+-            private const float ReactTimeNotMovingScale = 0.0284269F;
+-            private const float ReactTimeNotMovingScaleOffset = 0.0298799F;
+-
+-            private const float PathChangeBaseBonus = -10F;
+-            private const float PathChangeMovingScale = 0.0899F;
+-            private const float PathChangeNotMovingScale = 0.01576F;
+-
+-            #endregion
+-
+-            #region "Internal Classes"
+-
+-            internal static class Utils
++            internal static int Ping
+             {
+-                internal static bool IsPointOutOfLineSegment(Vector2 segmentStart, Vector2 segmentEnd, Vector2 point)
+-                {
+-                    var distanceStartEnd = segmentStart.Distance(segmentEnd, true);
+-                    var distanceStartPoint = segmentStart.Distance(point, true);
+-                    var distanceEndPoint = segmentEnd.Distance(point, true);
+-                    return (distanceEndPoint > distanceStartEnd || distanceStartPoint > distanceStartEnd);
+-                }
+-
+-                internal static void AdjustPointToLineSegment(Vector2 segmentStart, Vector2 segmentEnd, ref Vector2 point)
+-                {
+-                    if (IsPointOutOfLineSegment(segmentEnd, segmentEnd, point))
+-                    {
+-                        point = segmentEnd;
+-                    }
+-                }
+-
+-                internal static int GetLineCircleIntersectionPoints(
+-                    float cX,
+-                    float cY,
+-                    float radius,
+-                    Vector2 lineStart,
+-                    Vector2 lineEnd,
+-                    out Vector2 intersection1,
+-                    out Vector2 intersection2)
+-                {
+-                    float t;
+-
+-                    var dx = lineEnd.X - lineStart.X;
+-                    var dy = lineEnd.Y - lineStart.Y;
+-
+-                    var A = dx * dx + dy * dy;
+-                    var B = 2 * (dx * (lineStart.X - cX) + dy * (lineStart.Y - cY));
+-                    var C = (lineStart.X - cX) * (lineStart.X - cX) +
+-                            (lineStart.Y - cY) * (lineStart.Y - cY) -
+-                            radius * radius;
+-
+-                    var det = B * B - 4 * A * C;
+-                    if ((A <= 0.0000001) || (det < 0))
+-                    {
+-                        intersection1 = new Vector2(float.NaN, float.NaN);
+-                        intersection2 = new Vector2(float.NaN, float.NaN);
+-                        return 0;
+-                    }
+-                    if (det == 0)
+-                    {
+-                        t = -B / (2 * A);
+-                        intersection1 =
+-                            new Vector2(lineStart.X + t * dx, lineStart.Y + t * dy);
+-                        intersection2 = new Vector2(float.NaN, float.NaN);
+-                        return 1;
+-                    }
+-                    t = (float) ((-B + Math.Sqrt(det)) / (2 * A));
+-                    intersection1 =
+-                        new Vector2(lineStart.X + t * dx, lineStart.Y + t * dy);
+-                    t = (float) ((-B - Math.Sqrt(det)) / (2 * A));
+-                    intersection2 =
+-                        new Vector2(lineStart.X + t * dx, lineStart.Y + t * dy);
+-                    return 2;
+-                }
+-
+-                internal static int LineSegmentCircleCircleIntersectionPriority(
+-                    Vector2 segmentStart,
+-                    Vector2 segmentEnd,
+-                    Vector2 circlePos1,
+-                    float radius1,
+-                    Vector2 circlePos2,
+-                    float radius2)
+-                {
+-                    Vector2 aIntersection1;
+-                    Vector2 aIntersection2;
+-
+-                    var aCount = GetLineCircleIntersectionPoints(circlePos1.X, circlePos1.Y, radius1, segmentStart,
+-                        segmentEnd, out aIntersection1, out aIntersection2);
+-
+-                    Vector2 bIntersection1;
+-                    Vector2 bIntersection2;
+-
+-                    var bCount = GetLineCircleIntersectionPoints(circlePos2.X, circlePos2.Y, radius2, segmentStart,
+-                        segmentEnd, out bIntersection1, out bIntersection2);
+-
+-                    if (IsPointOutOfLineSegment(segmentStart, segmentEnd, aIntersection1))
+-                    {
+-                        aCount -= 1;
+-                        aIntersection1 = aIntersection2;
+-                    }
+-
+-                    if (IsPointOutOfLineSegment(segmentStart, segmentEnd, aIntersection2))
+-                    {
+-                        aCount -= 1;
+-                    }
+-
+-                    if (IsPointOutOfLineSegment(segmentStart, segmentEnd, bIntersection1))
+-                    {
+-                        bCount -= 1;
+-                        bIntersection1 = bIntersection2;
+-                    }
+-
+-                    if (IsPointOutOfLineSegment(segmentStart, segmentEnd, bIntersection2))
+-                    {
+-                        bCount -= 1;
+-                    }
+-
+-                    if (aCount == 0 && bCount == 0)
+-                        return 0;
+-                    if (bCount == 0 && aCount > 0)
+-                        return 1;
+-                    if (aCount == 0 && bCount > 0)
+-                        return 2;
+-
+-                    var aPoint = aCount == 1
+-                        ? aIntersection1
+-                        : (segmentEnd.Distance(aIntersection1, true) > segmentEnd.Distance(aIntersection2, true)
+-                            ? aIntersection1
+-                            : aIntersection2);
+-                    var bPoint = bCount == 1
+-                        ? bIntersection1
+-                        : (segmentEnd.Distance(bIntersection1, true) > segmentEnd.Distance(bIntersection2, true)
+-                            ? bIntersection1
+-                            : bIntersection2);
+-
+-                    return segmentEnd.Distance(aPoint, true) > segmentEnd.Distance(bPoint, true) ? 1 : 2;
+-                }
+-
+-                internal static Vector2 GetCenterPoint(Vector2[] points)
+-                {
+-                    if (points.Length == 0)
+-                    {
+-                        return Vector2.Zero;
+-                    }
+-
+-                    return new Vector2(points.Sum(v => v.X) / points.Length, points.Sum(v => v.Y) / points.Length);
+-                }
++                get { return Game.Ping; }
+             }
+ 
+-            internal class DashArgs
++            internal static int ExtraHitbox
+             {
+-                internal Vector3[] Path;
+-                internal int Time;
+-
+-                internal DashArgs(Vector3[] path, int time)
+-                {
+-                    Path = path;
+-                    Time = time;
+-                }
++                get { return Menu["extraHitboxRadius"].Cast<Slider>().CurrentValue; }
+             }
+ 
+-            internal static class HitChanceCalculator
++            internal static void Initialize()
+             {
+-                internal static float HitChanceAdjustment
+-                {
+-                    get
+-                    {
+-                        return 1F; //+ Menu["hitchanceAdjustment"].Cast<Slider>().CurrentValue * HitchanceAdjustmentScale;
+-                    }
+-                }
++                Menu = MainMenu.AddMenu("Prediction", "Prediction");
++                Menu.AddGroupLabel("Collision");
++                Menu.Add("extraHitboxRadius", new Slider("Extra Hitbox Radius", 0, 0, 50));
+ 
+-                internal static float CalculateHitchance(
+-                    Obj_AI_Base target,
+-                    Vector2 sourcePos,
+-                    Vector2 castPos,
+-                    int missileRadius,
+-                    float missileSpeed,
+-                    int delay)
+-                {
+-                    var travelTime = missileSpeed > 0 ? sourcePos.Distance(castPos) / missileSpeed : 0;
+-                    var reactTime = 1000 *
+-                                    (travelTime - (target.BoundingRadius + missileRadius) / target.MoveSpeed +
+-                                     target.Position.Distance(castPos) / target.MoveSpeed) + delay;
+-                    var pathChangetime = Math.Min(PathChangeElapsedTime(target), 2500);
+-
+-                    var hitchance = LinearHitchanceBase;
+-                    var scale = IsMoving(target)
+-                        ? ReactTimeMovingScale
+-                        : ReactTimeNotMovingScale - ReactTimeNotMovingScaleOffset * pathChangetime;
+-                    hitchance -= Math.Min(reactTime * scale, LinearHitchanceReactionMaxPenalty);
+-
+-                    hitchance +=
+-                        Math.Min(
+-                            PathChangeBaseBonus +
+-                            pathChangetime * (IsMoving(target) ? PathChangeMovingScale : PathChangeNotMovingScale),
+-                            LinearHitchancePathChangeMaxBonus);
+-
+-                    if (reactTime <= ReactTimeHumanAverage)
+-                        return 100;
+-
+-                    return hitchance * HitChanceAdjustment;
+-                }
++                Obj_AI_Base.OnProcessSpellCast += OnBasicAttack;
++                Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
++                Obj_AI_Base.OnNewPath += OnNewPath;
+             }
+ 
+-            #endregion
++            private static Dictionary<int, List<Vector2>> _pathGroup = new Dictionary<int, List<Vector2>>();
++            private static Dictionary<int, Vector2> _tendencyDestination = new Dictionary<int, Vector2>();
+ 
+-            public static class Collision
++            private static void OnNewPath(Obj_AI_Base sender, GameObjectNewPathEventArgs args)
+             {
+-                public static bool MovingObjectsCollision(
+-                    Vector2 startPos1,
+-                    Vector2 endPos1,
+-                    float radius1,
+-                    float speed1,
+-                    bool isUnit1,
+-                    Vector2 startPos2,
+-                    Vector2 endPos2,
+-                    float radius2,
+-                    float speed2,
+-                    bool isUnit2)
++                if (!args.IsDash && sender is AIHeroClient)
+                 {
+-                    // constants
+-                    var a = speed2;
+-                    var b = startPos2.Distance(endPos2);
+-                    var c = endPos2.X;
+-                    var d = startPos2.X;
+-                    var f = startPos1.Distance(endPos1);
+-                    var j = endPos1.X;
+-                    var k = speed1;
+-                    var m = startPos1.X;
+-                    var n = endPos2.Y;
+-                    var p = startPos2.Y;
+-                    var q = endPos1.Y;
+-                    var w = startPos1.Y;
+-                    var h = (radius1 + radius2).Pow();
+-
+-                    // function distance(t) = a*t^2 + b*t + c
+-                    // solve for distance(t) <= h 
+-                    var theta = -1 / (b * b * f * f);
+-                    var da = (-a * a * c * c * f * f + 2 * a * a * c * d * f * f - a * a * d * d * f * f -
+-                              a * a * f * f * n * n + 2 * a * a * f * f * n * p - a * a * f * f * p * p +
+-                              2 * a * b * c * f * j * k - 2 * a * b * c * f * k * m - 2 * a * b * d * f * j * k +
+-                              2 * a * b * d * f * k * m + 2 * a * b * f * k * n * q -
+-                              2 * a * b * f * k * n * w -
+-                              2 * a * b * f * k * p * q + 2 * a * b * f * k * p * w - b * b * j * j * k * k +
+-                              2 * b * b * j * k * k * m - b * b * k * k * m * m - b * b * k * k * q * q +
+-                              2 * b * b * k * k * q * w - b * b * k * k * w * w) * theta;
+-                    var db = (-2 * a * b * c * d * f * f + 2 * a * b * c * f * f * m + 2 * a * b * d * d * f * f -
+-                              2 * a * b * d * f * f * m - 2 * a * b * f * f * n * p +
+-                              2 * a * b * f * f * n * w +
+-                              2 * a * b * f * f * p * p - 2 * a * b * f * f * p * w + 2 * b * b * d * f * j * k -
+-                              2 * b * b * d * f * k * m - 2 * b * b * f * j * k * m +
+-                              2 * b * b * f * k * m * m +
+-                              2 * b * b * f * k * p * q - 2 * b * b * f * k * p * w - 2 * b * b * f * k * q * w +
+-                              2 * b * b * f * k * w * w) * theta;
+-                    var dc = (b * b * (-d * d) * f * f + 2 * b * b * d * f * f * m + b * b * f * f * h -
+-                              b * b * f * f * m * m - b * b * f * f * p * p + 2 * b * b * f * f * p * w -
+-                              b * b * f * f * w * w) * theta;
+-                    var dd = db * db - 4 * da * dc;
++                    List<Vector2> group;
+ 
+-                    // division with 0
+-                    if (b == 0 || f == 0)
+-                        return true;
+-
+-                    // static function
+-                    if (da == 0 && db == 0)
+-                        return dc <= 0;
+-
+-                    // no solutions
+-                    if (dd < 0)
+-                        return dc <= 0;
+-
+-                    //TODO: check if da == 0
+-                    //var solution0 = -dc / db; 
+-
+-                    var solution1 = (-db + Math.Sqrt(dd)) / (2 * da);
+-                    var solution2 = (-db - Math.Sqrt(dd)) / (2 * da);
+-
+-                    var time1 = startPos1.Distance(endPos1) / speed1;
+-                    var time2 = startPos2.Distance(endPos2) / speed2;
+-
+-                    // check only for t[0, maxTime]
+-                    var minTime = 0F;
+-                    var maxTime = time1 > time2 ? time2 : time1;
+-
+-                    // function changes polarity during [t, maxTime]
+-                    if (solution1 >= minTime && solution1 <= maxTime)
+-                        return true;
+-
+-                    // function changes polarity during [t, maxTime]
+-                    if (solution2 >= minTime && solution2 <= maxTime)
+-                        return true;
+-
+-                    // check when one object stops moving and f(0) > 0
+-                    if ((time1 > time2 || time2 > time1) && dc > 0)
++                    if (!_pathGroup.TryGetValue(sender.NetworkId, out group))
+                     {
+-                        // missiles disappear
+-                        if ((time2 > time1 && !isUnit1) || (time1 > time2 && !isUnit2))
+-                            return false;
+-
+-                        var time = (time1 > time2 ? time2 : time1);
+-                        var lineStart = time1 > time2 ? startPos1 : startPos2;
+-                        var lineEnd = time1 > time2 ? endPos1 : endPos2;
+-                        var speed = time1 > time2 ? speed1 : speed2;
+-                        var circlePos = time1 > time2 ? endPos2 : endPos1;
+-                        var circleRadius = radius1 + radius2;
+-
+-                        lineStart = lineStart.Extend(lineEnd, speed * time);
+-
+-                        // check for intersection
+-                        return
+-                            Utils.LineSegmentCircleCircleIntersectionPriority(lineStart, lineEnd, circlePos,
+-                                circleRadius,
+-                                circlePos,
+-                                circleRadius) > 0;
++                        group = new List<Vector2>();
++                        _pathGroup[sender.NetworkId] = group;
+                     }
+ 
+-                    //  check function value for t = 0, (f(0) = c)
+-                    return dc <= 0;
+-                }
++                    var destination = args.Path.Last().To2D();
++                    var center = group.Any() ? group.ToArray().CenterPoint() : destination;
+ 
+-                public static bool LinearMissileCollision(Obj_AI_Base unit, Vector2 missileStartPos, Vector2 missileEndPos, float missileSpeed, int missileWidth, int delay, int extraRadius = 0)
+-                {
+-                    if (!IsMoving(unit))
++                    const int tolerance = 200;
++
++                    if (destination.Distance(center, true) <= tolerance.Pow())
+                     {
+-                        return Utils.LineSegmentCircleCircleIntersectionPriority(missileStartPos, missileEndPos,
+-                            unit.ServerPosition.To2D(),
+-                            unit.BoundingRadius + missileWidth / 2, unit.ServerPosition.To2D(),
+-                            unit.BoundingRadius + missileWidth / 2 + extraRadius) > 0;
++                        group.Add(destination);
++                        _tendencyDestination[sender.NetworkId] = group.ToArray().CenterPoint();
+                     }
+-
+-                    var time = Game.Ping + delay;
+-                    var position = PredictUnitPosition(unit, time);
+-                    var path = GetRealPath(unit);
+-
+-                    var t = 0F;
+-                    for (var i = 0; i < path.Length - 1; i++)
++                    else
+                     {
+-                        var start = path[i].To2D();
+-                        var end = path[i + 1].To2D();
+-
+-                        if (position != Vector2.Zero)
+-                        {
+-                            if (Utils.IsPointOutOfLineSegment(start, end, position))
+-                            {
+-                                continue;
+-                            }
+-
+-                            start = position;
+-                            position = Vector2.Zero;
+-                        }
+-
+-                        var missileStart = missileStartPos.Extend(missileEndPos, t * missileSpeed);
+-
+-                        if (Utils.IsPointOutOfLineSegment(missileStartPos, missileEndPos, missileStart))
+-                        {
+-                            break;
+-                        }
+-
+-                        var endCollision = i >= path.Length - 2;
+-
+-                        if (MovingObjectsCollision(missileStart, missileEndPos, missileWidth, missileSpeed, false,
+-                            start, end, unit.BoundingRadius + extraRadius, unit.MoveSpeed, endCollision))
+-                        {
+-                            return true;
+-                        }
+-
+-                        t += start.Distance(end) / unit.MoveSpeed;
++                        group.Clear();
++                        _tendencyDestination[sender.NetworkId] = destination;
+                     }
+-
+-                    return false;
+-                }
+-
+-                public static bool CircularMissileCollision(Obj_AI_Base unit, Vector2 missileStartPos, Vector2 missileEndPos, float missileSpeed, int missileRadius, int delay)
+-                {
+-                    var time = Game.Ping + delay +
+-                               (missileSpeed > 0 ? missileStartPos.Distance(missileEndPos) / missileSpeed : 0F);
+-                    var position = PredictUnitPosition(unit, (int) time);
+-                    return missileEndPos.Distance(position, true) <= (missileRadius + unit.BoundingRadius).Pow();
+-                }
+-
+-                public static Vector2 GetCollisionPoint(
+-                    Vector2 unitStart,
+-                    Vector2 unitEnd,
+-                    Vector2 missileStart,
+-                    float unitSpeed,
+-                    float missileSpeed)
+-                {
+-                    if (unitStart == unitEnd)
+-                        return unitStart;
+-
+-                    var pointA = unitStart;
+-                    var pointB = unitEnd;
+-                    var pointC = missileStart;
+-
+-                    var vectorC = new Vector2(pointC.X - pointA.X, pointC.Y - pointA.Y);
+-                    var vectorB = new Vector2(pointB.X - pointA.X, pointB.Y - pointA.Y);
+-
+-                    var cosine = (vectorC.X * vectorB.X + vectorC.Y * vectorB.Y) /
+-                                 (Math.Sqrt(Math.Pow(vectorC.X, 2) + Math.Pow(vectorC.Y, 2)) *
+-                                  Math.Sqrt(Math.Pow(vectorB.X, 2) + Math.Pow(vectorB.Y, 2)));
+-
+-                    var distanceCA = pointA.Distance(pointC);
+-
+-                    var distanceAP =
+-                        (float)
+-                            Math.Abs((unitSpeed.Pow() * distanceCA * cosine -
+-                                      Math.Sqrt(unitSpeed.Pow() * distanceCA.Pow() *
+-                                                (missileSpeed.Pow() + unitSpeed.Pow() * cosine.Pow() - unitSpeed.Pow()))) /
+-                                     (missileSpeed.Pow() - unitSpeed.Pow()));
+-
+-                    return pointA.Extend(pointB, distanceAP);
+                 }
+             }
+ 
+-            public static Menu.Menu Menu { get; internal set; }
+-            private static readonly Dictionary<int, DashArgs> DashDictionary = new Dictionary<int, DashArgs>();
+-            private static readonly Dictionary<int, int> PathChangeDictionary = new Dictionary<int, int>();
+-
+-            private static int ImmunityTime
++            private static Vector2 TendencyDestination(Obj_AI_Base unit)
+             {
+-                get { return BaseImmunityTime; }
+-            }
++                var dash = unit.GetDashInfo();
+ 
+-            private static int ExtraRadius
+-            {
+-                get { return BaseExtraRadius + Menu["extraHitboxRadius"].Cast<Slider>().CurrentValue; }
+-            }
+-
+-            private static bool DashSimulation
+-            {
+-                get { return Menu["dashSpeedSimulation"].Cast<CheckBox>().CurrentValue; }
+-            }
++                if (dash != null)
++                {
++                    return dash.EndPos.To2D();
++                }
+ 
+-            internal static void Initialize()
+-            {
+-                Menu = MainMenu.AddMenu("Prediction", "Prediction");
+-                Menu.AddGroupLabel("Algorithm");
++                if (unit is AIHeroClient)
++                {
++                    Vector2 tendency;
+ 
+-                var slider = new Slider("Hitchance Adjustment", 0, -HitchanceAdjustmentMax, HitchanceAdjustmentMax);
+-                slider.OnValueChange +=
+-                    delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs args)
++                    if (_tendencyDestination.TryGetValue(unit.NetworkId, out tendency))
+                     {
+-                        sender.DisplayName = string.Format("Hitchance Adjustment: {0}", args.NewValue < 0 ? "Decreased Hitchance" : args.NewValue == 0 ? "Default" : "Increased Hitchance");
+-                    };
+-                Menu.Add("hitchanceAdjustment", slider);
+-
+-                Menu.AddSeparator();
+-                Menu.Add("dashSpeedSimulation", new CheckBox("Enable Dash Speed Simulation (Beta)"));
+-                Menu.AddSeparator();
+-                Menu.AddGroupLabel("Collision");
+-                Menu.Add("extraHitboxRadius", new Slider("Extra Hitbox Radius", 0, 0, 50));
++                        return tendency;
++                    }
++                }
+ 
+-                Obj_AI_Base.OnProcessSpellCast += OnBasicAttack;
+-                Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
+-                Obj_AI_Base.OnNewPath += OnNewPath;
++                return unit.Path.Last().To2D();
+             }
+ 
+-            private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+-            {
+-                if (sender is AIHeroClient && (!sender.CanMove || Math.Abs(args.SData.CastTime) > 1))
+-                {
+-                    PathChangeDictionary[sender.NetworkId] = 0;
+-                }
+-            }
++            private static Dictionary<int, Tuple<float, float>> _heroActionDuration = new Dictionary<int, Tuple<float, float>>();
+ 
+             private static void OnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+             {
+                 if (sender is AIHeroClient && args.SData.IsAutoAttack())
+                 {
+-                    PathChangeDictionary[sender.NetworkId] = 0;
++                    var time = sender.AttackCastDelay * 1000;
++                    _heroActionDuration[sender.NetworkId] = new Tuple<float, float>(Game.Time, time);
+                 }
+             }
+ 
+-            private static void OnNewPath(Obj_AI_Base sender, GameObjectNewPathEventArgs args)
++            private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+             {
+-                if (!(sender is AIHeroClient))
+-                {
+-                    return;
+-                }
++                //=======================
++                // 19/2/2016, patch 6.3
++                // broken properties: sender.CanMove, args.SData.CastTime 
++                //=======================
+ 
+-                if (args.IsDash)
+-                {
+-                    DashDictionary[sender.NetworkId] = new DashArgs(args.Path, Core.GameTickCount);
+-                    PathChangeDictionary[sender.NetworkId] = 0;
+-                }
+-                else
++                if (sender is AIHeroClient)
+                 {
+-                    DashDictionary[sender.NetworkId] = null;
+-
+-                    var time = PathChangeElapsedTime(sender);
+-                    PathChangeDictionary[sender.NetworkId] = time >= BaseImmunityTime / 2 && time <= BaseImmunityTime
+-                        ? 0
+-                        : Core.GameTickCount;
++                    var time = args.SData.CastTime;
++                    _heroActionDuration[sender.NetworkId] = new Tuple<float, float>(Game.Time, time);
+                 }
+             }
+ 
+-            [Obsolete("IsDashing is deprecated, please use GetDashInfo instead.")]
+-            public static bool IsDashing(Obj_AI_Base unit)
++            private static float ActionDuration(Obj_AI_Base unit)
+             {
+-                if (!DashDictionary.ContainsKey(unit.NetworkId) || DashDictionary[unit.NetworkId] == null)
+-                    return false;
+-
+-                return (unit.ServerPosition.Distance(DashDictionary[unit.NetworkId].Path.Last(), true) > 0);
+-            }
+-
+-            [Obsolete("GetDashPos is deprecated, please use GetDashInfo instead.")]
+-            public static Vector2 GetDashPos(Obj_AI_Base unit)
+-            {
+-                return IsDashing(unit) ? DashDictionary[unit.NetworkId].Path.Last().To2D() : Vector2.Zero;
+-            }
+-
+-            [Obsolete("GetDashStartPos is deprecated, please use GetDashInfo instead.")]
+-            public static Vector2 GetDashStartPos(Obj_AI_Base unit)
+-            {
+-                return IsDashing(unit) ? DashDictionary[unit.NetworkId].Path.First().To2D() : Vector2.Zero;
+-            }
++                if (unit is AIHeroClient)
++                {
++                    Tuple<float, float> action;
+ 
+-            [Obsolete("GetDashDuration is deprecated, please use GetDashInfo instead.")]
+-            public static int GetDashDuration(Obj_AI_Base unit)
+-            {
+-                return IsDashing(unit) ? Core.GameTickCount - DashDictionary[unit.NetworkId].Time : 0;
+-            }
++                    if (_heroActionDuration.TryGetValue(unit.NetworkId, out action))
++                    {
++                        var time = action.Item2 - (Game.Time - action.Item1);
+ 
+-            [Obsolete("GetDashSpeed is deprecated, please use GetDashInfo instead.")]
+-            public static float GetDashSpeed(Obj_AI_Base unit)
+-            {
+-                if (!IsDashing(unit))
+-                    return 0;
++                        return Math.Max(0, time);
++                    }
++                }
+ 
+-                return Math.Max(2100, 2 * GetDashStartPos(unit).Distance(GetDashPos(unit)) / GetDashDuration(unit));
++                return 0;
+             }
+ 
+-            public static Vector2 PredictUnitPosition(Obj_AI_Base unit, int milliSeconds)
++            private static Obj_AI_Base[] GatherCollisionObjects(Vector2 center, float range, Obj_AI_Base[] ignoreUnits = null)
+             {
+-                //TODO: take into account movement speed buffs/debuffs durations
+-
+-                var totalDistMoved = (milliSeconds / 1000F) * unit.MoveSpeed;
+-                var path = GetRealPath(unit);
+-
+-                for (var i = 0; i < path.Length - 1; i++)
+-                {
+-                    var lineStart = path[i].To2D();
+-                    var lineEnd = path[i + 1].To2D();
+-                    var dist = lineStart.Distance(lineEnd);
+-
+-                    if (dist > totalDistMoved)
+-                    {
+-                        return lineStart.Extend(lineEnd, totalDistMoved);
+-                    }
++                ignoreUnits = ignoreUnits ?? new Obj_AI_Base[] { };
+ 
+-                    totalDistMoved -= dist;
+-                }
+-                return (path.Length == 0 ? unit.ServerPosition : path.Last()).To2D();
++                return
++                    ObjectManager.Get<Obj_AI_Base>()
++                        .Where(
++                            unit =>
++                                unit.IsEnemy && !unit.IsDead && unit.IsHPBarRendered &&
++                                !unit.IsStructure() && !unit.IsWard() && !unit.IsInvulnerable &&
++                                unit.ServerPosition.Distance(center, true) <= range.Pow() &&
++                                ignoreUnits.All(ignore => ignore.Index != unit.Index)).ToArray();
+             }
+ 
+-            public static Vector3[] GetRealPath(Obj_AI_Base unit)
++            private static Vector2[] TerrainCollisionPoints(Geometry.Polygon polygon)
+             {
+-                var path = unit.Path.ToList();
++                var list = new List<Vector2>();
++                var points = polygon.Points;
+ 
+-                for (var i = path.Count - 1; i > 0; i--)
++                for (var i = 0; i < points.Count; i++)
+                 {
+-                    var lineStart = path[i].To2D();
+-                    var lineEnd = path[i - 1].To2D();
++                    var point = points[i];
+ 
+-                    if (unit.ServerPosition.Distance(lineStart, lineEnd, true) <= 20.Pow())
++                    if (point.IsWall())
+                     {
+-                        path.RemoveRange(0, i);
+-                        break;
++                        list.Add(point);
+                     }
+                 }
+ 
+-                return new[] { unit.Position }.Concat(path).ToArray();
+-            }
+-
+-            private static int PathChangeElapsedTime(Obj_AI_Base unit)
+-            {
+-                if (!PathChangeDictionary.ContainsKey(unit.NetworkId))
+-                    return ushort.MaxValue;
+-
+-                return Core.GameTickCount - PathChangeDictionary[unit.NetworkId];
++                return list.ToArray();
+             }
+ 
+-            private static bool RecentlyChangedPath(Obj_AI_Base unit)
++            private static bool CollidesWithTerrain(Geometry.Polygon polygon)
+             {
+-                return PathChangeElapsedTime(unit) <= ImmunityTime;
++                return TerrainCollisionPoints(polygon).Length > 0;
+             }
+ 
+-            private static bool IsMoving(Obj_AI_Base unit)
++            private static bool CollidesWithTerrain(PredictionData data, Vector2 castPos)
+             {
+-                // Obj_AI_Base.IsMoving is not always accurate
+-                return unit.IsMoving;
++                return CollidesWithTerrain(data.GetSkillshotPolygon(castPos));
+             }
+ 
+-            private static Obj_AI_Base[] GatherCollisionObjects(
+-                Vector2 center,
+-                float range,
+-                Obj_AI_Base[] ignoreUnits = null)
++            /// <summary>
++            /// Predict cast position and collision for a specific target.
++            /// </summary>
++            /// <param name="target"> The target to predict.</param>
++            /// <param name="data"> The prediction data.</param>
++            /// <param name="skipCollision"> Skip collision checks.</param>
++            public static PredictionResult GetPrediction(Obj_AI_Base target, PredictionData data, bool skipCollision = false)
+             {
+-                ignoreUnits = ignoreUnits ?? new Obj_AI_Base[] { };
+-
+-                return
+-                    ObjectManager.Get<Obj_AI_Base>()
+-                        .Where(
+-                            unit =>
+-                                unit.IsEnemy && !unit.IsDead && unit.IsHPBarRendered &&
+-                                !unit.IsStructure() && !unit.IsWard() && !unit.IsInvulnerable &&
+-                                unit.ServerPosition.Distance(center, true) <= range.Pow() &&
+-                                ignoreUnits.All(ignore => ignore.Index != unit.Index)).ToArray();
+-            }
++                if (target == null)
++                    throw new ArgumentNullException("target");
+ 
+-            public static PredictionResult PredictLinearMissile(
+-                Obj_AI_Base target,
+-                float range,
+-                int width,
+-                int delay,
+-                float speed,
+-                int allowedCollisionCount,
+-                Vector3? sourcePosition = null,
+-                bool ignoreCollision = false)
+-            {
+-                var extraRadius = ExtraRadius;
+-                speed = speed <= 0 ? SpeedHuge : speed;
++                if (data == null)
++                    throw new ArgumentNullException("data");
+ 
+-                Vector2 predictedPos;
+-                Vector2 unitPosition;
+-                var hitChancePercent = 0F;
+-                var hitChanceOverride = HitChance.Unknown;
++                Vector3 unitPos;
++                Vector3 start;
++                Vector3 end;
++                float speed;
+ 
+-                var sourcePosition2D = (sourcePosition ?? Player.Instance.ServerPosition).To2D();
+-                var actualDelay = delay + Game.Ping;
++                var delay = data.Delay + Ping;
++                var dash = target.GetDashInfo();
+ 
+-                if (IsDashing(target))
++                if (dash != null)
+                 {
+-                    predictedPos = GetDashPos(target);
++                    const int dashSpeed = 3000;
+ 
+-                    if (DashSimulation)
+-                    {
+-                        var pos = target.Position.To2D();
+-                        var endPos = GetDashPos(target);
+-                        predictedPos = Collision.GetCollisionPoint(pos, endPos, sourcePosition2D, GetDashSpeed(target),
+-                            speed);
+-                        Utils.AdjustPointToLineSegment(pos, endPos, ref predictedPos);
+-                    }
++                    speed = dashSpeed;
++                    start = dash.StartPos;
++                    end = dash.EndPos;
+ 
+-                    unitPosition = predictedPos;
+-                    hitChanceOverride = HitChance.Dashing;
++                    unitPos = end;
+                 }
+-                else if (IsMoving(target))
++                else if (!target.IsMoving)
+                 {
+-                    var newPath = GetRealPath(target);
+-                    var pos = PredictUnitPosition(target, actualDelay);
+-                    var endPos = newPath.Length > 2 ? newPath[2].To2D() : newPath.Last().To2D();
+-                    predictedPos = Collision.GetCollisionPoint(pos, endPos, sourcePosition2D, target.MoveSpeed, speed);
+-                    unitPosition = predictedPos;
+-
+-                    if (Utils.IsPointOutOfLineSegment(pos, endPos, predictedPos))
+-                    {
+-                        return new PredictionResult(predictedPos.To3DWorld(), unitPosition.To3DWorld(), 0F, null,
+-                            allowedCollisionCount, HitChance.Impossible);
+-                    }
++                    speed = 0;
++                    start = target.ServerPosition;
++                    end = target.ServerPosition;
+ 
+-                    predictedPos = predictedPos.Extend(target, width / 2 + target.BoundingRadius / 2);
++                    unitPos = end;
+                 }
+                 else
+                 {
+-                    var immobileDuration = target.GetMovementBlockedDebuffDuration();
++                    var path = GetRealPath(target);
++
++                    speed = target.MoveSpeed;
++                    start = PredictUnitPosition(target, delay).To3DWorld();
++                    end = path.Last();
+ 
+-                    predictedPos = target.ServerPosition.To2D();
+-                    unitPosition = predictedPos;
++                    unitPos = start;
+ 
+-                    // Check for debuffs
+-                    if (immobileDuration > 0)
++                    for (var i = 0; i < path.Length - 1; i++)
+                     {
+-                        var rTime = (sourcePosition2D.Distance(predictedPos) - target.BoundingRadius) / speed;
++                        var pathStart = path[i];
++                        var pathEnd = path[i + 1];
+ 
+-                        if (rTime <= immobileDuration)
++                        if (Geometry.PointInLineSegment(pathStart.To2D(), pathEnd.To2D(), start.To2D()))
+                         {
+-                            hitChanceOverride = HitChance.Immobile;
++                            end = pathEnd;
++                            break;
+                         }
+                     }
+-                }
+ 
+-                var distance = sourcePosition2D.Distance(predictedPos);
++                    var point = Collision.GetCollisionPoint(start.To2D(), end.To2D(), data.SourcePosition.To2D(), speed, data.Speed);
+ 
+-                // check if predicted position is in range
+-                if (distance > range)
+-                    return new PredictionResult(predictedPos.To3DWorld(), unitPosition.To3DWorld(), 0, null,
+-                        allowedCollisionCount, HitChance.Impossible);
++                    if (!Geometry.PointInLineSegment(start.To2D(), end.To2D(), point) && end != path.Last())
++                    {
++                        return PredictionResult.ResultImpossible(data);
++                    }
++                }
+ 
+-                // check for collision
+-                var scanRange = range * 2F;
+-                var collisionObjects = new List<Obj_AI_Base>();
++                var castPosition = Collision.GetCollisionPoint(start.To2D(), end.To2D(), data.SourcePosition.To2D(), speed, data.Speed);
++                var tendency = TendencyDestination(target);
++                var hitbox = target.BoundingRadius;
+ 
+-                if (!ignoreCollision)
++                if (!Geometry.PointInLineSegment(start.To2D(), end.To2D(), castPosition))
+                 {
+-                    foreach (var unit in GatherCollisionObjects(sourcePosition2D, scanRange, new[] { target }))
++                    var oldPoint = castPosition;
++                    castPosition = end.To2D();
++
++                    if (tendency != end.To2D())
+                     {
+-                        if (!IsMoving(unit))
++                        var distance1 = castPosition.Distance(oldPoint, true);
++                        var distance2 = castPosition.Distance(tendency, true);
++
++                        if (distance1 > distance2)
+                         {
+-                            if (Utils.LineSegmentCircleCircleIntersectionPriority(sourcePosition2D, predictedPos,
+-                                predictedPos,
+-                                target.BoundingRadius + width / 2, unit.ServerPosition.To2D(),
+-                                unit.BoundingRadius + width / 2 + extraRadius) == 2)
+-                            {
+-                                collisionObjects.Add(unit);
+-                            }
++                            castPosition = castPosition.Extend(tendency, castPosition.Distance(tendency));
+                         }
+                         else
+                         {
+-                            if (Collision.LinearMissileCollision(unit, sourcePosition2D, predictedPos, speed, width,
+-                                delay,
+-                                extraRadius))
+-                            {
+-                                collisionObjects.Add(unit);
+-                            }
++                            castPosition = castPosition.Extend(tendency, data.Radius + hitbox / 4);
+                         }
+                     }
+                 }
++                else
++                {
++                    castPosition = castPosition.Extend(tendency, -data.Radius / 2);
++                }
+ 
+-                // check if skillshot gets blocked by collision objects
+-                if (collisionObjects.Count > allowedCollisionCount && allowedCollisionCount >= 0)
+-                    return new PredictionResult(predictedPos.To3DWorld(), unitPosition.To3DWorld(), 0,
+-                        collisionObjects.ToArray(), allowedCollisionCount);
++                if (CollidesWithTerrain(data, castPosition))
++                {
++                    castPosition = castPosition.Extend(start, data.Radius);
++                }
+ 
+-                // Ignore units that have recently updated their path
+-                if (RecentlyChangedPath(target))
+-                    return new PredictionResult(predictedPos.To3DWorld(), unitPosition.To3DWorld(), 0,
+-                        collisionObjects.ToArray(), allowedCollisionCount, HitChance.Impossible);
++                var scanRange = data.Range * 2f;
++                var collisionObjects = new List<Obj_AI_Base>();
+ 
+-                hitChancePercent = hitChanceOverride > HitChance.High
+-                    ? 100
+-                    : HitChanceCalculator.CalculateHitchance(target, sourcePosition2D, predictedPos, width / 2, speed,
+-                        actualDelay);
++                if (!skipCollision)
++                {
++                    var collisionCheck = data.GetCollisionCalculator(castPosition);
+ 
+-                return new PredictionResult(predictedPos.To3DWorld(), unitPosition.To3DWorld(), hitChancePercent,
+-                    collisionObjects.ToArray(), allowedCollisionCount, hitChanceOverride);
+-            }
++                    foreach (var unit in GatherCollisionObjects(data.SourcePosition.To2D(), scanRange, new[] { target }))
++                    {
++                        if (collisionCheck(unit))
++                        {
++                            collisionObjects.Add(unit);
++                        }
++                    }
++                }
++
++                var travelTime = data.SourcePosition.Distance(castPosition) / data.Speed;
++                var escapeTime = hitbox / target.MoveSpeed;
++                var reactionTime = Math.Max(0.001, travelTime - escapeTime - ActionDuration(target));
++                var minimumTime = Math.Max(0.001, data.Range / data.Speed - escapeTime - ActionDuration(target));
++                var hitchance = (float) (reactionTime / minimumTime) * 100;
+ 
+-            public static PredictionResult PredictCircularMissile(
+-                Obj_AI_Base target,
+-                float range,
+-                int radius,
+-                int delay,
+-                float speed,
+-                Vector3? sourcePosition = null,
+-                bool ignoreCollision = false)
+-            {
+-                Vector2 predictedPos;
+-                float hitChancePercent;
+-                var unitPosition = target.ServerPosition.To2D();
+                 var hitChanceOverride = HitChance.Unknown;
+ 
+-                var sourcePosition2D = (sourcePosition ?? Player.Instance.ServerPosition).To2D();
+-                var actualDelay = Game.Ping + delay;
++                if (target.GetMovementBlockedDebuffDuration() > travelTime)
++                {
++                    hitChanceOverride = HitChance.Immobile;
++                    hitchance = 100;
++                }
+ 
+-                if (IsDashing(target))
++                if (dash != null)
+                 {
+-                    unitPosition = GetDashPos(target);
+-                    predictedPos = GetDashPos(target).Extend(target.ServerPosition, radius);
+                     hitChanceOverride = HitChance.Dashing;
++                    hitchance = 90;
+                 }
+-                else if (!IsMoving(target))
+-                {
+-                    predictedPos = target.ServerPosition.To2D();
+-                    var immobileDuration = target.GetMovementBlockedDebuffDuration();
+ 
+-                    if (immobileDuration > 0)
+-                    {
+-                        var availableTime = (speed > 0
+-                            ? (sourcePosition2D.Distance(predictedPos) - target.BoundingRadius) / speed
+-                            : 0);
++                return new PredictionResult(castPosition.To3DWorld(), unitPos, hitchance, collisionObjects.ToArray(), data.AllowCollisionCount, hitChanceOverride);
++            }
+ 
+-                        if (delay / 1000F + availableTime <= immobileDuration)
+-                        {
+-                            hitChanceOverride = HitChance.Immobile;
+-                        }
+-                    }
+-                }
+-                else
+-                {
+-                    if (speed <= 0)
+-                    {
+-                        unitPosition = PredictUnitPosition(target, actualDelay);
+-                        predictedPos = unitPosition.Extend(target, (radius + target.BoundingRadius) / 2);
++            /// <summary>
++            /// Predicts all the possible positions to hit as many targets as possible from a predifined group of targets.
++            /// </summary>
++            /// <param name="targets"> The targets to predict. If null then the enemy heroes will be chosen instead.</param>
++            /// <param name="data"> The prediction data.</param>
++            public static PredictionResult[] GetPredictionAoe(Obj_AI_Base[] targets, PredictionData data)
++            {
++                if (data == null)
++                    throw new ArgumentNullException("data");
+ 
+-                        if (predictedPos.Distance(target.Path.Last(), true) < radius.Pow())
+-                        {
+-                            predictedPos.Extend(target.ServerPosition, -radius);
+-                        }
+-                    }
+-                    else
+-                    {
+-                        var path = GetRealPath(target);
+-                        var pos = PredictUnitPosition(target, actualDelay);
+-                        var endPos = path.Length > 2 ? path[2].To2D() : path.Last().To2D();
+-                        predictedPos = Collision.GetCollisionPoint(pos, endPos, sourcePosition2D, target.MoveSpeed, speed);
+-                        unitPosition = predictedPos;
++                targets = targets ?? EntityManager.Heroes.Enemies.Cast<Obj_AI_Base>().ToArray();
+ 
+-                        if (Utils.IsPointOutOfLineSegment(pos, endPos, predictedPos))
+-                        {
+-                            return new PredictionResult(predictedPos.To3DWorld(), unitPosition.To3DWorld(), 0F, null, -1,
+-                                HitChance.Impossible);
+-                        }
++                var results = new Dictionary<Obj_AI_Base, PredictionResult>();
++                foreach (var unit in targets)
++                {
++                    var result = GetPrediction(unit, data, true);
+ 
+-                        predictedPos.Extend(target.ServerPosition, (radius + target.BoundingRadius) / 2);
++                    if (result.HitChance > HitChance.Collision)
++                    {
++                        results.Add(unit, result);
+                     }
+                 }
+ 
+-                // check the distance
+-                if (predictedPos.Distance(sourcePosition2D) > range)
+-                    return new PredictionResult(predictedPos.To3DWorld(), unitPosition.To3DWorld(), 0F, null, -1,
+-                        HitChance.Impossible);
++                if (results.Count == 0)
++                {
++                    return new PredictionResult[] { };
++                }
+ 
+-                // gather collision objects
+-                var scanRange = range * 2F;
+-                var collisionObjects = new List<Obj_AI_Base>();
++                var predictionResults = new List<PredictionResult>();
+ 
+-                if (!ignoreCollision)
++                foreach (var group in data.GetAoeGroups(results))
+                 {
+-                    foreach (var unit in GatherCollisionObjects(sourcePosition2D, scanRange, new[] { target }))
++                    var castPoint = group.ToArray().CenterPoint();
++                    var collisionCheck = data.GetCollisionCalculator(castPoint);
++                    var collisionObjects = new List<Obj_AI_Base>();
++
++                    foreach (var unit in GatherCollisionObjects(data.SourcePosition.To2D(), data.Range * 2))
+                     {
+-                        if (Collision.CircularMissileCollision(unit, sourcePosition2D, predictedPos, speed, radius,
+-                            delay))
++                        if (collisionCheck(unit))
+                         {
+                             collisionObjects.Add(unit);
+                         }
+                     }
+-                }
+-
+-                // Ignore units that have recently updated their path
+-                if (RecentlyChangedPath(target))
+-                    return new PredictionResult(predictedPos.To3DWorld(), unitPosition.To3DWorld(), 0F,
+-                        collisionObjects.ToArray(), -1, HitChance.Impossible);
+ 
+-                hitChancePercent = hitChanceOverride > HitChance.High
+-                    ? 100
+-                    : HitChanceCalculator.CalculateHitchance(target, sourcePosition2D, predictedPos, radius, speed,
+-                        actualDelay);
++                    predictionResults.Add(new PredictionResult(castPoint.To3DWorld(), Vector3.Zero, 100, collisionObjects.ToArray(), -1));
++                }
+ 
+-                return new PredictionResult(predictedPos.To3DWorld(), unitPosition.To3DWorld(), hitChancePercent,
+-                    collisionObjects.ToArray(), -1, hitChanceOverride);
++                return predictionResults.ToArray();
+             }
+ 
+-            public static PredictionResult PredictConeSpell(
++            public static PredictionResult PredictLinearMissile(
+                 Obj_AI_Base target,
+                 float range,
+-                int angle,
++                int width,
+                 int delay,
+                 float speed,
++                int allowedCollisionCount,
+                 Vector3? sourcePosition = null,
+                 bool ignoreCollision = false)
+             {
+-                var predictedPos = Vector2.Zero;
+-                var hitChancePercent = 0.0F;
+-                var hitChanceOverride = HitChance.Unknown;
++                var data = new PredictionData(PredictionData.PredictionType.Linear, (int) range, width / 2, 0, delay, (int) speed, allowedCollisionCount, sourcePosition);
++                return GetPrediction(target, data, ignoreCollision);
++            }
+ 
+-                var sourcePosition2D = (sourcePosition ?? Player.Instance.ServerPosition).To2D();
++            public static PredictionResult PredictCircularMissile(Obj_AI_Base target, float range, int radius, int delay, float speed, Vector3? sourcePosition = null, bool ignoreCollision = false)
++            {
++                var data = new PredictionData(PredictionData.PredictionType.Circular, (int) range, radius, 0, delay, (int) speed, -1, sourcePosition);
++                return GetPrediction(target, data, ignoreCollision);
++            }
+ 
+-                var actualDelay = Game.Ping + delay;
++            public static PredictionResult PredictConeSpell(Obj_AI_Base target, float range, int angle, int delay, float speed, Vector3? sourcePosition = null, bool ignoreCollision = false)
++            {
++                var data = new PredictionData(PredictionData.PredictionType.Cone, (int) range, 0, angle, delay, (int) speed, -1, sourcePosition);
++                return GetPrediction(target, data, ignoreCollision);
++            }
+ 
+-                if (IsDashing(target))
+-                {
+-                    predictedPos = GetDashPos(target);
+-                    hitChanceOverride = HitChance.Dashing;
+-                }
+-                else if (!IsMoving(target))
++            public static PredictionResult[] PredictCircularMissileAoe(Obj_AI_Base[] targets, float range, int radius, int delay, float speed, Vector3? sourcePosition = null)
++            {
++                var data = new PredictionData(PredictionData.PredictionType.Circular, (int) range, radius, 0, delay, (int) speed, -1, sourcePosition);
++                return GetPredictionAoe(targets, data);
++            }
++
++            public static PredictionResult[] PredictConeSpellAoe(Obj_AI_Base[] targets, float range, int angle, int delay, float speed, Vector3? sourcePosition = null)
++            {
++                var data = new PredictionData(PredictionData.PredictionType.Circular, (int) range, 0, angle, delay, (int) speed, -1, sourcePosition);
++                return GetPredictionAoe(targets, data);
++            }
++
++            /// <summary>
++            /// Returns the actual path of a unit.
++            /// </summary>
++            /// <param name="unit"> The unit.</param>
++            public static Vector3[] GetRealPath(Obj_AI_Base unit)
++            {
++                const int tolerance = 30;
++                var path = unit.Path.ToList();
++
++                for (var i = path.Count - 1; i > 0; i--)
+                 {
+-                    var immobileDuration = target.GetMovementBlockedDebuffDuration();
+-                    predictedPos = target.ServerPosition.To2D();
++                    var start = path[i].To2D();
++                    var end = path[i - 1].To2D();
+ 
+-                    if (immobileDuration > 0)
++                    if (unit.ServerPosition.Distance(start, end, true) <= tolerance.Pow())
+                     {
+-                        if (delay / 1000F <= immobileDuration)
+-                        {
+-                            hitChanceOverride = HitChance.Immobile;
+-                        }
++                        path.RemoveRange(0, i);
++                        break;
+                     }
+                 }
+-                else
+-                {
+-                    if (speed <= 0)
+-                    {
+-                        predictedPos = PredictUnitPosition(target, actualDelay);
+-                    }
+-                    else
+-                    {
+-                        var path = GetRealPath(target);
+-                        var pos = PredictUnitPosition(target, actualDelay);
+-                        var endPos = path.Length > 2 ? path[2].To2D() : path.Last().To2D();
+-                        predictedPos = Collision.GetCollisionPoint(pos, endPos, sourcePosition2D, target.MoveSpeed,
+-                            speed);
+ 
+-                        if (Utils.IsPointOutOfLineSegment(pos, endPos, predictedPos))
+-                        {
+-                            return new PredictionResult(predictedPos.To3DWorld(), predictedPos.To3DWorld(), 0F, null, -1,
+-                                HitChance.Impossible);
+-                        }
+-                    }
+-                }
++                return new[] { unit.Position }.Concat(path).ToArray();
++            }
+ 
+-                // check the distance
+-                var sector = new Geometry.Polygon.Sector(sourcePosition2D, predictedPos,
+-                    (float) (2 * angle * Math.PI / 360),
+-                    range);
+-                if (!sector.IsInside(predictedPos))
+-                    return new PredictionResult(predictedPos.To3DWorld(), predictedPos.To3DWorld(), 0F, null, -1,
+-                        HitChance.Impossible);
++            /// <summary>
++            /// Predicts the position of a moving unit after a specified amount of time.
++            /// </summary>
++            /// <param name="unit"> The unit.</param>
++            /// <param name="time"> The time in milliseconds.</param>
++            public static Vector2 PredictUnitPosition(Obj_AI_Base unit, int time)
++            {
++                //TODO: take into account movement speed buffs/debuffs durations
+ 
+-                // gather collision objects
+-                var scanRange = range * 2F;
+-                var collisionObjects = new List<Obj_AI_Base>();
++                var totalDistMoved = (time / 1000F) * unit.MoveSpeed;
++                var path = GetRealPath(unit);
+ 
+-                if (!ignoreCollision)
++                for (var i = 0; i < path.Length - 1; i++)
+                 {
+-                    foreach (var unit in GatherCollisionObjects(sourcePosition2D, scanRange, new[] { target }))
+-                    {
+-                        var time = Game.Ping + delay;
+-                        var pos = PredictUnitPosition(unit, time);
++                    var lineStart = path[i].To2D();
++                    var lineEnd = path[i + 1].To2D();
++                    var dist = lineStart.Distance(lineEnd);
+ 
+-                        if (sector.IsInside(pos))
+-                        {
+-                            collisionObjects.Add(unit);
+-                        }
++                    if (dist > totalDistMoved)
++                    {
++                        return lineStart.Extend(lineEnd, totalDistMoved);
+                     }
+-                }
+-
+-                // Ignore units that have recently updated their path
+-                if (RecentlyChangedPath(target))
+-                    return new PredictionResult(predictedPos.To3DWorld(), predictedPos.To3DWorld(), 0F,
+-                        collisionObjects.ToArray(), -1, HitChance.Impossible);
+ 
+-                hitChancePercent = hitChanceOverride > HitChance.High
+-                    ? 100
+-                    : HitChanceCalculator.CalculateHitchance(target, sourcePosition2D, predictedPos, (int) sector.Radius,
+-                        speed, actualDelay);
++                    totalDistMoved -= dist;
++                }
+ 
+-                return new PredictionResult(predictedPos.To3DWorld(), predictedPos.To3DWorld(), hitChancePercent,
+-                    collisionObjects.ToArray(), -1, hitChanceOverride);
++                return (path.Length == 0 ? unit.ServerPosition : path.Last()).To2D();
+             }
+ 
+-            public static PredictionResult[] PredictCircularMissileAoe(
+-                Obj_AI_Base[] targets,
+-                float range,
+-                int radius,
+-                int delay,
+-                float speed,
+-                Vector3? sourcePosition = null)
++            /// <summary>
++            /// Holds all the necessary data needed to perform prediction.
++            /// </summary>
++            public class PredictionData
+             {
+-                targets = targets ?? EntityManager.Heroes.Enemies.Cast<Obj_AI_Base>().ToArray();
+-                var results = new Dictionary<Obj_AI_Base, PredictionResult>();
++                public enum PredictionType
++                {
++                    Linear,
++                    Circular,
++                    Cone,
++                }
+ 
+-                foreach (var unit in targets)
++                public int Range { get; internal set; }
++                public int Radius { get; internal set; }
++                public int Angle { get; internal set; }
++                public int Delay { get; internal set; }
++                public float Speed { get; internal set; }
++                public int AllowCollisionCount { get; internal set; }
++                public Vector3 SourcePosition { get; internal set; }
++                public PredictionType Type { get; internal set; }
++
++                /// <summary>
++                /// Initializes a new instance of the PredictionData class.
++                /// </summary>
++                /// <param name="type"> The prediction type.</param>
++                /// <param name="range"> The maximum range of the skillshot.</param>
++                /// <param name="radius"> The radius of the skillshot.</param>
++                /// <param name="angle"> The angle in degrees of the skillshot. It is used only in cone spells.</param>
++                /// <param name="delay"> The delay (or cast time) of the skillshot.</param>
++                /// <param name="speed"> The movement speed of the missile.</param>
++                /// <param name="allowCollisionCount"> The number of collision objects the skillshot can pass through. It is used only in Linear skillshots</param>
++                /// <param name="sourcePosition"> The start position of the skillshot. Player's position is considered the starting point by default.</param>
++                public PredictionData(PredictionType type, int range, int radius, int angle, int delay, int speed, int allowCollisionCount = 0, Vector3? sourcePosition = null)
+                 {
+-                    var result = PredictCircularMissile(unit, range, radius, delay, speed, sourcePosition, true);
++                    Type = type;
++                    Range = range;
++                    Radius = radius;
++                    Angle = angle;
++                    Delay = delay;
++                    AllowCollisionCount = allowCollisionCount;
++                    Speed = speed <= 0 ? int.MaxValue : speed;
++                    SourcePosition = sourcePosition ?? Player.Instance.ServerPosition;
++                }
+ 
+-                    if (result.HitChance > HitChance.Collision)
++                internal Geometry.Polygon GetSkillshotPolygon(Vector2 castPos)
++                {
++                    switch (Type)
+                     {
+-                        results.Add(unit, result);
++                        case PredictionType.Linear:
++                            return new Geometry.Polygon.Rectangle(SourcePosition, SourcePosition.Extend(castPos, Range).To3DWorld(), Radius * 2);
++                        case PredictionType.Circular:
++                            return new Geometry.Polygon.Circle(castPos, Radius);
++                        case PredictionType.Cone:
++                            return new Geometry.Polygon.Sector(SourcePosition, castPos.To3DWorld(), (float) (Angle * Math.PI / 180), Range);
++                        default:
++                            return null;
+                     }
+                 }
+ 
+-                if (results.Count == 0)
++                internal delegate bool CollisionCheck(Obj_AI_Base target);
++
++                internal CollisionCheck GetCollisionCalculator(Vector2 castPos)
+                 {
+-                    return new PredictionResult[] { };
+-                }
++                    switch (Type)
++                    {
++                        case PredictionType.Linear:
++                            return (unit) =>
++                            {
++                                return Collision.LinearMissileCollision(unit, SourcePosition.To2D(), castPos, Speed, Radius * 2, Delay, ExtraHitbox);
+ 
+-                // group points
+-                var groupRange = radius;
+-                var groups = new List<List<Vector2>>();
++                                //if (unit.IsMoving)
++                                //{
++                                //    return Collision.LinearMissileCollision(unit, SourcePosition.To2D(), castPos, Speed, Radius * 2, Delay, ExtraHitbox);
++                                //}
+ 
+-                foreach (var unit in results.Keys)
+-                {
+-                    var result = results[unit];
+-                    var newGroup = new List<Vector2> { result.UnitPosition.To2D() };
++                                //return
++                                //    Geometry.SegmentCircleIntersectionPriority(SourcePosition.To2D(), castPos, castPos,
++                                //        unit.BoundingRadius + Radius, unit.ServerPosition.To2D(), unit.BoundingRadius + Radius + ExtraHitbox) ==  2;
++                            };
+ 
+-                    newGroup.AddRange(
+-                        results.Where(
+-                            r =>
+-                                r.Value.UnitPosition.Distance(result.UnitPosition, true) <=
+-                                (groupRange + r.Key.BoundingRadius / 2).Pow())
+-                            .Select(r => r.Value.UnitPosition.To2D()));
++                        case PredictionType.Circular:
++                            return (unit) => { return Collision.CircularMissileCollision(unit, SourcePosition.To2D(), castPos, Speed, Radius, Delay); };
+ 
+-                    if (groups.All(g => g.Count(p => newGroup.Contains(p)) != newGroup.Count))
+-                    {
+-                        groups.Add(newGroup);
++                        case PredictionType.Cone:
++                            var sector = GetSkillshotPolygon(castPos);
++
++                            return (unit) =>
++                            {
++                                var time = Delay + Ping;
++                                var pos = PredictUnitPosition(unit, time);
++                                return sector.IsInside(pos);
++                            };
++
++                        default:
++                            return null;
+                     }
+                 }
+-                groups.Sort((g1, g2) => g2.Count.CompareTo(g1.Count));
+-
+-                var predictionResults = new List<PredictionResult>();
+ 
+-                foreach (var group in groups)
++                internal List<List<Vector2>> GetAoeGroups(Dictionary<Obj_AI_Base, PredictionResult> results)
+                 {
+-                    var castPoint = Utils.GetCenterPoint(group.ToArray());
++                    var groups = new List<List<Vector2>>();
+ 
+-                    // gather collision objects
+-                    var scanRange = range * 2F;
+-                    var collisionObjects = new List<Obj_AI_Base>();
+-                    var sourcePosition2D = (sourcePosition ?? Player.Instance.ServerPosition).To2D();
+-
+-                    foreach (var unit in GatherCollisionObjects(sourcePosition2D, scanRange))
++                    switch (Type)
+                     {
+-                        if (Collision.CircularMissileCollision(unit, sourcePosition2D, castPoint, speed, radius, delay))
+-                        {
+-                            collisionObjects.Add(unit);
+-                        }
++                        case PredictionType.Linear:
++                            Logger.Warn("AoE prediction for linear skillshots is not available yet");
++                            return new List<List<Vector2>>();
++
++                        case PredictionType.Circular:
++                            var groupRange = Radius;
++
++                            foreach (var unit in results.Keys)
++                            {
++                                var result = results[unit];
++                                var newGroup = new List<Vector2> { result.UnitPosition.To2D() };
++
++                                newGroup.AddRange(
++                                    results.Where(
++                                        r =>
++                                            r.Value.UnitPosition.Distance(result.UnitPosition, true) <=
++                                            (groupRange + r.Key.BoundingRadius / 2).Pow()).Select(r => r.Value.UnitPosition.To2D()));
++
++                                if (groups.All(g => g.Count(p => newGroup.Contains(p)) != newGroup.Count))
++                                {
++                                    groups.Add(newGroup);
++                                }
++                            }
++                            break;
++
++                        case PredictionType.Cone:
++
++                            var sectorLength = (float) (2 * Angle * Math.PI / 360) * Range;
++                            var sourcePosition2D = SourcePosition.To2D();
++
++                            foreach (var unit in results.Keys)
++                            {
++                                var result = results[unit];
++                                var newGroup = new List<Vector2> { result.UnitPosition.To2D() };
++
++                                foreach (var r in results)
++                                {
++                                    var sector = new Geometry.Polygon.Sector(sourcePosition2D,
++                                        r.Value.UnitPosition.To2D().Extend(result.UnitPosition, sectorLength / 2),
++                                        (float) (Angle * Math.PI / 180), Range);
++
++                                    if (sector.IsInside(result.UnitPosition))
++                                    {
++                                        newGroup.Add(r.Value.UnitPosition.To2D());
++                                    }
++                                }
++
++                                if (groups.All(g => g.Count(p => newGroup.Contains(p)) != newGroup.Count))
++                                {
++                                    groups.Add(newGroup);
++                                }
++                            }
++                            break;
+                     }
+ 
+-                    predictionResults.Add(new PredictionResult(castPoint.To3DWorld(), Vector3.Zero, 85F,
+-                        collisionObjects.ToArray(), -1));
++                    return groups;
+                 }
+-
+-                return predictionResults.ToArray();
+             }
+ 
+-            public static PredictionResult[] PredictConeSpellAoe(
+-                Obj_AI_Base[] targets,
+-                float range,
+-                int angle,
+-                int delay,
+-                float speed,
+-                Vector3? sourcePosition = null)
++            /// <summary>
++            /// Computes collision between objects.
++            /// </summary>
++            public static class Collision
+             {
+-                targets = targets ?? EntityManager.Heroes.Enemies.Cast<Obj_AI_Base>().ToArray();
+-                var results = new Dictionary<Obj_AI_Base, PredictionResult>();
+-
+-                foreach (var unit in targets)
++                /// <summary>
++                /// Determines whether two moving objects will collide within a predetermined path. The movement is considered linear.
++                /// </summary>
++                /// <param name="start"> The starting point of the first object.</param>
++                /// <param name="destination"> The destination point of the first object.</param>
++                /// <param name="hitbox"> The hitbox radius of the first object.</param>
++                /// <param name="speed"> The movement speed of the first object.</param>
++                /// <param name="isUnit"> Determines whether the object is a unit. Set to true if the first object disappears after reaching its destination.</param>                
++                /// <param name="start2"> The starting point of the second object.</param>
++                /// <param name="destination2"> The destination point of the second object.</param>
++                /// <param name="hitbox2"> The hitbox radius of the second object.</param>
++                /// <param name="speed2"> The movement speed of the second object.</param>
++                /// <param name="isUnit2"> Determines whether the object is a unit. Set to true if the second object disappears after reaching its destination.</param>
++                public static bool MovingObjectsCollision(
++                    Vector2 start,
++                    Vector2 destination,
++                    float hitbox,
++                    float speed,
++                    bool isUnit,
++                    Vector2 start2,
++                    Vector2 destination2,
++                    float hitbox2,
++                    float speed2,
++                    bool isUnit2)
+                 {
+-                    var result = PredictConeSpell(unit, range, angle, delay, speed, sourcePosition, true);
++                    // constants
++                    var a = speed2;
++                    var b = start2.Distance(destination2);
++                    var c = destination2.X;
++                    var d = start2.X;
++                    var f = start.Distance(destination);
++                    var j = destination.X;
++                    var k = speed;
++                    var m = start.X;
++                    var n = destination2.Y;
++                    var p = start2.Y;
++                    var q = destination.Y;
++                    var w = start.Y;
++                    var h = (hitbox + hitbox2).Pow();
++
++                    // function distance(t) - h = a*t^2 + b*t + c
++                    // solve for distance(t) <= h
++                    var theta = -1 / (b * b * f * f);
++                    var da = (-a * a * c * c * f * f + 2 * a * a * c * d * f * f - a * a * d * d * f * f -
++                              a * a * f * f * n * n + 2 * a * a * f * f * n * p - a * a * f * f * p * p +
++                              2 * a * b * c * f * j * k - 2 * a * b * c * f * k * m - 2 * a * b * d * f * j * k +
++                              2 * a * b * d * f * k * m + 2 * a * b * f * k * n * q -
++                              2 * a * b * f * k * n * w -
++                              2 * a * b * f * k * p * q + 2 * a * b * f * k * p * w - b * b * j * j * k * k +
++                              2 * b * b * j * k * k * m - b * b * k * k * m * m - b * b * k * k * q * q +
++                              2 * b * b * k * k * q * w - b * b * k * k * w * w) * theta;
++                    var db = (-2 * a * b * c * d * f * f + 2 * a * b * c * f * f * m + 2 * a * b * d * d * f * f -
++                              2 * a * b * d * f * f * m - 2 * a * b * f * f * n * p +
++                              2 * a * b * f * f * n * w +
++                              2 * a * b * f * f * p * p - 2 * a * b * f * f * p * w + 2 * b * b * d * f * j * k -
++                              2 * b * b * d * f * k * m - 2 * b * b * f * j * k * m +
++                              2 * b * b * f * k * m * m +
++                              2 * b * b * f * k * p * q - 2 * b * b * f * k * p * w - 2 * b * b * f * k * q * w +
++                              2 * b * b * f * k * w * w) * theta;
++                    var dc = (b * b * (-d * d) * f * f + 2 * b * b * d * f * f * m + b * b * f * f * h -
++                              b * b * f * f * m * m - b * b * f * f * p * p + 2 * b * b * f * f * p * w -
++                              b * b * f * f * w * w) * theta;
++                    var dd = db * db - 4 * da * dc;
+ 
+-                    if (result.HitChance > HitChance.Collision)
++                    // division with 0
++                    if (b == 0 || f == 0)
++                        return true;
++
++                    // static function
++                    if (da == 0 && db == 0)
++                        return dc <= 0;
++
++                    // no solutions
++                    if (dd < 0)
++                        return dc <= 0;
++
++                    //TODO: check if da == 0
++                    //var solution0 = -dc / db; 
++
++                    var solution1 = (-db + Math.Sqrt(dd)) / (2 * da);
++                    var solution2 = (-db - Math.Sqrt(dd)) / (2 * da);
++
++                    var time1 = start.Distance(destination) / speed;
++                    var time2 = start2.Distance(destination2) / speed2;
++
++                    // check only for t[0, maxTime]
++                    var minTime = 0F;
++                    var maxTime = time1 > time2 ? time2 : time1;
++
++                    // function changes polarity during [t, maxTime]
++                    if (solution1 >= minTime && solution1 <= maxTime)
++                        return true;
++
++                    // function changes polarity during [t, maxTime]
++                    if (solution2 >= minTime && solution2 <= maxTime)
++                        return true;
++
++                    // check when one object stops moving and f(0) > 0
++                    if ((time1 > time2 || time2 > time1) && dc > 0)
+                     {
+-                        results.Add(unit, result);
++                        // missiles disappear
++                        if ((time2 > time1 && !isUnit) || (time1 > time2 && !isUnit2))
++                            return false;
++
++                        var time = (time1 > time2 ? time2 : time1);
++                        var lineStart = time1 > time2 ? start : start2;
++                        var lineEnd = time1 > time2 ? destination : destination2;
++                        var velocity = time1 > time2 ? speed : speed2;
++                        var circlePos = time1 > time2 ? destination2 : destination;
++                        var circleRadius = hitbox + hitbox2;
++
++                        lineStart = lineStart.Extend(lineEnd, velocity * time);
++
++                        // check for intersection
++                        return
++                            Geometry.SegmentCircleIntersectionPriority(lineStart, lineEnd, circlePos,
++                                circleRadius,
++                                circlePos,
++                                circleRadius) > 0;
+                     }
+-                }
+ 
+-                if (results.Count == 0)
+-                {
+-                    return new PredictionResult[] { };
++                    //  check function value for t = 0, (f(0) = c)
++                    return dc <= 0;
+                 }
+ 
+-                var sectorLength = (float) (2 * angle * Math.PI / 360) * range;
+-                var sourcePosition2D = (sourcePosition ?? Player.Instance.ServerPosition).To2D();
++                /// <summary>
++                /// Determines whether a unit will collide with a linear missile along a predetermined path.
++                /// </summary>
++                /// <param name="unit"> The unit to check collision.</param>
++                /// <param name="missileStartPos"> The starting point of the missile.</param>
++                /// <param name="missileEndPos"> The destination point of the missile.</param>
++                /// <param name="missileSpeed"> Missile's speed.</param>
++                /// <param name="missileWidth"> Missile's width. The width is equal to the double of the missile's hitbox radius.</param>
++                /// <param name="delay"> The time (in milliseconds) it will take for the missile to spawn.</param>
++                /// <param name="extraRadius"> The extra hitbox radius you can assign to the unit. Default value: 0.</param>
++                public static bool LinearMissileCollision(Obj_AI_Base unit, Vector2 missileStartPos, Vector2 missileEndPos, float missileSpeed, int missileWidth, int delay, int extraRadius = 0)
++                {
++                    var hitboxRadius = unit.BoundingRadius + extraRadius;
+ 
+-                // group points 
+-                var groups = new List<List<Vector2>>();
++                    if (!unit.IsMoving)
++                    {
++                        return Geometry.SegmentCircleIntersectionPriority(missileStartPos, missileEndPos,
++                            unit.ServerPosition.To2D(), hitboxRadius,
++                            unit.ServerPosition.To2D(), hitboxRadius + missileWidth / 2) > 0;
++                    }
+ 
+-                foreach (var unit in results.Keys)
+-                {
+-                    var result = results[unit];
+-                    var newGroup = new List<Vector2> { result.UnitPosition.To2D() };
++                    var time = delay + Ping;
++                    var position = PredictUnitPosition(unit, time);
++                    var path = GetRealPath(unit);
+ 
+-                    foreach (var r in results)
++                    var t = 0f;
++                    for (var i = 0; i < path.Length - 1; i++)
+                     {
+-                        var sector = new Geometry.Polygon.Sector(sourcePosition2D,
+-                            r.Value.UnitPosition.To2D().Extend(result.UnitPosition, sectorLength / 2),
+-                            (float) (2 * angle * Math.PI / 360), range);
++                        var start = path[i].To2D();
++                        var end = path[i + 1].To2D();
+ 
+-                        if (sector.IsInside(result.UnitPosition))
++                        if (position != Vector2.Zero)
+                         {
+-                            newGroup.Add(r.Value.UnitPosition.To2D());
++                            if (!Geometry.PointInLineSegment(start, end, position))
++                            {
++                                continue;
++                            }
++
++                            start = position;
++                            position = Vector2.Zero;
+                         }
+-                    }
+ 
+-                    if (groups.All(g => g.Count(p => newGroup.Contains(p)) != newGroup.Count))
+-                    {
+-                        groups.Add(newGroup);
++                        var missilePos = missileStartPos.Extend(missileEndPos, t * missileSpeed);
++
++                        if (!Geometry.PointInLineSegment(missileStartPos, missileEndPos, missilePos))
++                        {
++                            break;
++                        }
++
++                        if (MovingObjectsCollision(missilePos, missileEndPos, missileWidth / 2, missileSpeed, false,
++                            start, end, hitboxRadius, unit.MoveSpeed, true))
++                        {
++                            return true;
++                        }
++
++                        t += start.Distance(end) / unit.MoveSpeed;
+                     }
++
++                    return false;
+                 }
+-                groups.Sort((g1, g2) => g2.Count.CompareTo(g1.Count));
+ 
+-                var predictionResults = new List<PredictionResult>();
++                /// <summary>
++                /// Determines whether a unit will collide with a circular missile along a predetermined path. Circular missiles cause collision only at the destination point.
++                /// </summary>
++                /// <param name="unit"> The unit to check collision.</param>
++                /// <param name="missileStartPos"> The starting point of the missile.</param>
++                /// <param name="missileEndPos"> The destination point of the missile.</param>
++                /// <param name="missileSpeed"> Missile's speed.</param>
++                /// <param name="missileRadius"> Missile's collision radius.</param>
++                /// <param name="delay"> The time (in milliseconds) it will take for the missile to spawn.</param>
++                /// <param name="extraRadius"> The extra hitbox radius you can assign to the unit. Default value: 0.</param>
++                public static bool CircularMissileCollision(Obj_AI_Base unit, Vector2 missileStartPos, Vector2 missileEndPos, float missileSpeed, int missileRadius, int delay, int extraRadius = 0)
++                {
++                    var time = delay + Ping + (missileSpeed > 0 ? missileStartPos.Distance(missileEndPos) / missileSpeed : 0F);
++                    var position = PredictUnitPosition(unit, (int) time);
++                    return missileEndPos.Distance(position, true) <= (missileRadius + unit.BoundingRadius + extraRadius).Pow();
++                }
+ 
+-                foreach (var group in groups)
++                /// <summary>
++                /// Computes the point where an object can collide with another object moving along a predetermined path. There may not always exist a valid point.
++                /// </summary>
++                /// <param name="start"> The starting point of the pretedermined path.</param>
++                /// <param name="end"> The ending point of the predetermined path.</param>
++                /// <param name="position"> The current position of the object.</param>
++                /// <param name="speed"> The movement speed of the object moving along the predetermined path.</param>
++                /// <param name="speed2"> The movement speed of the object.</param>
++                public static Vector2 GetCollisionPoint(
++                    Vector2 start,
++                    Vector2 end,
++                    Vector2 position,
++                    float speed,
++                    float speed2)
+                 {
+-                    var castPoint = Utils.GetCenterPoint(group.ToArray());
++                    if (start == end)
++                        return start;
+ 
+-                    // gather collision objects
+-                    var scanRange = range * 2F;
+-                    var collisionObjects = new List<Obj_AI_Base>();
+-                    var sector = new Geometry.Polygon.Sector(sourcePosition2D, castPoint,
+-                        (float) (2 * angle * Math.PI / 360),
+-                        range);
++                    var pointA = start;
++                    var pointB = end;
++                    var pointC = position;
+ 
+-                    foreach (var unit in GatherCollisionObjects(sourcePosition2D, scanRange))
+-                    {
+-                        var time = Game.Ping + delay;
+-                        var pos = PredictUnitPosition(unit, time);
++                    var vectorC = new Vector2(pointC.X - pointA.X, pointC.Y - pointA.Y);
++                    var vectorB = new Vector2(pointB.X - pointA.X, pointB.Y - pointA.Y);
+ 
+-                        if (sector.IsInside(pos))
+-                        {
+-                            collisionObjects.Add(unit);
+-                        }
+-                    }
++                    var cosine = (vectorC.X * vectorB.X + vectorC.Y * vectorB.Y) /
++                                 (Math.Sqrt(Math.Pow(vectorC.X, 2) + Math.Pow(vectorC.Y, 2)) *
++                                  Math.Sqrt(Math.Pow(vectorB.X, 2) + Math.Pow(vectorB.Y, 2)));
+ 
+-                    predictionResults.Add(new PredictionResult(castPoint.To3DWorld(), Vector3.Zero, 85F,
+-                        collisionObjects.ToArray(), -1));
+-                }
++                    var distanceCA = pointA.Distance(pointC);
+ 
+-                return predictionResults.ToArray();
++                    var distanceAP =
++                        (float)
++                            Math.Abs((speed.Pow() * distanceCA * cosine -
++                                      Math.Sqrt(speed.Pow() * distanceCA.Pow() *
++                                                (speed2.Pow() + speed.Pow() * cosine.Pow() - speed.Pow()))) /
++                                     (speed2.Pow() - speed.Pow()));
++
++                    return pointA.Extend(pointB, distanceAP);
++                }
+             }
+         }
+     }
+@@ -1441,7 +1186,7 @@ namespace EloBuddy.SDK
+             HitChance hitChanceOverride = HitChance.Unknown)
+         {
+             if (hitChancePercent < 0)
+-                hitChancePercent = 1.2F;
++                hitChancePercent = 0F;
+ 
+             if (hitChancePercent > 100)
+                 hitChancePercent = 100F;
+@@ -1453,5 +1198,10 @@ namespace EloBuddy.SDK
+             _allowedCollisionCount = allowedCollisionCount;
+             _hitChanceOverride = hitChanceOverride;
+         }
++
++        internal static PredictionResult ResultImpossible(Prediction.Position.PredictionData data, Vector3? castPos = null, Vector3? unitPos = null)
++        {
++            return new PredictionResult(castPos ?? Vector3.Zero, unitPos ?? Vector3.Zero, 0, null, data.AllowCollisionCount, HitChance.Impossible);
++        }
+     }
+ }
+-- 
+1.9.4.msysgit.2
+

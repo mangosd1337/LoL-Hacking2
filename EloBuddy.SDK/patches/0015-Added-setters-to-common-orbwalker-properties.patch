@@ -1,0 +1,100 @@
+From e928f48eb16c6c4358bad80a09020ac62920db59 Mon Sep 17 00:00:00 2001
+From: Lachlan van der Velden <lvelden1@gmail.com>
+Date: Mon, 8 Feb 2016 17:18:38 +1100
+Subject: [PATCH 15/28] Added setters to common orbwalker properties
+
+---
+ EloBuddy.SDK/Orbwalker.cs | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/EloBuddy.SDK/Orbwalker.cs b/EloBuddy.SDK/Orbwalker.cs
+index e0c3387..c97bddd 100644
+--- a/EloBuddy.SDK/Orbwalker.cs
++++ b/EloBuddy.SDK/Orbwalker.cs
+@@ -181,42 +181,52 @@ namespace EloBuddy.SDK.AddonDevelopers
+         public static int HoldRadius
+         {
+             get { return Menu["holdRadius" + Player.Instance.ChampionName].Cast<Slider>().CurrentValue; }
++            set { Menu["holdRadius" + Player.Instance.ChampionName].Cast<Slider>().CurrentValue = value; }
+         }
+         public static bool LaneClearAttackChamps
+         {
+             get { return Menu["laneClearChamps"].Cast<CheckBox>().CurrentValue; }
++            set { Menu["laneClearChamps"].Cast<CheckBox>().CurrentValue = value; }
+         }
+         public static bool ParanoidMode
+         {
+             get { return Menu["paranoid"].Cast<CheckBox>().CurrentValue; }
++            set { Menu["paranoid"].Cast<CheckBox>().CurrentValue = value; }
+         }
+         public static int MovementDelay
+         {
+             get { return Menu["delayMove"].Cast<Slider>().CurrentValue; }
++            set { Menu["delayMove"].Cast<Slider>().CurrentValue = value; }
+         }
+         public static bool IncludePing
+         {
+             get { return Menu["pingInclude"].Cast<CheckBox>().CurrentValue; }
++            set { Menu["pingInclude"].Cast<CheckBox>().CurrentValue = value; }
+         }
+         public static bool DrawRange
+         {
+             get { return DrawingsMenu["drawrange"].Cast<CheckBox>().CurrentValue; }
++            set { DrawingsMenu["drawrange"].Cast<CheckBox>().CurrentValue = value; }
+         }
+         public static bool DrawAzirRange
+         {
+             get { return DrawingsMenu["drawAzirRange"].Cast<CheckBox>().CurrentValue; }
++            set { DrawingsMenu["drawAzirRange"].Cast<CheckBox>().CurrentValue = value; }
+         }
+         public static bool DrawEnemyRange
+         {
+             get { return DrawingsMenu["drawEnemyRange"].Cast<CheckBox>().CurrentValue; }
++            set { DrawingsMenu["drawEnemyRange"].Cast<CheckBox>().CurrentValue = value; }
+         }
+         public static bool DrawLastHitMarker
+         {
+             get { return DrawingsMenu["drawLasthit"].Cast<CheckBox>().CurrentValue; }
++            set { DrawingsMenu["drawLasthit"].Cast<CheckBox>().CurrentValue = value; }
+         }
+         public static bool DrawHoldRadius
+         {
+             get { return DrawingsMenu["drawHoldRadius"].Cast<CheckBox>().CurrentValue; }
++            set { DrawingsMenu["drawHoldRadius"].Cast<CheckBox>().CurrentValue = value; }
+         }
+ 
+         internal static bool _disableMovement;
+@@ -234,10 +244,12 @@ namespace EloBuddy.SDK.AddonDevelopers
+         public static bool UseOnTick
+         {
+             get { return AdvancedMenu["useTick"].Cast<CheckBox>().CurrentValue; }
++            set { AdvancedMenu["useTick"].Cast<CheckBox>().CurrentValue = value; }
+         }
+         public static bool UseOnUpdate
+         {
+             get { return AdvancedMenu["useUpdate"].Cast<CheckBox>().CurrentValue; }
++            set { AdvancedMenu["useUpdate"].Cast<CheckBox>().CurrentValue = value; }
+         }
+         internal static bool UseTiamat
+         {
+@@ -250,14 +262,17 @@ namespace EloBuddy.SDK.AddonDevelopers
+         internal static bool AttackObjects
+         {
+             get { return Menu["attackObjects"].Cast<CheckBox>().CurrentValue; }
++            set { FarmingMenu["attackObjects"].Cast<CheckBox>().CurrentValue = value; }
+         }
+         public static bool LastHitPriority
+         {
+             get { return FarmingMenu["lastHitPriority"].Cast<CheckBox>().CurrentValue; }
++            set { FarmingMenu["lastHitPriority"].Cast<CheckBox>().CurrentValue = value; }
+         }
+         public static int ExtraFarmDelay
+         {
+             get { return FarmingMenu["extraFarmDelay"].Cast<Slider>().CurrentValue; }
++            set { FarmingMenu["extraFarmDelay"].Cast<Slider>().CurrentValue = value; }
+         }
+ 
+         internal static bool FreezePriority
+-- 
+1.9.4.msysgit.2
+

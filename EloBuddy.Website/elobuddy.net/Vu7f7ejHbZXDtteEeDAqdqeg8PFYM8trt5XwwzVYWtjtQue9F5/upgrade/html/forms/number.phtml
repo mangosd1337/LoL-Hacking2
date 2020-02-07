@@ -1,0 +1,30 @@
+<ips:template parameters="$name, $value, $required, $unlimited, $range, $min, $max, $step, $decimals, $unlimitedLang, $disabled=FALSE, $suffix, $toggles" />
+<input
+	type="{{if $range}}range{{else}}number{{endif}}"
+	name="{$name}"
+	size="5"
+	{{if $required === TRUE}}required{{endif}}
+	{{if $unlimited !== NULL and $value === $unlimited}}
+		value=""
+		data-jsdisable="true"
+	{{else}}
+		value="{$value}"
+	{{endif}}
+	{{if $min !== NULL}}
+		min="{$min}"
+	{{endif}}
+	{{if $max !== NULL}}
+		max="{$max}"
+	{{endif}}
+	{{if $step !== NULL}}
+		step="{$step}"
+	{{endif}}
+	{{if $disabled}}disabled{{endif}}
+>
+{$suffix}
+{{if $unlimited !== NULL}}
+	&nbsp;
+	{lang="or"}
+	&nbsp;
+	<label><input type="checkbox" data-control="unlimited" name="{expression="preg_replace( '/\[(.+?)\]/', '[$1_unlimited]', $name, 1 )"}" value="{$unlimited}" {{if $unlimited === $value}}checked{{endif}} {{if $disabled}}disabled{{endif}} data-control="toggle" data-toggles="{expression="implode( ',', $toggles )"}" /> {lang="$unlimitedLang"}</label>
+{{endif}}

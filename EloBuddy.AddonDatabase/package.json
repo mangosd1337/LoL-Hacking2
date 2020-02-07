@@ -1,0 +1,47 @@
+{
+  "name": "addon-db",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "bootstrap": "^3.3.7",
+    "eslint": "^3.7.1",
+    "eslint-config-google": "^0.6.0",
+    "eslint-config-standard": "^6.2.0",
+    "eslint-plugin-promise": "^2.0.1",
+    "eslint-plugin-standard": "^2.0.1",
+    "flow-bin": "^0.33.0",
+    "react-bootstrap": "^0.30.5",
+    "react-scripts": "0.6.1"
+  },
+  "dependencies": {
+    "bcrypt": "^0.8.7",
+    "bootstrap": "^3.3.7",
+    "express": "^4.14.0",
+    "fingerprintjs2": "^1.4.1",
+    "flux": "^3.0.0",
+    "jquery": "^3.1.1",
+    "keymirror": "^0.1.1",
+    "material-ui": "^0.15.4",
+    "mongoose": "^4.6.2",
+    "morgan": "^1.7.0",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "react": "^15.3.2",
+    "react-bootstrap": "^0.30.5",
+    "react-dom": "^15.3.2",
+    "react-motion": "^0.4.5",
+    "react-router": "^2.8.1",
+    "react-swipeable-views": "^0.7.10",
+    "react-tap-event-plugin": "^1.0.0",
+    "superagent": "^2.3.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  }
+}

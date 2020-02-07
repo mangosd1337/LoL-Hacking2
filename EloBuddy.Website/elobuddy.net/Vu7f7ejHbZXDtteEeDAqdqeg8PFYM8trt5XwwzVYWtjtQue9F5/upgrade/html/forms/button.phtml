@@ -1,0 +1,6 @@
+<ips:template parameters="$lang, $type, $href=NULL, $class='', $attributes=array()" />
+{{if $type === 'link'}}
+	<a href="{$href}" class='ipsButton ipsButton_link {{if $class}}{$class}{{endif}}' {{if $attributes}}{{foreach $attributes as $key => $value}}{$key}="{$value}"{{endforeach}}{{endif}} role="button">{lang="$lang"}</a>
+{{else}}
+	<button type="{$type}" class="{{if $class}}{$class}{{endif}}" {{if $attributes}}{{foreach $attributes as $key => $value}}{$key}="{$value}"{{endforeach}}{{endif}} role="button">{lang="$lang"}</button>
+{{endif}}

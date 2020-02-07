@@ -1,0 +1,38 @@
+<ips:template parameters="$name, $value, $required, $options, $disabled=FALSE, $toggles=array(), $descriptions=array(), $warnings=array(), $userSuppliedInput='', $unlimited=NULL, $unlimitedLang=NULL" />
+{{if $unlimited !== NULL}}
+	<ul class="ipsField_fieldList" role="radiogroup">
+		<li>
+			<input type="checkbox" name="{$name}" value="{$unlimited}" id='elRadio_{$name}_{unlimited}' data-control="toggle" data-togglesOff="elRadio_{$name}" {{if $value === $unlimited}}checked{{endif}} />
+			<div class='ipsField_fieldList_content'>
+				<label for='elRadio_{$name}_{unlimited}'>
+					{lang="$unlimitedLang"}
+				</label>
+			</div>
+		</li>
+	</ul>
+{{endif}}
+<ul class="ipsField_fieldList" role="radiogroup" id="elRadio_{$name}">
+{{foreach $options as $k => $v}}
+	<li>
+		<input type="radio" name="{$name}" value="{$k}" {{if (string) $value == (string) $k or ( isset( $userSuppliedInput ) and !in_array( $value, array_keys( $options ) ) and $k == $userSuppliedInput )}}checked{{endif}} {{if $required === TRUE}}required{{endif}} {{if $disabled === TRUE or ( is_array( $disabled ) and in_array( $k, $disabled ) )}}disabled{{endif}} {{if isset( $toggles[ $k ] ) and !empty( $toggles[ $k ] )}}data-control="toggle" data-toggles="{expression="implode( ',', $toggles[ $k ] )"}"{{endif}} id="elRadio_{$name}_{$k}" />
+		<div class='ipsField_fieldList_content'>
+			<label for='elRadio_{$name}_{$k}' id='elField_{$name}_label'>{$v|raw}</label>
+			{{if !empty( $userSuppliedInput ) AND $userSuppliedInput == $k}}
+				<input type='text' name='{$userSuppliedInput}_{$name}' value="{{if !in_array( $value, array_keys( $options ) )}}{$value}{{endif}}" id='{$userSuppliedInput}_{expression="preg_replace('/[^a-zA-Z0-9\-_]/', '_', $name)"}'>
+			{{endif}}
+			{{if isset( $descriptions[ $k ] )}}
+				<br>
+				<span class='ipsFieldRow_desc'>
+					{$descriptions[ $k ]|raw}
+				</span>
+			{{endif}}
+			{{if isset( $warnings[ $k ] )}}
+				<div id="{$name}_{$k}_warning">
+					<br>
+					<p class='ipsMessage ipsMessage_warning'>{$warnings[ $k ]|raw}</p>
+				</div>
+			{{endif}}
+		</div>
+	</li>
+{{endforeach}}
+</ul>

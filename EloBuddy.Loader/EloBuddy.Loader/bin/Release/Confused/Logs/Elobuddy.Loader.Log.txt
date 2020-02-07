@@ -1,0 +1,13 @@
+[03/14/2016 00:01:18] <Info> Initializing Elobuddy.Loader [0.1.7.5]
+[03/14/2016 00:01:18] <Info> Deserializing settings.
+[03/14/2016 00:01:18] <Info> Elobuddy.Loader initialized successfully.
+[03/14/2016 00:01:18] <Info> Running elobuddy system updater.
+[03/14/2016 00:01:25] <Info> Copied EloBuddy.Core.dll to: "C:\Users\kappa\AppData\Local\Temp\Qi3MKG6kNpwOJXT\Elobuddy.Core.dll"
+[03/14/2016 00:01:25] <Info> Copied EloBuddy.Sandbox.dll to: "C:\Users\kappa\AppData\Local\Temp\Qi3MKG6kNpwOJXT\gyz9N1VRHXqHAac.dll"
+[03/14/2016 00:01:25] <Info> Copied EloBuddy.dll to: "C:\Users\kappa\AppData\Local\Temp\Qi3MKG6kNpwOJXT\NZWXQn1huyh8ey1.dll"
+[03/14/2016 00:01:25] <Info> Elobuddy system updater has finished updating.
+[03/14/2016 00:01:26] <Info> Elobuddy.Loader is exiting.
+[03/14/2016 00:01:26] <Info> Deleted temporary core directory: "C:\Users\kappa\AppData\Local\Temp\Qi3MKG6kNpwOJXT"
+[03/14/2016 00:01:26] <Info> Serializing settings
+[03/14/2016 00:01:26] <Info> Elobuddy.Loader has exited.
+

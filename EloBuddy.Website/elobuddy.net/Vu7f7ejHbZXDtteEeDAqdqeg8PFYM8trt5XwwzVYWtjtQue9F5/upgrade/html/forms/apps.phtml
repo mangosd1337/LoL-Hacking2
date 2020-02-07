@@ -1,0 +1,22 @@
+<ips:template parameters="$apps, $selected" />
+<ul class='ipsField_fieldList'>
+{{foreach $apps as $key => $data}}
+	<li>
+		<input type="checkbox" id='app_{$key}' name="apps[{$key}]" {{if $data['force'] or in_array( $key, $selected )}}checked{{endif}} {{if $data['force'] or $data['disabled']}}disabled{{endif}} value='1'>
+		<div class='ipsField_fieldList_content'>
+			<label for='app_{$key}' class='ipsFieldRow_label'>{$data['name']}</label>
+			<dl class='ipsVersions{{if $data['disabled']}} disabled{{endif}}'>
+				<dt>{lang="current_version"}</dt>
+				<dd>{$data['current']}</dd>
+				<dt>{lang="available_version"}</dt>
+				<dd>{$data['available']}</dd>
+			</dl>
+			{{if !empty( $data['errors'] )}}
+				<p class="ipsMessage ipsMessage_error">
+					{expression="implode( '<br />', $data['errors'] )" raw="true"}
+				</p>
+			{{endif}}
+		</div>
+	</li>
+{{endforeach}}
+</ul>

@@ -1,0 +1,30 @@
+<ips:template parameters="$forms, $error" />
+
+{{if $error !== NULL}}
+<div class='ipsMessage ipsMessage_error'>
+	{lang="$error"}
+</div>
+<br>
+{{endif}}
+
+<div class='ipsColumns ipsColumns_collapsePhone'>
+	<div class='ipsColumn ipsColumn_fluid ipsPad'>
+		{{foreach $forms as $k => $form}}
+			{{if $k === '_standard'}}
+				{$form|raw}
+			{{endif}}
+		{{endforeach}}
+	</div>
+	{{if count ( $forms ) > 1}}
+		<div class='ipsColumn ipsColumn_veryWide ipsPad'>
+			<h2 class='ipsType_sectionHead'>{lang='sign_in_faster'}</h2>
+			<p class='ipsType_normal ipsType_reset ipsType_light'>{lang='sign_in_connect'}</p>
+			<br>
+			{{foreach $forms as $k => $form}}
+				{{if $k !== '_standard'}}
+					{$form|raw}
+				{{endif}}
+			{{endforeach}}
+		</div>
+	{{endif}}
+</div>

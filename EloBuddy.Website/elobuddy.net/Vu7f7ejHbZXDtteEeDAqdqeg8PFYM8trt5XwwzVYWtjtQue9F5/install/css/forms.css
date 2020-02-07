@@ -1,0 +1,470 @@
+.ipsFieldRow:not( :last-child ) {
+	margin-bottom: 15px;
+}
+
+	.ipsFieldRow_noLabel > label,
+	.ipsFieldRow_noLabel > .ipsFieldRow_content > label {
+		display: none;
+	}
+
+/* CHECKBOX FIELDS */
+/* For single checkboxes, and inline checkboxes */
+.ipsFieldRow_checkbox {
+	margin-bottom: 5px;
+}
+	
+	.ipsFieldRow_checkbox + .ipsFieldRow:not( .ipsFieldRow_checkbox ) {
+		margin-top: 15px;
+	}
+
+	.ipsFieldRow_checkbox input[type="checkbox"],
+	.ipsFieldRow_checkbox input[type="radio"] {
+		float: left;
+		margin-top: 5px;
+	}
+
+	.ipsFieldRow_checkbox .ipsFieldRow_content {
+		margin-left: 22px;
+	}
+
+	.ipsFieldRow_checkbox label {
+		display: block;
+	}
+
+	.ipsFieldRow_inlineCheckbox {
+		margin-top: 6px;
+		display: inline-block;
+		margin-right: 15px;
+	}
+
+		.ipsFieldRow_inlineCheckbox input[type="checkbox"],
+		.ipsFieldRow_inlineCheckbox input[type="radio"],
+		.ipsToggle {
+			margin-right: 3px;
+		}
+
+/* FIELD LISTS (for stacks of radios/checkboxes) */
+.ipsField_fieldList {
+	padding-top: 7px;
+}
+
+.ipsField_fieldList > li {
+	margin-bottom: 10px;
+}
+
+.ipsField_fieldList input[type="radio"], .ipsField_fieldList input[type="checkbox"] {
+	float: left;
+	margin-top: 4px;
+}
+
+.ipsField_fieldList_content {
+	margin-left: 22px;
+}
+
+/* FULL WIDTH FIELDS */
+.ipsApp .ipsFieldRow_fullWidth input[type="text"], 
+.ipsApp .ipsFieldRow_fullWidth input[type="password"], 
+.ipsApp .ipsFieldRow_fullWidth input[type="submit"], 
+.ipsApp .ipsFieldRow_fullWidth button, 
+.ipsApp .ipsFieldRow_fullWidth textarea,
+.ipsApp .ipsFieldRow_fullWidth .ipsField_autocomplete,
+.ipsApp input.ipsField_fullWidth, .ipsApp textarea.ipsField_fullWidth {
+	width: 100%;
+	max-width: 100% !important;
+}
+
+/* FORM TYPOGRAPHY */
+.ipsFieldRow_desc {
+	font-size: 12px;
+	color: #adadad;
+	margin-top: 3px;
+	display: inline-block;
+}
+
+.ipsFieldRow:not( .ipsFieldRow_checkbox ) .ipsFieldRow_label,
+.ipsFieldRow:not( .ipsFieldRow_checkbox ) .ipsFieldRow_title {
+	font-size: 15px;
+	font-weight: bold;
+	margin-bottom: 5px;
+	display: inline-block;
+	padding-top: 5px;
+}
+
+.ipsApp .ipsField_primary,
+.ipsApp .ipsField_primary.ipsField_autocomplete input,
+.ipsApp .ipsFieldRow_primary input {
+	font-size: 18px;
+}
+
+.ipsFieldRow_required {
+	font-size: 10px;
+	text-transform: uppercase;
+	color: #c02222;
+	margin-left: 10px;
+	font-weight: normal;
+}
+
+/* HORIZONTAL FORMS */
+/* i.e. titles beside fields */
+.ipsForm_horizontal .ipsFieldRow > .ipsFieldRow_label,
+.ipsForm_horizontal .ipsFieldRow > .ipsFieldRow_title {
+	float: left;
+	width: 185px;
+	padding-right: 15px;
+	text-align: right;
+	line-height: 1.3;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.ipsForm.ipsForm_horizontal .ipsFieldRow.ipsFieldRow_shortTitle > .ipsFieldRow_title {
+	width: 85px;
+}
+
+.ipsForm_horizontal .ipsFieldRow:not( .ipsFieldRow_checkbox ) .ipsFieldRow_content {
+	margin-left: 185px;
+}
+
+.ipsForm_horizontal .ipsFieldRow.ipsFieldRow_shortTitle:not( .ipsFieldRow_checkbox ) .ipsFieldRow_content {
+	margin-left: 95px;
+}
+
+.ipsForm_horizontal .ipsFieldRow_checkbox {
+	margin-left: 185px;
+}
+
+.ipsForm_horizontal .ipsFieldRow_required {
+	font-size: 0;
+	margin: 0;
+}
+
+	.ipsForm_horizontal .ipsFieldRow_required:before {
+		content: '*';
+		display: inline;
+		color: #c02222;
+		font-size: 16px;
+	}
+
+.ipsForm_horizontal .ipsFieldRow_textValue .ipsFieldRow_content {
+	padding-top: 7px;
+}
+
+/* FIELD GROUPS */
+.ipsForm_group {
+	margin-bottom: 15px;
+	padding-top: 15px;
+	border: 0;
+	border-bottom: 1px solid #f0f0f0;
+}
+	
+	.ipsForm_group > .ipsForm_groupTitle {
+		float: left;
+		font-size: 16px;
+		font-weight: 500;
+		margin: 0;
+	}
+
+	.ipsForm_group > .ipsForm_groupContent {
+		margin: 0 0 0 175px;
+		padding: 0 0 0 15px;
+		border-left: 1px solid #f6f6f6;
+		list-style: none;
+	}
+
+.ipsForm .ipsForm_group:last-child {
+	border-bottom: 0;
+}
+
+/* ELEMENT STYLES */
+.ipsApp input, .ipsApp button, .ipsApp select, .ipsApp textarea {
+	font-size: 14px;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	vertical-align: middle;
+}
+
+.ipsApp .ipsField_autocomplete {
+	padding-right: 35px;
+	position: relative;
+	outline: 0;
+}
+
+.ipsApp .ipsField_autocomplete_loading {
+	position: absolute;
+	right: 10px;
+}
+
+.ipsApp .ipsField_autocomplete [data-action='addToken'] {
+	font-size: 13px;
+}
+
+.ipsApp input[type="color"] {
+	min-width: 50px;
+}
+
+.ipsApp .ipsField_autocomplete, .ipsApp textarea, .ipsApp input[type="text"], .ipsApp input[type="password"],
+.ipsApp input[type="datetime"], .ipsApp input[type="datetime-local"], .ipsApp input[type="date"],
+.ipsApp input[type="month"], .ipsApp input[type="time"], .ipsApp input[type="week"], 
+.ipsApp input[type="number"], .ipsApp input[type="email"], .ipsApp input[type="url"],
+.ipsApp input[type="search"], .ipsApp input[type="tel"] {
+ 	background-color: #ffffff;
+ 	border: 1px solid #cccccc;
+	border-radius: 3px;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.075) inset;
+	width: 100%;
+	max-width: 350px;
+	padding: 7px;
+}
+
+.ipsApp textarea.ipsField_short, .ipsApp input[type="text"].ipsField_short, .ipsApp input[type="password"].ipsField_short,
+.ipsApp input[type="datetime"].ipsField_short, .ipsApp input[type="datetime-local"].ipsField_short, .ipsApp input[type="date"].ipsField_short,
+.ipsApp input[type="month"].ipsField_short, .ipsApp input[type="time"].ipsField_short, .ipsApp input[type="week"].ipsField_short, 
+.ipsApp input[type="number"].ipsField_short, .ipsApp input[type="email"].ipsField_short, .ipsApp input[type="url"].ipsField_short,
+.ipsApp input[type="search"].ipsField_short, .ipsApp input[type="tel"].ipsField_short, .ipsApp input[type="color"].ipsField_short {
+	max-width: 200px;
+	width: auto;
+}
+
+.ipsApp textarea:focus, .ipsApp input[type="text"]:focus, .ipsApp input[type="password"]:focus,
+.ipsApp input[type="datetime"]:focus, .ipsApp input[type="datetime-local"]:focus,
+.ipsApp input[type="date"]:focus, .ipsApp input[type="month"]:focus, .ipsApp input[type="time"]:focus,
+.ipsApp input[type="week"]:focus, .ipsApp input[type="number"]:focus, .ipsApp input[type="email"]:focus,
+.ipsApp input[type="url"]:focus, .ipsApp input[type="search"]:focus, .ipsApp input[type="tel"]:focus,
+.ipsApp input[type="color"]:focus {
+	border-color: rgba(82, 168, 236, 0.8);
+	outline: 0;
+	box-shadow: 0 1px 1px rgba(0,0,0,0.075), 0 0 8px rgba(82,168,236,0.6) inset ;
+}
+
+.ipsApp .ipsToggle:focus {
+	border-color: rgba(82, 168, 236, 0.8);
+	outline: 0;
+	box-shadow: 0 1px 1px rgba(0,0,0,0.075), 0 0 8px rgba(82,168,236,0.6);
+}
+
+.ipsApp .ipsField_autocomplete input[type="text"] {
+	border: 0;
+	padding: 0;
+	background: transparent;
+	width: auto;
+	max-width: 100%;
+	box-shadow: none;
+}
+
+.ipsApp textarea {
+	height: auto;
+	max-width: 100%;
+}
+
+	.ipsApp textarea[name=conf_global_error] {
+		height: 200px;
+		font-family: monospace;
+	}
+
+.ipsFieldRow_content select {
+	margin-top: 6px;
+}
+
+.ipsFieldRow .ipsFieldRow_icon {
+	position: relative;
+}
+
+	.ipsFieldRow .ipsFieldRow_icon input[type="text"] {
+		padding-left: 35px;
+	}
+
+	.ipsFieldRow .ipsFieldRow_icon:after {
+		font-family: 'FontAwesome';
+		font-size: 16px;
+		position: absolute;
+		left: 3px;
+		top: 3px;
+		color: #404040;
+		display: inline-block;
+		width: 30px;
+		height: 30px;
+	}
+
+		.ipsFieldRow .ipsFieldRow_icon[data-icon="search"] {
+			content: "\\f002";
+		}
+
+	.ipsFieldRow.ipsFieldRow_primary .ipsFieldRow_icon:after {
+		font-size: 18px;
+		left: 10px;
+		top: 0;
+	}
+
+.ipsApp input.ipsField_loading {
+	background-image: url( {resource="loaders/tiny_loading.gif" app="core" location="front"} );
+	background-repeat: no-repeat;
+	background-position: right 5px center;
+}
+
+.ipsFieldRow_section {
+	background: #f9f9f9;
+	color: #333;
+	padding: 15px;
+	font-size: 16px;
+	margin-bottom: 10px;
+}
+
+/* TOGGLES */
+input[type="checkbox"]:disabled + .ipsToggle {
+	opacity: 0.4;
+	pointer-events: none;
+}
+
+.ipsToggle {
+	width: 50px;
+	background: red;
+	display: inline-block;
+	height: 22px;
+	line-height: 22px;
+	border-radius: 2px;
+	position: relative;
+	box-shadow: 0px 0px 1px rgba(0,0,0,0.2) inset;
+	border: 1px solid rgba(0,0,0,0.3);
+	overflow: hidden;
+	vertical-align: middle;
+	cursor: pointer;
+	-webkit-transition: all 0.3s linear;
+}
+	
+	.ipsToggle.ipsToggle_off {
+		background: #c2c2c2;
+	}
+
+	.ipsToggle.ipsToggle_on {
+		background: #679b35;
+	}
+
+	.ipsToggle input {
+		opacity: 0.001;
+	}
+
+	.ipsToggle span {
+		background: #f5f5f5;
+		border-radius: 2px;
+		height: 18px;
+		width: 18px;
+		top: 1px;
+		text-indent: 100%;
+		white-space: nowrap;
+		box-shadow: 0px 0px 1px rgba(0,0,0,0.5);
+		display: block;
+		position: absolute;
+		-webkit-transition: all 0.2s linear;
+		pointer-events: none;
+	}	
+
+		.ipsToggle.ipsToggle_on span,
+		.ipsToggle.ipsToggle_off:active span {
+			right: 1px;
+		}
+
+		.ipsToggle.ipsToggle_off span,
+		.ipsToggle.ipsToggle_on:active span {
+			right: 29px;
+		}
+
+	.ipsToggle span:before {
+		content: '\\f0c9';
+		font-family: 'FontAwesome';
+		font-size: 10px;
+		line-height: 20px;
+		display: block;
+		position: absolute;
+		width: 18px;
+		height: 18px;
+		top: 0;
+		left: -14px;
+		color: rgba(0,0,0,0.2);		
+	}
+
+	.ipsToggle span:after {
+		content: '\\f00c';
+		font-family: 'FontAwesome';
+		font-size: 12px;
+		text-transform: uppercase;
+		display: block;
+		color: #fff;
+		position: absolute;
+		right: 27px;
+		top: 0px;
+		line-height: 18px;
+		text-shadow: 0px 0px 1px rgba(0,0,0,0.5);
+	}
+
+		.ipsToggle.ipsToggle_off span:after {
+			content: '\\f00d';
+			right: -18px;
+			left: auto;
+		}
+
+/* No, no, no, no, yes */
+.ipsField_yesNo {
+	display: inline-block;
+}
+
+.ipsField_yesNo li {
+	float: left;
+}
+
+.ipsField_yesNo input[type="radio"] {
+	display: none;
+}
+
+.ipsField_yesNo label {
+	display: block;
+	height: 32px;
+	line-height: 32px;
+	text-align: center;
+	width: 40px;
+	background: #f2f2f2;
+	overflow: hidden;
+	text-indent: 100%;
+	whitespace: no-wrap;
+	cursor: pointer;
+	-webkit-transition: 0.2s all linear;
+	position: relative;
+}
+
+	.ipsField_yesNo label:after {
+		color: #d5d5d5;		
+		font-family: "FontAwesome";
+		position: absolute;
+		left: 50%;
+		top: 0;
+		text-indent: 0;
+		font-size: 18px;
+	}
+
+		.ipsField_yesNo .ipsField_yesNo_yes label:after {
+			content: "\\f00c";
+			margin-left: -9px;
+		}
+
+			.ipsField_yesNo .ipsField_yesNo_yes input[type="radio"]:checked + label {
+				background: #68a72f;
+			}
+
+		.ipsField_yesNo .ipsField_yesNo_no label:after {
+			content: "\\f00d";
+			margin-left: -7px;
+		}
+
+			.ipsField_yesNo .ipsField_yesNo_no input[type="radio"]:checked + label {
+				background: #a72f35;
+			}
+
+.ipsField_yesNo li:first-child label {
+	border-radius: 3px 0 0 3px;
+}
+
+.ipsField_yesNo li:last-child label {
+	border-radius: 0 3px 3px 0;
+}
+
+.ipsField_yesNo input[type="radio"]:checked + label:after {
+	color: #fff;
+}

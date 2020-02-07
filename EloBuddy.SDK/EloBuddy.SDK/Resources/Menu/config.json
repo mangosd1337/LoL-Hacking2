@@ -1,0 +1,343 @@
+{
+	"Colors": 
+    {
+        "Scrollbar":  { "A": 200, "R": 100, "G": 100, "B": 100 },
+        "ScrollbarBackground":  { "A": 255, "R": 0, "G": 0, "B": 0 }
+    },
+    "SpriteAtlas": 
+    {
+        "MainForm": 
+        {
+            "Complete": 
+            {
+                "X": 0,
+                "Y": 0,
+                "Width": 758,
+                "Height": 598
+            },
+            "Header": 
+            {
+                "X": 0,
+                "Y": 0,
+                "Width": 758,
+                "Height": 52
+            },
+            "Footer": 
+            {
+                "X": 0,
+                "Y": 544,
+                "Width": 758,
+                "Height": 54,
+                "Offset": 
+                {
+                    "X": 0,
+                    "Y": 544
+                }
+            },
+            "AddonButtonContainer": 
+            {
+                "X": 11,
+                "Y": 52,
+                "Width": 146,
+                "Height": 490,
+                "Offset": 
+                {
+                    "X": 11,
+                    "Y": 52
+                }
+            },
+            "ContentHeader": 
+            {
+                "X": 172,
+                "Y": 67,
+                "Width": 554,
+                "Height": 20,
+                "Offset": 
+                {
+                    "X": 172,
+                    "Y": 67
+                }
+            },
+		    "ContentContainer": 
+            {
+                "X": 172,
+                "Y": 98,
+                "Width": 554,
+                "Height": 438,
+                "Offset": 
+                {
+                    "X": 172,
+                    "Y": 98
+                }
+            }
+        },
+        "Backgrounds": 
+        {
+            "Slider": 
+            {
+                "X": 0,
+                "Y": 598,
+                "Width": 546,
+                "Height": 17
+            },
+            "ScrollBar": 
+            {
+                "X": 814,
+                "Y": 0,
+                "Width": 6,
+                "Height": 418,
+                "Offset": 
+                {
+                    "X": 570,
+                    "Y": 51
+                }
+            }
+        },
+        "Controls": 
+        {
+            "Buttons": 
+            {
+                "Exit": 
+                {
+                    "Width": 56,
+                    "Height": 56,
+                    "Offset": 
+                    {
+                        "X": 716,
+                        "Y": -16
+                    },
+                    "Normal": 
+                    {
+                        "X": 758,
+                        "Y": 0
+                    },
+                    "Hover": 
+                    {
+                        "X": 758,
+                        "Y": 56
+                    },
+                    "Down": 
+                    {
+                        "X": 758,
+                        "Y": 112
+                    }
+                },
+                "Addon": 
+                {
+                    "Width": 146,
+                    "Height": 38,
+                    "Offset": 
+                    {
+                        "X": 0,
+                        "Y": 6
+                    },
+                    "Hover": 
+                    {
+                        "X": 0,
+                        "Y": 615
+                    },
+                    "Down": 
+                    {
+                        "X": 147,
+                        "Y": 615
+                    },
+                    "ActiveNormal": 
+                    {
+                        "X": 294,
+                        "Y": 615
+                    },
+                    "ActiveHover": 
+                    {
+                        "X": 294,
+                        "Y": 615
+                    },
+                    "ActiveDown": 
+                    {
+                        "X": 294,
+                        "Y": 615
+                    }
+                },
+                "Normal": 
+                {
+                    "Width": 130,
+                    "Height": 34,
+                    "Normal": 
+                    {
+                        "X": 390,
+                        "Y": 739
+                    },
+                    "Hover": 
+                    {
+                        "X": 130,
+                        "Y": 739
+                    },
+                    "Down": 
+                    {
+                        "X": 520,
+                        "Y": 705
+                    },
+                    "Disabled": 
+                    {
+                        "X": 0,
+                        "Y": 739
+                    }
+                },
+                "Confirm": 
+                {
+                    "Width": 130,
+                    "Height": 34,
+                    "Offset": 
+                    {
+                        "X": 609,
+                        "Y": 548
+                    },
+                    "Normal": 
+                    {
+                        "X": 130,
+                        "Y": 705
+                    },
+                    "Hover": 
+                    {
+                        "X": 390,
+                        "Y": 705
+                    },
+                    "Down": 
+                    {
+                        "X": 0,
+                        "Y": 705
+                    },
+                    "Disabled": 
+                    {
+                        "X": 260,
+                        "Y": 705
+                    }
+                },
+                "Mini": 
+                {
+                    "Width": 149,
+                    "Height": 26,
+                    "Normal": 
+                    {
+                        "X": 582,
+                        "Y": 653
+                    },
+                    "Hover": 
+                    {
+                        "X": 343,
+                        "Y": 679
+                    },
+                    "Down": 
+                    {
+                        "X": 520,
+                        "Y": 739
+                    },
+                    "Disabled": 
+                    {
+                        "X": 194,
+                        "Y": 679
+                    }
+                }
+            },
+            "CheckBox": 
+            {
+                "Width": 24,
+                "Height": 24,
+                "Normal": 
+                {
+                    "X": 650,
+                    "Y": 705
+                },
+                "Hover": 
+                {
+                    "X": 693,
+                    "Y": 739
+                },
+                "Down": 
+                {
+                    "X": 650,
+                    "Y": 705
+                },
+                "ActiveNormal": 
+                {
+                    "X": 669,
+                    "Y": 739
+                },
+                "ActiveHover": 
+                {
+                    "X": 669,
+                    "Y": 739
+                },
+                "ActiveDown": 
+                {
+                    "X": 669,
+                    "Y": 739
+                }
+            },
+            "Slider": 
+            {
+                "Width": 52,
+                "Height": 52,
+                "Normal": 
+                {
+                    "X": 758,
+                    "Y": 168
+                },
+                "Hover": 
+                {
+                    "X": 758,
+                    "Y": 272
+                },
+                "Down": 
+                {
+                    "X": 758,
+                    "Y": 324
+                },
+                "Disabled": 
+                {
+                    "X": 758,
+                    "Y": 220
+                }
+            },
+            "ComboBox": 
+            {
+                "Width": 194,
+                "Height": 26,
+                "Normal": 
+                {
+                    "X": 0,
+                    "Y": 679
+                },
+                "Hover": 
+                {
+                    "X": 194,
+                    "Y": 653
+                },
+                "Down": 
+                {
+                    "X": 441,
+                    "Y": 615
+                },
+                "Disabled": 
+                {
+                    "X": 0,
+                    "Y": 653
+                },
+                "ActiveNormal": 
+                {
+                    "X": 0,
+                    "Y": 679
+                },
+                "ActiveHover": 
+                {
+                    "X": 194,
+                    "Y": 653
+                },
+                "ActiveDown": 
+                {
+                    "X": 441,
+                    "Y": 615
+                }
+            }
+        }
+    }
+}

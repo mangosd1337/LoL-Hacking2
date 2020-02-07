@@ -1,0 +1,30 @@
+[
+    {
+        "key": "calendar_date_format",
+        "default": "d_lm_y"
+    },
+    {
+        "key": "calendar_date_format_custom",
+        "default": ""
+    },
+    {
+        "key": "calendar_default_view",
+        "default": "month"
+    },
+    {
+        "key": "calendar_rss_feed",
+        "default": "1"
+    },
+    {
+        "key": "calendar_rss_feed_days",
+        "default": "30"
+    },
+    {
+        "key": "ipb_calendar_mon",
+        "default": "0"
+    },
+    {
+        "key": "show_bday_calendar",
+        "default": "1"
+    }
+]

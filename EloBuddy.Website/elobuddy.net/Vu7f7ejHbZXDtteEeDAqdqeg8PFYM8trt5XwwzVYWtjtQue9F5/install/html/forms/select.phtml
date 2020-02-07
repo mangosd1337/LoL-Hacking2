@@ -1,0 +1,6 @@
+<ips:template parameters="$name, $value, $required, $options" />
+<select name="{$name}" id="{$name}">
+	{{foreach $options as $k => $v}}
+			<option value='{$k}' {{if $value == $k}}selected{{endif}}>{$v|raw}</option>
+	{{endforeach}}
+</select>

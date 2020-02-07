@@ -1,0 +1,25 @@
+From b800bf20f1798db9909f3932ed90a6a58de36ae9 Mon Sep 17 00:00:00 2001
+From: Javier <jachicao@uc.cl>
+Date: Sat, 6 Feb 2016 04:10:26 -0300
+Subject: [PATCH 6/8] fixes EloBuddy/EloBuddy.Issues#42
+
+---
+ EloBuddy.SDK/Damage.cs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/EloBuddy.SDK/Damage.cs b/EloBuddy.SDK/Damage.cs
+index 30cb0da..9a26ca0 100644
+--- a/EloBuddy.SDK/Damage.cs
++++ b/EloBuddy.SDK/Damage.cs
+@@ -306,7 +306,7 @@ namespace EloBuddy.SDK
+                     {
+                         precalculated.RawMagical += 20f + 0.1f * fromHero.FlatMagicDamageMod;
+                     }
+-                    if (fromHero.HasBuff("NetherBlade"))
++                    if (fromHero.HasBuff("NetherBladeArmorPen"))
+                     {
+                         precalculated.RawMagical += -5f + 25f * fromHero.Spellbook.GetSpell(SpellSlot.W).Level +
+                                                     0.6f * fromHero.FlatMagicDamageMod;
+-- 
+1.9.4.msysgit.2
+

@@ -1,0 +1,14 @@
+<ips:template parameters="$name, $value=FALSE, $disabled=FALSE, $toggles=array(), $toggleOn=TRUE, $label='', $hiddenName=''" />
+<input type="hidden" name="{$hiddenName}" value="0" />
+<label>
+	<input
+		type='checkbox'
+		name='{$name}'
+		value='1'
+		{{if $value}}checked{{endif}}
+		{{if $disabled}}disabled{{endif}}
+		{{if !empty($toggles)}} data-control="toggle" data-toggles="{expression="implode( ',', $toggles )"}"{{endif}}
+		{{if $toggleOn === FALSE}}data-togglereverse="true"{{endif}}
+	/>
+	{lang="$label"}
+</label>

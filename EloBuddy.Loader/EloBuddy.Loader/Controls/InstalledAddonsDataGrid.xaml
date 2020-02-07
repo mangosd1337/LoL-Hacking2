@@ -1,0 +1,211 @@
+﻿<UserControl x:Name="DataGrid" x:Class="EloBuddy.Loader.Controls.InstalledAddonsDataGrid"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:globals="clr-namespace:EloBuddy.Loader.Globals" mc:Ignorable="d" d:DesignHeight="300"
+             d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style x:Key="DataGridCellStyle" TargetType="{x:Type DataGridCell}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                              VerticalAlignment="Center" Margin="10 0 10 0" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                    <Setter Property="Foreground"
+                            Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                    <Setter Property="BorderBrush" Value="{x:Null}" />
+                </Trigger>
+                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                    <Setter Property="BorderBrush" Value="{x:Null}" />
+                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsSelected" Value="true" />
+                        <Condition Property="Selector.IsSelectionActive" Value="false" />
+                    </MultiTrigger.Conditions>
+                    <Setter Property="BorderBrush" Value="{x:Null}" />
+                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                    <Setter Property="Foreground"
+                            Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                </MultiTrigger>
+                <Trigger Property="IsEnabled" Value="false">
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <globals:MultiLanguage x:Key="MultiLanguage" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="46" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Rectangle Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Focusable="True" Fill="#FF141414" />
+        <TextBox x:Name="SearchTextBox" Grid.Column="0" Height="30" Grid.Row="0" VerticalContentAlignment="Center"
+                 HorizontalAlignment="Stretch" Style="{DynamicResource AddonSearchTextBoxStyle}"
+                 TextChanged="SearchTextBox_OnTextChanged" Margin="0 0 0 0" />
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Grid.Column="1" Grid.Row="0" Margin="7">
+            <Button x:Name="InstallAssemblyButton" Padding="20 0" Style="{DynamicResource InstallButtonStyle}"
+                    Background="#FF40D151" Margin="0 0 10 0" BorderBrush="{x:Null}" Foreground="White"
+                    Click="InstallAssemblyButton_Click">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="" FontFamily="pack://application:,,,/font/#FontAwesome"
+                                   VerticalAlignment="Center" Margin="5" />
+                        <TextBlock
+                            Text="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridButtonInstallAddon}"
+                            VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button x:Name="DeleteAddonsButton" Padding="20 0" Background="#FFD14040" BorderBrush="{x:Null}"
+                    Style="{DynamicResource DeleteButtonStyle}" Foreground="White" Click="DeleteAddonsButton_Click">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="" FontFamily="pack://application:,,,/font/#FontAwesome"
+                                   VerticalAlignment="Center" Margin="5" />
+                        <TextBlock
+                            Text="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridButtonUninstallAddon}"
+                            VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+        </StackPanel>
+        <DataGrid AllowDrop="True" ItemsSource="{Binding Items}" IsReadOnly="True" RowHeaderWidth="0" Grid.Column="0"
+                  Grid.ColumnSpan="2" Grid.Row="1" AutoGenerateColumns="False" CanUserReorderColumns="False"
+                  BorderBrush="{x:Null}" CanUserAddRows="False" x:Name="Grid" CanUserDeleteRows="False"
+                  HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}"
+                  CellStyle="{DynamicResource DataGridCellStyle}" CanUserSortColumns="True" RowHeight="43"
+                  FontSize="13" RenderTransformOrigin="0.5,0.5" Drop="InstalledAddonsDataGrid_OnDrop"
+                  PreviewMouseLeftButtonDown="InstalledAddonsDataGrid_OnPreviewMouseLeftButtonDown"
+                  PreviewMouseMove="InstalledAddonDataGrid_OnPreviewMouseMove"
+                  DragOver="InstalledAddonDataGrid_OnDragOver">
+            <DataGrid.Resources>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="White" />
+                    <Setter Property="BorderBrush" Value="LightGray" />
+                </Style>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF40A6D1" />
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn MinWidth="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsActive}" HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" Style="{DynamicResource RoundedCheckBoxStyle}"
+                                      HorizontalContentAlignment="Center" RenderTransformOrigin="0.5,0.5"
+                                      Unchecked="CheckBox_Unchecked" Checked="CheckBox_Checked">
+                                <CheckBox.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                        <SkewTransform />
+                                        <RotateTransform />
+                                    </TransformGroup>
+                                </CheckBox.RenderTransform>
+                            </CheckBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock
+                            Text="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridCollumnActive}"
+                            FontWeight="SemiBold" FontSize="16" Margin="10 0" Foreground="DimGray" />
+                    </DataGridTemplateColumn.Header>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Width="0.7*" Binding="{Binding AssemblyName}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock
+                            Text="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridCollumnAddon}"
+                            FontWeight="SemiBold" FontSize="16" Margin="10 0" Foreground="DimGray" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                <DataGridTextColumn Width="Auto" Binding="{Binding Author}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock
+                            Text="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridCollumnAuthor}"
+                            FontWeight="SemiBold" FontSize="16" Margin="10 0" Foreground="DimGray" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                <DataGridTextColumn Width="Auto" Binding="{Binding Type}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock
+                            Text="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridCollumnType}"
+                            FontWeight="SemiBold" FontSize="16" Margin="10 0" Foreground="DimGray" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                <DataGridTextColumn Width="Auto" Binding="{Binding Version}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock
+                            Text="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridCollumnVersion}"
+                            FontWeight="SemiBold" FontSize="16" Margin="10 0" Foreground="DimGray" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                <DataGridTextColumn Width="2*" Binding="{Binding Location}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock
+                            Text="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridCollumnLocation}"
+                            FontWeight="SemiBold" FontSize="16" Margin="10 0" Foreground="DimGray" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                <DataGridTextColumn Width="*" Binding="{Binding Status}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock
+                            Text="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridCollumnStatus}"
+                            FontWeight="SemiBold" FontSize="16" Margin="10 0" Foreground="DimGray" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+            <DataGrid.ContextMenu>
+                <ContextMenu Style="{DynamicResource InstalledAddonsContextMenu}" Name="ItemsContextMenu">
+                    <MenuItem Style="{DynamicResource InstalledAddonsContextMenuItem}"
+                              Header="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridContextMenuOpenLocation}"
+                              Click="MenuOpenLocation_Click" />
+                    <MenuItem Style="{DynamicResource InstalledAddonsContextMenuItem}"
+                              Header="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridContextMenuCopyLocation}"
+                              Click="MenuCopyLocation_Click" />
+                    <Separator />
+                    <MenuItem Style="{DynamicResource InstalledAddonsContextMenuItem}"
+                              Header="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridContextMenuRecompile}"
+                              Click="MenuRecompileSelected_Click" />
+                    <!--<MenuItem Style="{DynamicResource InstalledAddonsContextMenuItem}" Header="Recompile All" Click="MenuRecompileAll_Click"/>
+                    <Separator />-->
+                    <MenuItem Style="{DynamicResource InstalledAddonsContextMenuItem}"
+                              Header="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridContextMenuUpdate}"
+                              Click="MenuUpdateSelected_Click" />
+                    <!--<MenuItem Style="{DynamicResource InstalledAddonsContextMenuItem}" Header="Update All" Click="MenuUpdateAll_Click"/>
+                    <Separator />-->
+                    <MenuItem Style="{DynamicResource InstalledAddonsContextMenuItem}"
+                              Header="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridContextMenuUninstall}"
+                              Click="MenuRemoveSelected_Click" />
+                    <!--<MenuItem Style="{DynamicResource InstalledAddonsContextMenuItem}" Header="Uninstall All" Click="MenuRemoveAll_Click"/>-->
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+        </DataGrid>
+        <Button x:Name="UpdateAssembliesButton" Padding="20 0" Style="{DynamicResource UpdateAddonStyle}"
+                Background="#FF9640D1" Margin="8.973,7,0,7" BorderBrush="{x:Null}" Foreground="White"
+                Click="UpdateAssembliesButton_Click" Grid.Column="1" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="↻" FontFamily="pack://application:,,,/font/#FontAwesome" VerticalAlignment="Center"
+                           Margin="5" FontSize="16" />
+                <TextBlock Text="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridButtonUpdateAddons}"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+        </Button>
+    </Grid>
+</UserControl>

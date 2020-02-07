@@ -1,0 +1,18 @@
+{
+    "allowStoreRegistrationGuests": {
+        "type": "C",
+        "class": "\\IPS\\core\\modules\\front\\system\\register "
+    },
+    "register": {
+        "type": "C",
+        "class": "\\IPS\\core\\modules\\front\\system\\register"
+    },
+    "clientAreaLinkLoad": {
+        "type": "C",
+        "class": "\\IPS\\Data\\Store\\Database"
+    },
+    "clientAreaLink": {
+        "type": "S",
+        "class": "\\IPS\\Theme\\class_core_front_global"
+    }
+}

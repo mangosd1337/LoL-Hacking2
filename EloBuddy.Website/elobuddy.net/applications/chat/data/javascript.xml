@@ -1,0 +1,1989 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<javascript app="chat">
+ <file javascript_app="chat" javascript_location="front" javascript_path="controllers/chat" javascript_name="ips.chat.main.js" javascript_type="controller" javascript_version="101030" javascript_position="1000050"><![CDATA[/**
+ * IPS Community Suite 4
+ * (c) 2013 Invision Power Services - http://www.invisionpower.com
+ *
+ * ips.chat.main.js - Main chat controller
+ *
+ * Author: Rikki Tissier
+ * @todo	Ban user is not implemented?
+ */
+;( function($, _, undefined){
+	"use strict";
+
+	ips.controller.register('chat.front.chatcompat.main', {
+
+		_polling: 3,
+		_lastPolled: 0,
+		_lastMsgId: 0,
+		_lastTime: null,
+		_doneInitialLoad: false,
+		_kicked: false,
+		_chattingUpdate: 60,
+		_bypassFlag: false,
+		_templates: [],
+		_emoticons: {},
+		_unreadTabs: {},
+		_lastAction: null,
+		_lastUser: {},
+		_poller: null,
+		_updater: null,
+		_charset: '',
+		_iframe: null,
+		_iframeWindow: null,
+		_secure: true,
+		_urlRegex: /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:localhost)|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$/ig,
+		_imgRegex: /^(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;\(\)]*[-A-Z0-9+&@#\/%=~_|])(\.jpg|\.png|\.gif)$/ig,
+
+		initialize: function () {
+			this.on( window, 'message', this.windowMessage );
+			this.on( 'tabShown', '#elChatTabs', this.tabShown );
+			this.on( 'click', '[data-action="closeTab"]', this.closeTab );
+			this.on( 'keypress', '.cMessageTextarea', this.messageBoxKeypress );
+			this.on( 'click', '.cMessageSubmit', this.submitButtonClick );
+			this.on( 'menuItemSelected', '.cChatUserRow', this.userMenu );
+			this.on( 'click', '[data-action="toggleSound"]', this.toggleSound );
+			this.on( 'click', '[data-action="toggleImage"]', this.toggleImage );
+			this.on( window, 'focus', this.windowFocus );
+			this.on( window, 'blur', this.windowBlur );
+			this.on( document, 'insertEmoticon', this.insertEmoticon );
+			this.setup();
+		},
+
+		/**
+		 * Setup wrapper method
+		 *
+		 * @returns {void}
+		 */
+		setup: function () {
+			var self = this;
+
+			if( window.btoa && window.atob ){
+				this._doSetup();	
+			} else {
+				// If bas64 isn't supported in the browser (< IE10), then load a polyfill before continuing
+				ips.loader.get( ['chat/interface/base64/base64.js'] ).then( function () {
+					self._doSetup();
+				});
+			}			
+		},
+
+		/**
+		 * Performs setup tasks
+		 *
+		 * @returns {void}
+		 */
+		_doSetup: function () {
+			var self = this;
+
+			this._setUpMainPanel();
+			this._createBadge();
+
+			this._lastAction = this._getCurrentTime();
+
+			// Create the iframe which we'll use for cross domain messaging
+			this._createIFrame();
+			this._buildInitialList();
+
+			// Fix sound button 
+			this.scope
+				.find('[data-action="toggleSound"] .fa')
+				.replaceWith( 
+					$('<i/>')
+						.addClass('fa') 
+						.addClass( ips.getSetting('soundEnabled') ? 'fa-volume-up' : 'fa-volume-off' )
+				);
+
+			// Set up main loop to check for new messages
+			this._poller	= setInterval( _.bind( this._getMessages, this ), this._polling * 1000 );
+			this._updater	= setInterval( _.bind( this._ping, this ), this._chattingUpdate * 1000 );
+
+			// Charset
+			this._charset = $('meta[charset]').attr('charset');
+		},
+
+		/**
+		 * Event handler for window focussing
+		 *
+		 * @returns {void}
+		 */
+		windowFocus: function () {
+			this._windowHasFocus = true;
+			this._cleanTitle();
+		},
+
+		/**
+		 * Event handler for window blurring
+		 *
+		 * @returns {void}
+		 */
+		windowBlur: function () {
+			this._windowHasFocus = false;
+			this._unreadCount = 0;
+		},
+
+		/**
+		 * Event handler indicating the active tab has changed
+		 *
+		 * @param 	{event} 	e 		Event object
+		 * @param	{object} 	data	Event data object
+		 * @returns {void}
+		 */
+		tabShown: function (e, data) {
+			this._activeTab = data.tabID;
+			this._updateTabCount( data.tabID, 0 );
+
+			if( !_.isUndefined( this._unreadTabs[ data.tabID ] ) ){
+				this._unreadTabs[ data.tabID ] = 0;
+			}
+		},
+
+		/**
+		 * Handles an event from the emoticon controller indicating we need to insert it into our chat box
+		 *
+		 * @param 	{event} 	e 		Event object
+		 * @param	{object} 	data	Event data object
+		 * @returns {void}
+		 */
+		insertEmoticon: function (e, data) {
+			var room = this.scope.find('[data-tab="' + data.editorID + '"]');
+
+			// Check there's text to show and check this is a valid chat window
+			if( !data.text || !room.length ){
+				return;
+			}
+
+			// Only do it if this is the active tab
+			if( this._activeTab != data.editorID ){
+				return;
+			}
+
+			// Find the textarea
+			var textarea = room.find('textarea');
+			// Don't put a space before the emoticon if there's nothing in the textarea
+			var startSpace = ( textarea.val() !== '' );
+
+			// Insert it at the cursor
+			textarea.focus();
+			textarea.replaceSelectedText( ( startSpace ? ' ' : '' ) + data.text + ' ' );
+		},
+
+		/**
+		 * Responds to data sent by the server via our postMessage iframe
+		 *
+		 * @param	{string} 	response	Server response
+		 * @returns {void}
+		 */
+		windowMessage: function (e) {
+			var response = e.originalEvent.data;
+
+			// Don't do anything if kicked or response is empty
+			if( this._kicked || !response.length ){
+				return;
+			}
+
+			// Ignore height notifications
+			if( response.substr( 0, 7 ) == 'height=' ){
+				return false;
+			}
+
+			if( response.substr( 0, 9 ) == '__ready__' || response.substr( 0, 8 ) == '__post__' || response.substr( 0, 12 ) == '__moderate__' ){
+				//If this is a response to a new submission or mod action, just get the messages
+				this._getMessages();
+			} else {
+				// Otherwise we need to update the displayed messages
+				this._updateMessages( response );
+			}
+		},
+
+		/**
+		 * Watches keypresses on the textarea and responds to ENTER
+		 *
+		 * @param 	{event} 	e 		Event object
+		 * @returns {void}
+		 */
+		messageBoxKeypress: function (e) {
+			if( e.keyCode == ips.ui.key.ENTER ){
+				this._sendChat( e );
+			}
+		},
+
+		/**
+		 * Watches submit button clicks
+		 *
+		 * @param 	{event} 	e 		Event object
+		 * @returns {void}
+		 */
+		submitButtonClick: function (e) {
+			e.currentTarget = $( e.currentTarget ).closest('.cChatCompose').find('textarea.cMessageTextarea');
+
+			this._sendChat( e );
+		},
+
+		/**
+		 * Handles a selection from a user menu
+		 *
+		 * @param 	{event} 	e 		Event object
+		 * @param 	{object} 	data 	Event data object
+		 * @returns {void}
+		 */
+		userMenu: function (e, data) {
+			var userRow = $( data.triggerElem );
+			var userID = userRow.attr('data-userID');
+			var forumUserID = userRow.attr('data-forumUserID');
+			var username = userRow.attr('data-username');
+
+			switch( data.selectedItemID ){
+				case 'private':
+					data.originalEvent.preventDefault();
+
+					if( !ips.getSetting('private') ){
+						return;
+					}
+
+					this._doPrivateChat( forumUserID, userID, username );
+				break;
+				case 'ignore':
+					data.originalEvent.preventDefault();
+					this._ignoreUser( forumUserID, userID, username );
+				break;
+				case 'unignore':
+					data.originalEvent.preventDefault();
+					this._unignoreUser( forumUserID, userID, username );
+				break;
+				case 'kick':
+					data.originalEvent.preventDefault();
+
+					if( !ips.getSetting('moderator') ){
+						return;
+					}
+
+					this._kickUser( forumUserID, userID, username );
+				break;
+				case 'ban':
+					data.originalEvent.preventDefault();
+
+					if( !ips.getSetting('moderator') ){
+						return;
+					}
+
+					this._kickUser( forumUserID, userID, username );
+					this._banUser( forumUserID, userID, username );
+				break;
+			}
+		},
+
+		/**
+		 * Toggles notification sounds
+		 *
+		 * @param 	{event} 	e 	Event object
+		 * @returns {void}
+		 */
+		toggleSound: function (e) {
+			e.preventDefault();
+
+			this.scope
+				.find('[data-action="toggleSound"] .fa')
+				.replaceWith( 
+					$('<i/>')
+						.addClass('fa') 
+						.addClass( ips.getSetting('soundEnabled') ? 'fa-volume-off' : 'fa-volume-up' )
+						.removeClass( ips.getSetting('soundEnabled') ? 'fa-volume-up' : 'fa-volume-off' )
+				);
+
+			ips.setSetting( 'soundEnabled', !ips.getSetting('soundEnabled') );
+			ips.utils.db.set( 'chat', 'sounds', ips.getSetting('soundEnabled') );
+
+			// Show a flash message
+			ips.ui.flashMsg.show( ips.getSetting('soundEnabled') ? ips.getString('soundEnabled') : ips.getString('soundDisabled') );
+		},
+
+		/**
+		 * User has clicked x to close a tab
+		 *
+		 * @param 	{event} 	e 		Event object
+		 * @param 	{object} 	data 	Event data object
+		 * @returns {void}
+		 */
+		closeTab: function (e, data) {
+			var tab = $( e.currentTarget ).closest('.ipsTabs_item');
+			this._doCloseTab( tab );
+		},
+
+		toggleImage: function (e) {
+			e.preventDefault();
+			var container = $( e.currentTarget ).closest('.cChatParsedImage');
+
+			if( container.attr('data-isHidden') ){
+				container
+					.removeAttr( 'data-isHidden' )
+					.find('img')
+						.show()
+					.end()
+					.find('[data-role="imageHidden"]')
+						.hide()
+					.end()
+					.find('.fa')
+						.removeClass('fa-caret-down')
+						.addClass('fa-caret-up');
+			} else {
+				container
+					.attr( 'data-isHidden', true )
+					.find('img')
+						.hide()
+					.end()
+					.find('[data-role="imageHidden"]')
+						.show()
+					.end()
+					.find('.fa')
+						.addClass('fa-caret-down')
+						.removeClass('fa-caret-up');
+			}
+		},
+
+		/**
+		 * Creates the notification badge on the chat tab
+		 *
+		 * @returns {void}
+		 */
+		_createBadge: function () {
+			// This is now added with a hook and doesn't need to be done here
+			//$('.elNavigation_app_chat_Chat').append( $('<span/>').addClass('ipsNotificationCount').text('0') );
+		},
+
+		/**
+		 * Sets up the main chatroom
+		 *
+		 * @returns {void}
+		 */
+		_setUpMainPanel: function () {
+			var tabTemplate = ips.templates.render( 'chat.tabs.tab', {
+				roomID: 'chatroom',
+				roomTitle: ips.getString('chatroom'),
+				tooltip: ips.getString('chatroomTooltip'),
+				close: false,
+				active: true
+			});
+
+			var panelTemplate = ips.templates.render( 'chat.tabs.main', {
+				roomID: 'chatroom',
+				roomTitle: ips.getString('chatroom'),
+				emoticons: ips.templates.render('core.editor.emoticons', {
+					id: 'elEmoticons_chatroom',
+					editor: 'chatroom'
+				}),
+				loading: true
+			});
+
+			// Append it to the tab bar
+			this.scope.find('#elChatTabsContent').append( panelTemplate );
+			this.scope.find('#elChatTabBar').append( tabTemplate );
+
+			this.scope.find('#elChatTabs')
+				.attr( 'data-ipsTabBar', '' )
+				.attr( 'data-ipsTabBar-contentarea', '#elChatTabsContent' );
+
+			$( document ).trigger( 'contentChange', [ this.scope.find('#elChatWrapper') ] );
+		},
+
+		/**
+		 * Removes a tab
+		 *
+		 * @param 	{element} 	tabToClose 		Tab element
+		 * @returns {void}
+		 */
+		_doCloseTab: function (tab) {
+			if( !tab.length ){
+				return;
+			}
+
+			var tabParent = tab.closest('li');
+			var active = tab.hasClass('ipsTabs_activeItem');
+			var switchTo = null;
+			var tabID = tab.attr('id');
+
+			if( active ){
+				// Find the previous, or next, or #chatroom tab
+				switchTo = tabParent.prev().length ? tabParent.prev() : ( tabParent.next().length ) ? tabParent.next() : tabParent.siblings('#chatroom');
+				switchTo.find('> a').click();
+			}
+
+			ips.utils.anim.go('fadeOutDown fast', tabParent)
+				.done( function () {
+					tabParent.remove();
+				});
+
+			this.scope.find('.ipsTabs_panel[data-tab="' + tabID + '"]').remove();
+		},
+
+		/**
+		 * Removes the (2) thing from the browser title
+		 *
+		 * @returns {void}
+		 */
+		_cleanTitle: function () {
+			// Note that we use a setTimeout here because Chrome's blur and focus events are not reliable.  When switching tabs in the browser
+	 		// the events are fired twice, however the first event does not update the document title.  By using a setTimeout we work around this behavior.
+			if( document.title.match( /\(\d+\) (.+?)/gi ) ){
+				setTimeout( function(){ document.title = document.title.replace( /\(\d+\) (.+?)/gi, "$1" ) }, 200 );
+			}
+			
+			this._unreadCount = 0;
+		},
+
+		/**
+		 * Starts a private chat
+		 *
+		 * @param 	{number} 	forumUserID 	Local forum user ID
+		 * @param 	{number} 	userID 			Chat user ID
+		 * @param 	{string} 	username 		Username
+		 * @returns {void}
+		 */
+		_doPrivateChat: function (forumUserID, userID, username) {
+			// Not if it's us
+			if( userID == ips.getSetting('userID') ){
+				Debug.error("Can't chat with yourself");
+				return;
+			}
+
+			// Also not if we're ignoring them
+			if( !_.isUndefined( ips.getSetting('ignoredChats')[ userID ] ) ){
+				ips.ui.alert.show( {
+					type: 'alert',
+					icon: 'info',
+					message: ips.getString('cantChatWithSelf'),
+					callbacks: {}
+				});
+
+				return;
+			}
+
+			// Do we have a window already?
+			if( !this.scope.find('[data-roomid="private_' + userID + '"]').length ){
+				this._createTab( userID, forumUserID, username );
+			}
+
+			// Click it to focus it
+			this._switchToTab( 'private_' + userID );
+		},
+
+		/**
+		 * Ping server to stay online
+		 *
+		 * @returns {void}
+		 */
+		_ping: function () {
+			var url = '?app=chat&module=chat&controller=action&do=ping';
+			var self = this;
+			
+			// Load the mini profile to show in the sidebar
+			ips.getAjax()( url, {
+				data: {
+					id: ips.getSetting('userID')
+				}
+			})
+				.done( function (response) {
+					// We don't need to do anything
+				})
+				.fail(function(response){
+					if ( response.responseJSON.message ) {
+						var containers = self._getAllStorageContainers();
+						containers.append( ips.templates.render('chat.system', {
+							text: response.responseJSON.message,
+							date: self._getChatTime( self._getCurrentTime() )
+						}));
+						self._kicked = true;
+						self._scrollToBottom( self._activeTab );
+					}
+				});
+		},
+
+		/**
+		 * Ban a user
+		 *
+		 * @param 	{number} 	forumUserID 	Local forum user ID
+		 * @param 	{number} 	userID 			Chat user ID
+		 * @param 	{string} 	username 		Username
+		 * @returns {void}
+		 */
+		_banUser: function (forumUserID, userID, username) {
+			// Not if it's us
+			if( userID == ips.getSetting('userID') ){
+				Debug.error("Can't ban yourself");
+				return;
+			}
+
+			if( !ips.getSetting('moderator') ){
+				Debug.error("You aren't a moderator.");
+				return;
+			}
+
+			if( !forumUserID ){
+				Debug.error("Can't ban guests.");
+				return;
+			}
+
+			var url = '?app=chat&module=chat&controller=action&do=banUser';
+
+			// Send ajax request to backend if they're a member
+			ips.getAjax()( url, {
+				data: {
+					id: forumUserID,
+					block: 0
+				},
+				type: 'post'
+			});	
+
+			// Update menu choices
+			this._syncMenuOptions( userID, forumUserID );
+
+			// Update last action
+			this._lastAction = this._getCurrentTime();
+		},
+
+		/**
+		 * Kicks a user
+		 *
+		 * @param 	{number} 	forumUserID 	Local forum user ID
+		 * @param 	{number} 	userID 			Chat user ID
+		 * @param 	{string} 	username 		Username
+		 * @returns {void}
+		 */
+		_kickUser: function (forumUserID, userID, username) {
+
+			if( !ips.getSetting('moderator') ){
+				Debug.error("You aren't a moderator.");
+				return;
+			}
+
+			// Not if it's us
+			if( userID == ips.getSetting('userID') ){
+				Debug.error("Can't kick yourself");
+				return;
+			}
+
+			this._sendMessageToServer({
+				action: 'kick',
+				against: userID
+			});
+
+			Debug.log( "Kicked " + username + " from the chatroom.");
+		},
+
+		/**
+		 * unIgnore a user
+		 *
+		 * @param 	{number} 	forumUserID 	Local forum user ID
+		 * @param 	{number} 	userID 			Chat user ID
+		 * @param 	{string} 	username 		Username
+		 * @returns {void}
+		 */
+		_unignoreUser: function (forumUserID, userID, username) {
+			// Not if it's us
+			if( userID == ips.getSetting('userID') ){
+				Debug.error("Can't unignore yourself");
+				return;
+			}
+
+			var url = '?app=chat&module=chat&controller=action&do=blockUser';
+			var tmpID = forumUserID;
+
+			if( forumUserID ){
+				// Send ajax request to backend if they're a member
+				ips.getAjax()( url, {
+					data: {
+						id: forumUserID,
+						block: 0
+					},
+					type: 'post'
+				});	
+			} else {
+				// If they're a guest, add them to the local storage
+				var ignoredGuests = ips.utils.db.get('chat', 'ignoredGuests') || [];
+				
+				if( _.indexOf( ignoredGuests, userID ) !== -1 ){
+					ignoredGuests = _.without( ignoredGuests, userID );
+				}
+
+				ips.utils.db.set( 'chat', 'ignoredGuests', ignoredGuests );
+				tmpID = 'g_' + userID;
+			}	
+
+			if( !_.isUndefined( ips.getSetting('ignoredChats')[ tmpID ] ) ){
+				delete ips.getSetting('ignoredChats')[ tmpID ];
+			}
+
+			// Update menu choices
+			this._syncMenuOptions( userID, forumUserID );
+
+			// Update last action
+			this._lastAction = this._getCurrentTime();
+		},
+
+		/**
+		 * Ignore a user
+		 *
+		 * @param 	{number} 	forumUserID 	Local forum user ID
+		 * @param 	{number} 	userID 			Chat user ID
+		 * @param 	{string} 	username 		Username
+		 * @returns {void}
+		 */
+		_ignoreUser: function (forumUserID, userID, username) {
+			// Not if it's us
+			if( userID == ips.getSetting('userID') ){
+				Debug.error("Can't ignore yourself");
+				return;
+			}
+
+			var user = ips.getSetting('forumIDMap')[ userID ];
+
+			if( _.isUndefined( user ) || !user.canBeIgnored ){
+				ips.ui.alert.show( {
+					type: 'alert',
+					icon: 'info',
+					message: ips.getString('cantIgnoreUser', {
+						user: username
+					}),
+					callbacks: {}
+				});
+
+				return;
+			}
+
+			var url = '?app=chat&module=chat&controller=action&do=blockUser';
+			var tmpID = forumUserID;
+
+			if( forumUserID ){
+				// Send ajax request to backend if they're a member
+				ips.getAjax()( url, {
+					data: {
+						id: forumUserID,
+						block: 1
+					},
+					type: 'post'
+				});	
+			} else {
+				// If they're a guest, add them to the local storage
+				var ignoredGuests = ips.utils.db.get('chat', 'ignoredGuests') || [];
+				ignoredGuests.push( userID );
+				ips.utils.db.set( 'chat', 'ignoredGuests', ignoredGuests );
+				tmpID = 'g_' + userID;
+			}			
+
+			ips.getSetting('ignoredChats')[ tmpID ] = tmpID;
+
+			// Update menu choices
+			this._syncMenuOptions( userID, forumUserID );
+
+			// Update last action
+			this._lastAction = this._getCurrentTime();		
+		},
+
+		/**
+		 * Syncs the menu options to current data, showing/hiding items as needed
+		 *
+		 * @param 	{number} 	userID 		ID of the user menu to sync
+		 * @returns {void}
+		 */
+		_syncMenuOptions: function (userID, forumUserID) {
+			var menu = this.scope.find('.cChatUserMenu[data-userID="' + userID + '"]');
+
+			// If we aren't a moderator, we can get rid of all those options
+			if( !ips.getSetting('moderator') ){
+				menu.find('[data-ipsMenuValue="kick"], [data-ipsMenuValue="ban"], [data-role="modSep"]').remove();
+			}
+
+			// If we can't do privates, get rid of that too
+			if( !ips.getSetting('private') ){
+				menu.find('[data-ipsMenuValue="private"], [data-role="privateSep"]').remove()
+			}
+
+			// Are we ignoring them?
+			var ignoring = !_.isUndefined( ips.getSetting('ignoredChats')[ forumUserID ? forumUserID : 'g_' + userID ] );
+			var isSelf = userID == ips.getSetting('userID');
+
+			// Show/hide the appropriate option, or hide both if it's us
+			menu
+				.find('[data-ipsMenuValue="unignore"]')
+					.toggle( ignoring && !isSelf )
+				.end()
+				.find('[data-ipsMenuValue="ignore"]')
+					.toggle( !ignoring && !isSelf );
+		},
+
+		/**
+		 * Switches the view to a different tab
+		 *
+		 * @param 	{string} 	tabID 		ID of the tab to create
+		 * @returns {void}
+		 */
+		_switchToTab: function (tabID) {
+			this.scope
+				.find( '#' + tabID )
+					.click()
+				.end()
+				.find('[name="message"]')
+					.focus();
+		},
+
+		/**
+		 * Creates a new tab in the chatroom
+		 *
+		 * @param 	{string} 	tabID 		ID of the tab to create
+		 * @param 	{string} 	tabTitle	Text shown on the tab
+		 * @returns {void}
+		 */
+		_createTab: function (userID, forumUserID, tabTitle) {
+			var tabTemplate = ips.templates.render( 'chat.tabs.tab', {
+				roomID: 'private_' + userID,
+				roomTitle: tabTitle,
+				tooltip: ips.getString('privateChatWith', {
+					user: tabTitle
+				}),
+				close: true
+			});
+
+			var panelTemplate = ips.templates.render( 'chat.tabs.panel', {
+				roomID: 'private_' + userID,
+				roomTitle: tabTitle,
+				emoticons: ips.templates.render('core.editor.emoticons', {
+					id: 'elEmoticons_private_' + userID,
+					editor: 'private_' + userID
+				})
+			});
+
+			// Append it to the tab bar
+			this.scope.find('#elChatTabBar').append( tabTemplate );
+			this.scope.find('#elChatTabsContent').append( panelTemplate );
+
+			var userInfoArea = this.scope.find( '[data-tab="private_' + userID + '"]' ).find('.cChatUserInfo');
+			var url = '?app=chat&module=chat&controller=action&do=loadUserInfo';
+
+			// Load the mini profile to show in the sidebar
+			ips.getAjax()( url, {
+				data: {
+					id: forumUserID
+				}
+			})
+				.done( function (response) {
+					userInfoArea.removeClass('ipsLoading').html( response );
+				});
+		},
+
+		/**
+		 * Sends a message the user has typed
+		 * This method differs slightly from the 3.x version because each chat tab
+		 * has its own textarea now, so we use that tab to determine which room to send
+		 * the message to.
+		 *
+		 * @param 	{event} 	e 		Event object
+		 * @returns {void}
+		 */
+		_sendChat: function (e) {
+			if( e ){
+				e.preventDefault();
+			}
+
+			// Get message, trim and clean it
+			var message = this._cleanMessage( $.trim( $( e.currentTarget ).val() ) );
+			var tab = $( e.currentTarget ).closest('[data-tab]').attr('data-tab');
+			var tabID = $( e.currentTarget ).closest('[data-tab]').attr('data-tab').replace('private_', '');
+
+			if( !message || !tabID ){
+				Debug.log("No message or no tab");
+				return;
+			}
+
+			var extra = '';
+			var data = {
+				lmsg: this._lastMsgId,
+				message: message
+			};
+
+			if( tab == 'chatroom' ){
+				data.action = 'post';
+				extra = '0';
+			} else {
+				data.action = 'private';
+				data.toUser = tabID;
+				extra = 'private=' + tabID;
+			}
+
+			if( this._sendMessageToServer( data ) ){
+				this._scrollToBottom( tab );
+
+				// Manually send our own chats to the screen here
+				var post = this._escapeHTML( message );
+				
+				this._bypassFlag = true;
+				this._updateMessages( "1,0~~||~~" + Math.round( new Date().getTime() / 1000 ) + ",1," + ips.getSetting('username').replace( ',', '~~#~~' ) + "," + post + "," + extra + "," + ips.getSetting('userID') + "~~||~~" );
+				this._bypassFlag = false;
+			}
+
+			// Clear the field
+			$( e.currentTarget ).val('');
+
+			this._scrollToBottom( tab );
+			this._lastAction = this._getCurrentTime();
+		},
+
+		/**
+		 * Get messages from the server
+		 *
+		 * @returns {void}
+		 */
+		_getMessages: function () {
+			var curtime = this._getCurrentTime();
+
+			this._checkInactivity( curtime );
+
+			if( this._kicked ){
+				clearInterval( this._poller );
+				clearInterval( this._updater );
+			}
+
+			// If current time - last polled time is less than the polling timeperiod,
+			// skip this iteration (prevent DOS when user submits many messages quickly)
+			if( ( curtime - this._lastPolled ) < this._polling ){
+				return false;
+			}
+
+			this._lastPolled = curtime;
+
+			this._sendMessageToServer( {
+				msg: this._lastMsgId
+			});
+		},
+
+		/**
+		 * Checks whether we've been inactive longer than allowed
+		 *
+		 * @returns {void}
+		 */
+		_checkInactivity: function (timestamp) {
+			if( !ips.getSetting('inactiveKick') ){
+				return;
+			}
+		
+			if( timestamp - this._lastAction > ips.getSetting('inactiveKick') ){
+				var whateverItWas = this._bypassFlag;
+				this._bypassFlag = true;
+				this._updateMessages( "0," + this._lastMsgId + "~~||~~" + this._getCurrentTime() + ",5," + ips.getSetting('username').replace( ',', '~~#~~' ) + ",,1_" + ips.getSetting('userID') + "," + ips.getSetting('userID') + "~~||~~" );
+				this._bypassFlag = whateverItWas;
+				this._kicked = true;
+			}
+			
+			return;
+		},
+
+		/**
+		 * Sends a system message to the server
+		 *
+		 * @param	{object} 	data 		Key/values to send to the server
+		 * @returns {void}
+		 */
+		_sendMessageToServer: function (data) {
+			var url = 'http' + ( this._secure ? 's' : '' ) + '://' + ips.getSetting('serverHost');
+			var self = this;
+
+			// Don't send any messages if kicked
+			if( this._kicked ){
+				return false;
+			}
+
+			data = _.defaults( data, {
+				server: ips.getSetting('serverHost'),
+				path: ips.getSetting('serverPath'),
+				room: ips.getSetting('roomID'),
+				user: ips.getSetting('userID'),
+				access_key: ips.getSetting('accessKey'),
+				charset: this._charset
+			});
+
+			// Send request
+			Debug.log( "Sending: " + JSON.stringify( data ) );
+
+			this._iframeWindow.postMessage( JSON.stringify( data ), url );
+
+			return true;
+		},
+
+		/**
+		 * Plays a sound notification
+		 *
+		 * @param 	{string} 	soundName 	Key of the sound to play
+		 * @returns {void}
+		 */
+		_playSound: function (soundName) {
+			if( _.isUndefined( ips.getSetting('sounds')[ soundName ] ) || !ips.getSetting('soundEnabled') ){
+				return;
+			}
+
+			var sound = new buzz.sound( ips.getSetting('baseURL') + 'applications/chat/interface/sounds/' + ips.getSetting('sounds')[ soundName ], {
+			    formats: [ "mp3" ]
+			});
+
+			sound.play();
+		},
+
+		/**
+		 * Updates the messages in the list
+		 *
+		 * @param 	{string} 	response Raw server response
+		 * @returns {void}
+		 */
+		_updateMessages: function (response) {
+			if( !response ){
+				return;
+			}
+
+			// Stop the panels from loading
+			this.scope.find('.cChatContainer').removeClass('ipsLoading');
+
+			// http://community.invisionpower.com/tracker/issue-35857-incompatibility
+			if( response.substr( 0, 2 ) != '0,' && response.substr( 0, 2 ) != '1,' ){
+				return true;
+			}
+
+			// Messages are imploded on ~~||~~
+			var messages = response.split( "~~||~~" );
+
+			var state = {
+				showOwn: false,
+				initialEmpty: false,
+				previousLastMsgID: this._lastMsgId,
+				updatedCount: 0,
+				alsoTo: null
+			};
+
+			// Loop over each message
+			for( var i = 0; i < messages.length; i++ ){
+				messages[ i ] = this._parseMessage( messages[ i ] );
+
+				var msgDetails	= messages[ i ].split( ',' );
+
+				// First iteration is meta data: code,lastMessageId
+				if( i === 0 ){
+
+					// Request failed
+					if( msgDetails[0] != 1 ){
+						var containers = this._getAllStorageContainers();
+
+						containers.append( ips.templates.render('chat.system', {
+							text: ips.getString('kickedFromServer'),
+							date: this._getChatTime( this._getCurrentTime() )
+						}));
+
+						// Kick to prevent further calls
+						this._kicked = true;
+						this._scrollToBottom( this._activeTab );
+						return true;
+					} else {
+
+						if( !this._bypassFlag && msgDetails[1] == this._lastMsgId ){
+							if( this._lastMsgId == 0 ){
+								this._bypassFlag = true;
+								this._lastMsgId	= 1;
+								state.initialEmpty = true;
+
+								msgDetails[1] = 2;
+								msgDetails[2] = ips.getSetting('username');
+								msgDetails[3] = '';
+								msgDetails[4] = '1_' + ips.getSetting('userID');
+								msgDetails[5] = ips.getSetting('userID');
+							} else {
+								return true;
+							}
+						}
+
+						if( !this._bypassFlag ){
+							// If we refreshed the page, and all chat messages are being pulled,
+							// we don't want to skip our own messages
+							if( this._lastMsgId == 0 ) {
+								state.showOwn = true;
+							}
+
+							this._lastMsgId	= msgDetails[1];
+						}
+						
+						if( !state.initialEmpty ){
+							continue;
+						}
+					}
+				}
+
+				if( !state.previousLastMsgID && ips.getSetting('noBuffer') ){
+					continue;
+				}
+
+				if( msgDetails[1] ){
+
+					// Don't add our own messages since we do that automatically upon submit
+					if( !this._bypassFlag && msgDetails[5] == ips.getSetting('userID') && ( msgDetails[1] == 1 || msgDetails[1] == 3 ) && !state.showOwn ){
+						continue;
+					}
+
+					var thisRoomID	= 'chatroom';
+
+					if( msgDetails[1] == 1 ){
+
+						// Is this a private chat?
+						if( msgDetails[4] ){
+							var userDetails = msgDetails[4].split( '=' );
+
+							if( userDetails[1] ){
+								var user = msgDetails[5] == ips.getSetting('userID') ? userDetails[1] : msgDetails[5];
+								var forumUser = ips.getSetting('forumIDMap')[ user ];
+
+								if( _.isUndefined( forumUser ) ){
+									continue;
+								}
+
+								if( !this.scope.find('[data-tab="private_' + user + '"]').length ){
+									var blocked	= 0;
+
+									if( forumUser.forumUserID ){
+										blocked = ips.getSetting('ignoredChats')[ forumUser.forumUserID ];
+									} else {
+										blocked = ips.getSetting('ignoredChats')[ 'g_' + user ];
+									}
+									
+									if( blocked ){
+										Debug.log('blocked');
+										continue;
+									}
+
+									this._createTab( user, forumUser.forumUserID, forumUser.username );
+								}
+
+								thisRoomID = 'private_' + user;
+							}
+
+							msgDetails[4] = msgDetails[4].replace( '~~#~~', "," );
+						}
+					}
+
+					var ulList	= this._getStorageContainer( thisRoomID );
+					var scrollBottom = this._scrollIsAtBottom( thisRoomID );
+
+					// Format date from timestamp
+					var itemDate = this._getChatTime( msgDetails[0] );
+
+					msgDetails[2] = msgDetails[2].replace( '~~#~~', "," );
+					msgDetails[2] = this._unCleanMessage( msgDetails[2] );
+					msgDetails[3] = msgDetails[3].replace( '~~#~~', "," );
+					msgDetails[3] = this._unCleanMessage( msgDetails[3] );
+					msgDetails[3] = this._parseEmoticonsAndBbcode( msgDetails[3], msgDetails[5] );
+
+					// /me commands
+					if( msgDetails[1] == 1 ){
+						if( !_.isUndefined( msgDetails[3] ) && msgDetails[3].match( /^\/me /gi ) ){
+							msgDetails[1] = 3;
+							msgDetails[3] = msgDetails[3].replace( /^\/me /gi, '' );
+						}
+					}
+
+					// Handle the message appropriately
+					// Calls a function appropriate for the type of message being handled
+					var handlers = ["normal", "userStatus", "me", "system", "modAction"];
+
+					if( !_.isUndefined( handlers[ ( msgDetails[ 1 ] - 1 ) ] ) ){
+						var handlerReturn = this._handlers[ handlers[ ( msgDetails[ 1 ] - 1 ) ] ].call( this, msgDetails, thisRoomID, itemDate, state );
+					}
+
+					if( handlerReturn === false ){
+						continue;
+					}
+
+					if( handlers[ ( msgDetails[ 1 ] - 1 ) ] == 'system' ){
+						// Update all windows
+						ulList = this._getAllStorageContainers();
+					} else if( handlers[ ( msgDetails[ 1 ] - 1 ) ] == 'userStatus' ){
+						// Update the main window, and any private windows
+						ulList = this._getAllStorageContainers( msgDetails[4].split( '_' )[ 1 ] );
+					}
+					
+					// Update current window
+					ulList.append( handlerReturn );
+
+					// Make sure new list has less li items than max allows
+					if( ips.getSetting('maxMessages') > 0 ){
+						var rowCount = ulList.find('> li');
+						// Got more than we're allowed?
+						if( rowCount.length > ips.getSetting('maxMessages') ){							
+							rowCount.slice( 0, rowCount.length - ips.getSetting('maxMessages') ).remove();
+						}
+					}
+
+					// Update the last time
+					if( !this._bypassFlag ){
+						this._lastTime = itemDate;
+					}
+
+					if( scrollBottom || !this._doneInitialLoad ){
+						this._scrollToBottom( thisRoomID );
+					}
+				}
+			}
+
+			// Handle unread counts
+			if( !this._windowHasFocus && this._unreadCount > 0 ){
+				if( document.title.match( /\(\d+\) (.+?)/gi ) ){
+					document.title = document.title.replace( /\(\d+\) (.+?)/gi, "(" + this._unreadCount + ") $1" );
+				} else {
+					document.title = "(" + this._unreadCount + ") " + document.title;
+				}
+			}
+
+			// Update tab counts			
+			this._updateTabUnreadCount();
+
+			// Play sound if needed
+			if( state.updatedCount ){
+				this._playSound('message');
+			}
+
+			// Reset bypass flag if this was initial pull override
+			if( state.initialEmpty ){
+				this._bypassFlag = false;
+			}
+
+			this._doneInitialLoad = true;
+		},
+
+		/**
+		 * Returns a time string based on given timestamp, or 'now' if none
+		 *
+		 * @param 	[number] 	timestamp	Optional timestamp on which time is based
+		 * @returns {string}
+		 */
+		_getChatTime: function (timestamp) {
+			var itemDate = new Date();
+			var secs = parseInt( timestamp ) ? parseInt( timestamp ) : parseInt( new Date().getTime() );
+			
+			itemDate.setTime( secs * 1000 );
+			
+			var hours = itemDate.getHours();
+			var mins = itemDate.getMinutes() + "";
+
+			// This makes sure we have leading 0
+			if( mins.length == 1 ){
+				mins = "0" + mins;
+			}
+
+			// Normalize dates for AM/PM instead of 24 hour
+			if( ips.getSetting('user24hour') ){
+				itemDate = hours + ':' + mins;
+			} else {
+				if( hours > 12 ){
+					itemDate = ( hours - 12 ) + ':' + mins + ' ' + ips.getString('time_pm');
+				} else if( hours == 0 ){
+					itemDate = 12 + ':' + mins + ' ' + ips.getString('time_am');
+				} else if( hours == 12 ){
+					itemDate = hours + ':' + mins + ' ' + ips.getString('time_pm');
+				} else {
+					itemDate = hours + ':' + mins + ' ' + ips.getString('time_am');
+				}
+			}
+
+			return itemDate;
+		},
+
+		/**
+		 * Returns the chat list element for a given container ID
+		 *
+		 * @param 	{string} 	containerID		ID to fetch
+		 * @returns {element}
+		 */
+		_getStorageContainer: function (containerID) {
+			return this.scope.find('[data-tab="' + containerID + '"] .cChatContainer');
+		},
+
+		/**
+		 * Returns all chat list elements
+		 *
+		 * @returns {element}
+		 */
+		_getAllStorageContainers: function (filter) {
+			if( !filter ){
+				return this.scope.find('[data-tab] .cChatContainer');	
+			} else {
+				return this.scope.find('[data-tab="chatroom"] .cChatContainer, [data-tab="private_' + filter + '"] .cChatContainer');
+			}
+			
+		},
+
+		_updateTabUnreadCount: function () {
+			// @todo
+		},
+
+		/**
+		 * Formats a username
+		 *
+		 * @returns {element}
+		 */
+		_formatName: function (userID, username) {
+			var details = ips.getSetting('forumIDMap')[ userID ];
+
+			if( !_.isUndefined( details ) ){
+				return details.prefix.replace( /__DBQ__/g, '"' ) + username + details.suffix.replace( /__DBQ__/g, '"' );
+			}
+
+			return username;
+		},
+
+		/**
+		 * Builds the initial user list
+		 *
+		 * @param 	{number} 	userID 			Chat user id
+		 * @param 	{string} 	username		User's name
+		 * @param 	{number} 	forumUserID 	Forum user id
+		 * @returns {void}
+		 */
+		_buildInitialList: function () {
+			this.scope.find('#elUserList').html( this.scope.find('#elInitialUserList').html() );
+			this.scope.find('#elInitialUserList').remove();
+
+			var self = this;
+
+			this.scope.find('#elUserList li').each( function(){
+				self._syncMenuOptions( $(this).find('[data-userID]').attr('data-userID'), $(this).find('[data-forumUserID]').attr('data-forumUserID') );
+			});
+
+			this._syncTotalChatters();
+		},
+
+		/**
+		 * Adds a user to the list after fetching info via ajax
+		 *
+		 * @param 	{number} 	userID 			Chat user id
+		 * @param 	{string} 	username		User's name
+		 * @param 	{number} 	forumUserID 	Forum user id
+		 * @returns {void}
+		 */
+		_addUserToList: function (userID, username, forumUserID) {
+			var userlist = this.scope.find('#elUserList');
+			var url = ips.getSetting('baseURL') + 'index.php?app=chat&module=chat&controller=action&do=addUser';
+			var self = this;
+
+			if( userlist.find('[data-userID="' + userID + '"]').length ){
+				return;
+			}
+
+			// Fetch the data
+			ips.getAjax()( url, {
+				dataType: 'json',
+				data: {
+					id: forumUserID,
+					user: userID
+				}
+			})
+				.done( function (response) {
+					// Update forum map
+					ips.getSetting('forumIDMap')[ userID ] = response.user;
+
+					// Insert in alphabetical order
+					var done = false;
+
+					userlist.find('[data-userID]').each( function () {
+						var name = $( this ).attr('data-userID');
+
+						if( ips.getSetting('username') < name ){
+							$( this ).before( response.html );
+							done = true;
+						}
+					});
+
+					if( !done ){
+						userlist.append( response.html );
+					}
+
+					self._syncMenuOptions( userID, forumUserID );
+
+					$( document ).trigger( 'contentChange', [ userlist ] );
+
+					// Play enter sound
+					self._playSound('enter');
+
+					self._syncTotalChatters();
+				});
+		},
+
+		/**
+		 * Removes a chatter from the user list
+		 *
+		 * @param 	{number} 	userID 			Chat user id
+		 * @param 	{string} 	username		User's name
+		 * @param 	{number} 	forumUserID 	Forum user id
+		 * @returns {void}
+		 */
+		_removeUserFromList: function (userID, username, forumUserID) {
+			var userlist = this.scope.find('#elUserList');
+			var row = userlist.find('#elChatUserRow_' + userID );
+			var self = this;
+
+			if( !row.length ){
+				return;
+			}
+
+			// Remove from list
+			userlist.find('[data-userID="' + userID + '"]').slideUp( function (){
+				row.remove();
+				self._syncTotalChatters();
+			});
+
+			// Play the leaving sound
+			self._playSound('leave');
+		},
+
+		/**
+		 * Syncs the '2 users chatting' and the global chat tab counts
+		 *
+		 * @returns {void}
+		 */
+		_syncTotalChatters: function () {
+			var userlist = this.scope.find('#elUserList');
+			var total = userlist.find('> li').length;
+
+			// Update total			
+			this.scope.find('[data-role="onlineChatters"]').html( ips.pluralize( ips.getString('usersChatting'), total ) );
+
+			// Update global chat tab
+			$('.ipsNavBar_primary [data-navapp="chat"] .ipsNotificationCount').text( total );
+		},
+
+		/**
+		 * Swaps out certain characters with alternatives we can make safe
+		 *
+		 * @param 	{string} 	message 	Raw message
+		 * @returns {string}
+		 */
+		_cleanMessage: function (message) {
+			return message
+					.replace( /\r/g, '' )
+					.replace( /\n/g, "__N__" )
+					.replace( /,/g, "__C__" )
+					.replace( /=/g, "__E__" )
+					.replace( /\+/g, "__PS__" )
+					.replace( /&/g, "__A__" )
+					.replace( /%/g, "__P__" )
+					.replace( /~~\|\|~~/, "~~###~~" );
+		},
+
+		/**
+		 * Swaps out our spcial characters back to their proper one
+		 *
+		 * @param 	{string} 	message 	Raw message
+		 * @returns {string}
+		 */
+		_unCleanMessage: function (message) {
+			return message
+					.replace( /__PS__/g, "+" )
+					.replace( /__E__/g, "=" )
+					.replace( /__P__/g, "%" )
+					.replace( /__A__/g, "&" )
+					.replace( /__C__/g, "," )
+					.replace( /__N__/g, "<br />" )
+					.replace( /~~###~~/, "~~||~~" );
+		},
+
+		/**
+		 * Parses our emoticons and bbcode from chats
+		 *
+		 * @param 	{string} 	message 	Raw message
+		 * @param 	{number} 	chatUserID 	Chat user ID number
+		 * @returns {string}
+		 */
+		_parseEmoticonsAndBbcode: function (message, chatUserID) {
+			var self = this;
+
+			// Emoticons
+			// @todo this line still needed?
+			message = message.replace( '!', '&#33;' );
+
+			_.each( ips.getSetting('chatEmoticons'), function (url, emoticon) {
+				var img = $('<img/>').attr({ 'src': url['image'], 'data-emoticon': 'true' });
+				if ( url['width'] ) {
+					img.attr( 'width', url['width'] );
+				}
+				if ( url['height'] ) {
+					img.attr( 'height', url['height'] );
+				}
+				if ( url['image_2x'] ) {
+					img.attr( 'srcset', url['image_2x'] );
+				}
+				img = "$1" + $('<div/>').append( img ).html() + "$2";
+
+				var regexp	= new RegExp( "(^|\\s)" + self._escapeRegex( emoticon.replace( /</g, "&lt;" ).replace( />/g, "&gt;" ) ) + "(\\s|$)", "gi" );
+				
+				while( message.match( regexp ) ){
+					message = message.replace( regexp, img );
+				}
+			});
+
+			// Bad words
+			var canBypassBadwords	= false;
+
+			if( chatUserID ){
+				var forumUser = ips.getSetting('forumIDMap')[ chatUserID ];	
+
+				if( !_.isUndefined( forumUser ) ){
+					canBypassBadwords	= forumUser.canBypassBadwords;
+				}
+			}
+
+			// Only do this if this group can't bypass badword filters
+			if( !canBypassBadwords ){ 
+				var replaceMap = {};
+				var iteration = 0;
+
+				// Loop through each badword to set up the replacement
+				_.each( ips.getSetting('badwords'), function (info, badword) {
+					var regex = null;
+					var matches = null;
+
+					if( _.isUndefined( info.swop ) ){
+						info.swop = '#####';
+					}
+
+					// Is this a loose replacement or exact match?
+					if( info.m_exact ){
+						// Loose
+						regex = new RegExp( '(^|\\b|\\s)' + self._escapeRegex( badword ) + '(\\b|!|\\?|\\.|,|$)', "gi" );
+					} else {
+						// Exact
+						regex = new RegExp( self._escapeRegex( badword ), "gi" );
+					}
+
+					// Iterate through the matches
+					while( matches = regex.exec( message ) ){
+						if( matches !== null ){
+							if( info.m_exact ){
+								replaceMap[ "__BW" + iteration + "__" ] = matches[1] + info.swop + matches[2];
+							} else {
+								replaceMap[ "__BW" + iteration + "__" ] = info.swop;
+							}
+
+							message = message.replace( matches[0], "__BW" + iteration + "__" );
+							iteration++;
+						}
+					}
+				});
+
+				// Now make the replacements for real
+				_.each( replaceMap, function (value, key) {
+					message = message.replace( key, value );
+				});
+			} 
+
+			// Basics
+			message = message.replace( /\[b\](.+?)\[\/b\]/gi, "<strong class='ipsStyle'>$1</strong>" );
+			message = message.replace( /\[i\](.+?)\[\/i\]/gi, "<em class='ipsStyle'>$1</em>" );
+			message = message.replace( /\[u\](.+?)\[\/u\]/gi, "<u class='ipsStyle'>$1</u>" );
+
+			return message;
+		},
+
+		/**
+		 * Parses a raw message
+		 *
+		 * @param 	{string} 	Raw message
+		 * @returns {string}
+		 */
+		_parseMessage: function (message) {
+			// Because we insert as text, we need to make sure &amp; is converted to &, otherwise entities will display incorrectly
+			message = message.replace( /&amp;/gi, '&' );
+
+			message	= message.replace( /%20/gi, ' ' );
+			message	= message.replace( /%23/gi, '#' );
+			message	= message.replace( /%22/gi, '&quot;' );
+			message	= message.replace( /%3C/gi, '&lt;' );
+			message	= message.replace( /%3E/gi, '&gt;' );
+			message	= message.replace( /\</gi, '&lt;' );
+			message	= message.replace( /\>/gi, '&gt;' );
+			
+			// This is here mainly for Safari.  In Safari, it automatically encodes chars
+		 	// and they are not valid for decodeURI/decodeURIComponent.
+		 	// Example: teraßyte becomes tera%DFyte
+		 	// This function will decode those characters
+			message = message.replace( /\%([a-zA-Z0-9]{2})/gi, function( hex ) {
+				return String.fromCharCode( parseInt( hex.replace( '%', '' ), 16 ) );
+			});
+
+			return message;
+		},
+
+		/**
+		 * Returns current time in seconds
+		 *
+		 * @returns {number}
+		 */
+		_getCurrentTime: function () {
+			return parseInt( new Date().getTime().toString().substring( 0, 10 ) );
+		},
+
+		_scrollIsAtBottom: function (rowID) {
+			var container = this._getStorageContainer( rowID );
+
+			if( container.scrollTop() + container.innerHeight() >= container.get(0).scrollHeight ){
+				Debug.log( "At bottom of " + rowID );
+				return true;
+			}
+
+			return false;
+		},
+
+		/**
+		 * Tracks the number of unread messages
+		 *
+		 * @returns {void}
+		 */
+		_updateUnread: function (rowID, lastUserID, state) {
+			state.updatedCount++;
+			this._unreadCount++;
+			
+			if( rowID != this._activeTab ){
+				if( this._unreadTabs[ rowID ] ){
+					this._unreadTabs[ rowID ] = parseInt( this._unreadTabs[ rowID ] ) + 1;
+				} else {
+					this._unreadTabs[ rowID ] = 1;
+				}
+			}
+
+			var self = this;
+
+			_.each( this._unreadTabs, function (value, key) {
+				if( key != self._activeTab ){
+					self._updateTabCount( key, value );
+				}				
+			});
+			
+			this._lastUser[ rowID ] = lastUserID;
+		},
+
+		/**
+		 * Changes the 'unread' count on the given tab. Pass 0 for count to remove the number.
+		 *
+		 * @param 	{string} 	roomID 		Tab/room ID
+		 * @param 	{number} 	count 		Number of unread messages
+		 * @returns {void}
+		 */
+		_updateTabCount: function (roomID, count) {
+			var tab = this.scope.find('[data-roomid="' + roomID + '"] a');
+			if ( !tab.length ) {
+				return;
+			}
+			
+			var text = tab.html();
+
+			// Remove any existing count
+			text = text.replace( /^\(\d+\) /i, '' );
+
+			if( count ){
+				text = "(" + count + ") " + text;	
+			}			
+
+			tab.html( text );
+		},
+
+		/**
+		 * Creates the iframe we'll use for cross-domain messaging
+		 *
+		 * @returns {void}
+		 */
+		_createIFrame: function () {
+			this._iframe = $('<iframe/>');
+			this.scope.find('#elChatIFrame').append( this._iframe );
+
+			this._iframe
+				.attr('id', 'elChatProxy')
+				.css({
+					position: 'absolute',
+					top: '0px',
+					left: '0px',
+					width: '1px',
+					height: '1px'
+				})
+				.hide()
+				.attr('src', 'http' + ( ( this._secure ) ? 's' : '' ) + '://' + ips.getSetting('serverHost') + ips.getSetting('serverPath') + 'web/postMessage40.php?parent=' + encodeURIComponent( ips.getSetting('ourURL') ) );
+
+			this._iframeWindow = this._iframe.get(0).contentWindow;
+		},
+
+		/**
+		 * Returns escaped HTML
+		 *
+		 * @returns {string}
+		 */
+		_escapeHTML: function (message) {
+			var div = document.createElement('div');
+		    div.appendChild( document.createTextNode( message ) );
+		    return div.innerHTML;
+		},
+
+		/**
+		 * Makes the given text safe for use in regex
+		 *
+		 * @param 	{string} 	text 	Text to escape
+		 * @returns {string}
+		 */
+		_escapeRegex: function (text) {
+			if ( !this._sRE ){
+			   	var specials = [ '/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\', '$', '^' ];
+			   	this._sRE = new RegExp( '(\\' + specials.join('|\\') + ')', 'g' );
+			}
+
+			return text.replace( this._sRE, '\\$1' );
+		},
+
+		/**
+		 * Scrolls the provided tabID storage element to the bottom
+		 *
+		 * @param 	{string} 	tabID 	tabID container to scroll
+		 * @returns {void}
+		 */
+		_scrollToBottom: function (tabID) {
+			var ulList = this._getStorageContainer( tabID );
+
+			if( !ulList.length ){
+				return;
+			}
+
+			ulList.scrollTop( ulList[0].scrollHeight );
+		},
+
+		/**
+		 * Parses images and urls in content
+		 *
+		 * @param 	{string} 	text 	The text to pars
+		 * @returns {string}
+		 */
+		_parseForContent: function (text) {
+			if( $.trim( text ).match( this._imgRegex ) ){
+				return ips.templates.render('chat.parsedImage', {
+					url: text
+				});
+			} else {
+				var lastPos = 0;
+
+				return text.replace( this._urlRegex, function (url) {
+					var indexOfURL = text.indexOf( url, lastPos );
+					var returnURL = url;
+
+					if( text.substring( indexOfURL, indexOfURL - 5) !== 'src="' && text.substring( indexOfURL, indexOfURL - 8) !== 'srcset="' ){
+						returnURL = '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a>';
+					}
+
+					lastPos = indexOfURL + url.length;
+
+					return returnURL;
+				});
+			}
+		},
+
+		//===================================================================
+		//===================================================================
+		// MESSAGE HANDLERS 
+		//===================================================================
+		//===================================================================
+		_handlers: {
+
+			/**
+			 * Normal message
+			 *
+			 * @param 	{array}		msgDetails 	Message pieces
+			 * @param	{object} 	state 		State values
+			 * @returns {void}
+			 */
+			normal: function (msgDetails, rowID, itemDate, state) {
+
+				var isOwn = false;
+
+				if( msgDetails[5] == ips.getSetting('userID') ){
+					isOwn = true;
+				} else if( !this._doneInitialLoad && msgDetails[2] === ips.getSetting('username') ){
+					// The check above is a bit hackish, and is done so if the user reloads the page, their own previous messages
+					// are still highlighted.  If we're in the initial loading stage, we'll check whether the
+					// message username matches our own username, so that we can mark it as ours. We can't simply check
+					// the userID, because when the page reloads the user gets a new chat ID.
+					isOwn = true;
+				}
+
+				// Format username
+				if( isOwn ){
+					msgDetails[2] = this._formatName( ips.getSetting('userID'), msgDetails[2] );
+				} else {
+					msgDetails[2]	= this._formatName( msgDetails[5], msgDetails[2] );
+				}
+
+				var template = ips.templates.render( ( msgDetails[5] == this._lastUser[ rowID ] ) ? 'chat.normalCompound' : 'chat.normal', { 
+					date: itemDate,
+					username: msgDetails[2],
+					photo: ips.getSetting('forumIDMap')[ msgDetails[5] ] ? ips.getSetting('forumIDMap')[ msgDetails[5] ].photo : '',
+					message: this._parseForContent( msgDetails[3] ),
+					own: isOwn
+				});
+
+				// Update counters
+				this._updateUnread( rowID, msgDetails[5], state );
+				
+				return template;
+			},
+
+			/**
+			 * User status (e.g. user has left the room)
+			 *
+			 * @param 	{array}		msgDetails 	Message pieces
+			 * @param	{object} 	state 		State values
+			 * @returns {void}
+			 */
+			userStatus: function (msgDetails, rowID, itemDate, state) {
+
+				// Details will be (1|2)_(userid).  1 means entered, 2 means left
+				var details = msgDetails[4].split( '_' );
+
+				// Check if we've entered or left
+				if( details[0] == 1 ){
+					var action	= ips.getString('enteredRoom', { username: msgDetails[2] } );
+					
+					// We don't want to add/remove on initial load - the chatters cache should be accurate anyways
+					if( state.previousLastMsgID > 0 ){
+						this._addUserToList( details[1], msgDetails[2], details[2] );
+					}
+
+					var _details = ips.getSetting('groups')[ details[3] ];
+
+					if( _details ){
+						msgDetails[2]	= _details.prefix.replace( /__DBQ__/g, '"' ) + msgDetails[2] + _details.suffix.replace( /__DBQ__/g, '"' );
+					}
+
+					// https://community.invisionpower.com/4bugtrack/active-reports/chat-tabs-with-html-in-group-name-r8351/
+					// This line isn't actually used and was causing the error.
+					//var tab = this.scope.find('#elChatTabs [data-user="' + msgDetails[2] + '"]')
+
+					state.alsoTo = details[1];
+
+				} else if( details[0] == 2 ) {
+
+					var action	= ips.getString('leftRoom', { username: msgDetails[2] } );
+
+					// We don't want to add/remove on initial load - the chatters cache should be accurate anyways
+					if( state.previousLastMsgID > 0 ){
+						this._removeUserFromList( details[1], msgDetails[2] );
+					}
+					
+					msgDetails[2]	= this._formatName( details[1], msgDetails[2] );
+				}
+
+				// Ignoring these messages?
+				if( !this._bypassFlag && ips.getSetting('hideEnterExit') ){
+					return false;
+				}
+
+				// If user is entering room, the photo may not be available yet, so we'll store a placeholder that we can fix in a moment when AJAX request completes
+				var photo = !_.isUndefined( ips.getSetting('forumIDMap')[ details[1] ] ) ? ips.getSetting('forumIDMap')[ details[1] ].photo : '<!--uid' + details[1] + '-->';
+				
+				this._lastUser[ rowID ] = 0;
+
+				return ips.templates.render( 'chat.userStatus', {
+					date: itemDate,
+					username: msgDetails[2],
+					photo: photo,
+					action: action 
+				});
+			},
+
+			/**
+			 * /me message
+			 *
+			 * @param 	{array}		msgDetails 	Message pieces
+			 * @param	{object} 	state 		State values
+			 * @returns {void}
+			 */
+			me: function (msgDetails, rowID, itemDate, state) {
+				// Commenting out formatting of names in a /me
+				//msgDetails[2] = this._formatName( msgDetails[5], msgDetails[2] );
+				
+				var text = msgDetails[2] + ' ' + msgDetails[3];
+
+				// Increment counter
+				this._updateUnread( rowID, 0, state );
+
+				return ips.templates.render( 'chat.me', {
+					date: itemDate,
+					username: msgDetails[2],
+					photo: ips.getSetting('forumIDMap')[ msgDetails[5] ] ? ips.getSetting('forumIDMap')[ msgDetails[5] ].photo : '',
+					message: msgDetails[3],
+					text: text
+				});
+			},
+
+			/**
+			 * System message
+			 *
+			 * @param 	{array}		msgDetails 	Message pieces
+			 * @param	{object} 	state 		State values
+			 * @returns {void}
+			 */
+			system: function (msgDetails, rowID, itemDate, state) {
+				return ips.templates.render( 'chat.system', {
+					date: itemDate,
+					text: msgDetails[3]
+				});
+			},
+
+			/**
+			 * Moderator action (kick)
+			 *
+			 * @param 	{array}		msgDetails 	Message pieces
+			 * @param	{object} 	state 		State values
+			 * @returns {void}
+			 */
+			modAction: function (msgDetails, rowID, itemDate, state) {
+				// Remove kicked user from chat list
+				this._removeUserFromList( msgDetails[4], msgDetails[3] );
+				
+				// Format username
+				msgDetails[2]	= this._formatName( msgDetails[5], msgDetails[2] );
+				msgDetails[3]	= this._formatName( msgDetails[4], msgDetails[3] );
+
+				this._lastUser[ rowID ] = 0;
+			}
+		}
+	});
+}(jQuery, _));]]></file>
+ <file javascript_app="chat" javascript_location="front" javascript_path="templates" javascript_name="ips.templates.chat.js" javascript_type="template" javascript_version="101030" javascript_position="1000100"><![CDATA[ips.templates.set('chat.tabs.tab', " \
+<li role='presentation' data-roomID='{{roomID}}'>\
+	<a href='#' role='tab' id='{{roomID}}' class='ipsFaded_withHover ipsTabs_item ipsType_blendLinks {{#active}}ipsTabs_activeItem{{/active}}' aria-selected='false'>\
+		{{roomTitle}} {{#close}}&nbsp;<span class='ipsFaded ipsFaded_more' data-action='closeTab' data-ipsTooltip title='{{#lang}}closeThisTab{{/lang}}'><i class='fa fa-times'></i></span>{{/close}}\
+	</a>\
+</li>\
+");
+
+ips.templates.set('chat.tabs.main', " \
+<div id='ipsTabs_elChatTabs_chatroom_panel' class='ipsTabs_panel' data-tab='chatroom'>\
+	<div class='ipsColumns ipsColumns_noSpacing ipsColumns_collapsePhone'>\
+		<div class='ipsColumn ipsColumn_fluid cChatTab'>\
+			<ul class='ipsList_reset cChatContainer {{#loading}}ipsLoading{{/loading}}'></ul>\
+			<div class='cChatCompose ipsAreaBackground ipsPad'>\
+				<div class='ipsColumns ipsColumns_collapsePhone'>\
+					<div class='ipsColumn ipsColumn_fluid'>\
+						<textarea name='message' class='cMessageTextarea' tabindex='0' maxlength='450'></textarea>\
+					</div>\
+					<div class='ipsColumn ipsColumn_veryNarrow cEmoticonsButton'>\
+						<button type='button' data-action='emoticons' class='ipsButton ipsButton_narrow ipsButton_veryLight ipsButton_large ipsButton_fullWidth' data-ipsTooltip title='{{#lang}}insertEmoticon{{/lang}}' data-ipsMenu data-ipsMenu-above='true' data-ipsMenu-appendTo='#elChatWrapper' data-ipsMenu-closeOnClick='false' id='elEmoticons_chatroom'><i class='fa fa-smile-o'></i></button>\
+					</div>\
+					<div class='ipsColumn ipsColumn_narrow cSendButton'>\
+						<button type='submit' class='ipsButton ipsButton_primary ipsButton_large ipsButton_fullWidth cMessageSubmit'>{{#lang}}sendChat{{/lang}}</button>\
+					</div>\
+				</div>\
+			</div>\
+		</div>\
+		<div class='ipsColumn ipsColumn_wide'>\
+			<div class='ipsAreaBackground ipsPad_half'>\
+				<strong data-role='onlineChatters'>{{#lang}}noUsersChatting{{/lang}}</strong>\
+			</div>\
+			<ol id='elUserList' class='ipsList_reset'></ol>\
+		</div>\
+	</div>\
+	{{{emoticons}}}\
+</div>\
+");
+
+ips.templates.set('chat.tabs.panel', " \
+<div id='ipsTabs_elChatTabs_{{roomID}}_panel' class='ipsTabs_panel' data-tab='{{roomID}}' style='display: none'>\
+	<div class='ipsColumns ipsColumns_noSpacing ipsColumns_collapsePhone'>\
+		<div class='ipsColumn ipsColumn_fluid cChatTab'>\
+			<ul class='ipsList_reset cChatContainer'></ul>\
+			<div class='cChatCompose ipsAreaBackground ipsPad'>\
+				<div class='ipsColumns ipsColumns_collapsePhone'>\
+					<div class='ipsColumn ipsColumn_fluid'>\
+						<textarea name='message' class='cMessageTextarea' tabindex='0' maxlength='450'></textarea>\
+					</div>\
+					<div class='ipsColumn ipsColumn_veryNarrow'>\
+						<button type='button' data-action='emoticons' class='ipsButton ipsButton_narrow ipsButton_veryLight ipsButton_large ipsButton_fullWidth' data-ipsTooltip title='{{#lang}}insertEmoticon{{/lang}}' data-ipsMenu data-ipsMenu-above='true' data-ipsMenu-appendTo='#elChatWrapper' data-ipsMenu-closeOnClick='false' id='elEmoticons_{{roomID}}'><i class='fa fa-smile-o'></i></button>\
+					</div>\
+					<div class='ipsColumn ipsColumn_narrow'>\
+						<button type='submit' class='ipsButton ipsButton_primary ipsButton_large ipsButton_fullWidth cMessageSubmit'>{{#lang}}sendChat{{/lang}}</button>\
+					</div>\
+				</div>\
+			</div>\
+		</div>\
+		<div class='ipsColumn ipsColumn_wide'>\
+			<div class='ipsAreaBackground ipsPad_half'>\
+				<strong>{{#lang}}privateChat{{/lang}}</strong>\
+			</div>\
+			<div class='cChatUserInfo'></div>\
+		</div>\
+	</div>\
+	{{{emoticons}}}\
+</div>\
+");
+
+ips.templates.set('chat.userStatus', " \
+<li class='cChatRow cChatRow_notice ipsContained ipsType_break'>\
+	<div class='cChatRow_user'></div>\
+	<div class='cChatRow_content'>{{action}}</div>\
+	<div class='cChatRow_date'></div>\
+</li>\
+");
+
+ips.templates.set('chat.normalCompound', " \
+<li class='cChatRow cChatRow_message {{#own}}cChatRow_own{{/own}} cChatRow_compound ipsContained ipsType_break'>\
+	<div class='cChatRow_user'></div>\
+	<div class='cChatRow_content'>{{{message}}}</div>\
+	<div class='cChatRow_date'>{{date}}</div>\
+</li>\
+");
+
+ips.templates.set('chat.normal', " \
+<li class='cChatRow cChatRow_message {{#own}}cChatRow_own{{/own}} ipsContained ipsType_break'>\
+	<div class='cChatRow_user'>{{{username}}} <span class='ipsResponsive_showPhone ipsResponsive_inline cChatRow_responsiveDate ipsType_light'>{{date}}</span></div>\
+	<div class='cChatRow_content'>{{{message}}}</div>\
+	<div class='cChatRow_date'>{{date}}</div>\
+</li>\
+");
+
+ips.templates.set('chat.me', " \
+<li class='cChatRow cChatRow_me ipsContained ipsType_break'>\
+	<div class='cChatRow_user'></div>\
+	<div class='cChatRow_content'>{{{text}}}</div>\
+	<div class='cChatRow_date'>{{date}}</div>\
+</li>\
+");
+
+ips.templates.set('chat.system', " \
+<li class='cChatRow cChatRow_system ipsContained ipsType_break'>\
+	<div class='cChatRow_user'>{{#lang}}system{{/lang}} <span class='ipsResponsive_showPhone ipsResponsive_inline cChatRow_responsiveDate ipsType_light'>{{date}}</span></div>\
+	<div class='cChatRow_content'>{{text}}</div>\
+	<div class='cChatRow_date'>{{date}}</div>\
+</li>\
+");
+
+ips.templates.set('chat.chatDate', " \
+<li class='cChatRow cChatRow_date ipsContained ipsType_break'>\
+	<div class='cChatRow_user'></div>\
+	<div class='cChatRow_content'>{{date}}</div>\
+	<div class='cChatRow_date'>{{date}}</div>\
+</li>\
+");
+
+ips.templates.set('chat.parsedImage', " \
+<div class='cChatParsedImage ipsFaded_withHover'><a href='{{url}}' target='_blank' rel='noopener noreferrer' data-ipsLightbox><img src='{{url}}'></a> <span class='ipsType_light ipsHide' data-role='imageHidden'>{{#lang}}imageHidden{{/lang}}</span> <a href='#' class='ipsFaded ipsFaded_more ipsButton ipsButton_narrow ipsButton_verySmall ipsButton_primary' title='{{#lang}}hideImage{{/lang}}' data-ipsTooltip data-action='toggleImage'><i class='fa fa-caret-up'></i></a></div>\
+");]]></file>
+ <order app="global" path="/dev/js//framework/">templates
+common/ui
+common/utils
+common
+controllers</order>
+ <order app="global" path="/dev/js//library/">underscore
+jquery
+mustache
+jstz
+Debug.js
+app.js</order>
+ <order app="global" path="/dev/js//library//jquery">jquery.js
+jquery.history.js
+jquery.transform.js</order>
+</javascript>

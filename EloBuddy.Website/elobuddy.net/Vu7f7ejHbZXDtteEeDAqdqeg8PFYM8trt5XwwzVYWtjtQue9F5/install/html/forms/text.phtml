@@ -1,0 +1,37 @@
+<ips:template parameters="$name, $type, $value, $required, $maxlength=NULL, $size=NULL, $disabled=FALSE, $autoComplete=NULL, $placeholder" />
+<input
+	type="{$type}"
+	name="{$name}"
+	value="{$value}"
+	{{if $required === TRUE}}required{{endif}}
+	{{if $maxlength !== NULL}}maxlength="{$maxlength}"{{endif}}
+	{{if $size !== NULL}}size="{$size}"{{endif}}
+	{{if $disabled}}disabled{{endif}}
+	class="input_text"
+	{{if $autoComplete !== NULL}}
+		data-ipsAutocomplete
+		{{if $autoComplete['maxItems']}}
+			data-ipsAutocomplete-maxItems='{$autoComplete['maxItems']}'
+		{{endif}}
+		{{if $autoComplete['unique']}}
+			data-ipsAutocomplete-unique
+		{{endif}}
+		{{if is_array( $autoComplete['source'] )}}	
+			list='{$name}_datalist'
+		{{elseif $autoComplete['source']}}
+			data-ipsAutocomplete-dataSource="{url="{$autoComplete['source']}"}"
+			data-ipsAutocomplete-queryParam='input'
+		{{endif}}
+		{{if $autoComplete['resultItemTemplate']}}
+			data-ipsAutocomplete-resultItemTemplate="{$autoComplete['resultItemTemplate']}"
+		{{endif}}
+	{{endif}}
+	{{if $placeholder !== NULL}}placeholder='{$placeholder}'{{endif}}
+/>
+{{if is_array( $autoComplete )}}
+	<datalist id="{$name}_datalist">
+		{{foreach $autoComplete as $v}}
+			<option value="$v">{$v}</option>
+		{{endforeach}}
+	</datalist>
+{{endif}}

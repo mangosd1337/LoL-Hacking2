@@ -1,0 +1,26 @@
+{
+    "1": {
+        "method": "dropColumn",
+        "params": [
+            "forums_archive_posts",
+            "archive_show_signature"
+        ]
+    },
+    "2": {
+        "method": "dropColumn",
+        "params": [
+            "forums_archive_posts",
+            "archive_show_emoticons"
+        ]
+    },
+    "3": {
+        "method": "dropColumn",
+        "params": [
+            "forums_posts",
+            [
+                "use_sig",
+                "use_emo"
+            ]
+        ]
+    }
+}

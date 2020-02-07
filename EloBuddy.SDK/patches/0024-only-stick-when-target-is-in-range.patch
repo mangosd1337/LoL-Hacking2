@@ -1,0 +1,29 @@
+From eb2fa2f678e62a3576d55c61c4d5be37187c4910 Mon Sep 17 00:00:00 2001
+From: Javier <jachicao@uc.cl>
+Date: Wed, 17 Feb 2016 15:25:14 -0300
+Subject: [PATCH 24/28] only stick when target is in range.
+
+---
+ EloBuddy.SDK/Orbwalker.cs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/EloBuddy.SDK/Orbwalker.cs b/EloBuddy.SDK/Orbwalker.cs
+index 8a94f7c..7e8d6d3 100644
+--- a/EloBuddy.SDK/Orbwalker.cs
++++ b/EloBuddy.SDK/Orbwalker.cs
+@@ -112,10 +112,10 @@ namespace EloBuddy.SDK
+                         return pos.Value;
+                     }
+                 }
+-                if (StickToTarget)
++                if (StickToTarget && LastTarget != null)
+                 {
+                     var targetBase = LastTarget as Obj_AI_Base;
+-                    if (targetBase != null && targetBase.Path.Length > 0)
++                    if (targetBase != null && (targetBase.IsMonster || targetBase.Type == GameObjectType.AIHeroClient) && Player.Instance.IsInRange(targetBase, Player.Instance.GetAutoAttackRange(targetBase) + 150) && targetBase.Path.Length > 0)
+                     {
+                         return targetBase.Path.Last();
+                     }
+-- 
+1.9.4.msysgit.2
+

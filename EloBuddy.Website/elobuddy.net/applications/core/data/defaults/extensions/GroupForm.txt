@@ -1,0 +1,50 @@
+<?php
+/**
+ * @brief		Admin CP Group Form
+ * @author		<a href='http://www.invisionpower.com'>Invision Power Services, Inc.</a>
+ * @copyright	(c) 2001 - 2016 Invision Power Services, Inc.
+ * @license		http://www.invisionpower.com/legal/standards/
+ * @package		IPS Community Suite
+{subpackage}
+ * @since		{date}
+ * @version		SVN_VERSION_NUMBER
+ */
+
+namespace IPS\{app}\extensions\core\GroupForm;
+
+/* To prevent PHP errors (extending class does not exist) revealing path */
+if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) )
+{
+	header( ( isset( $_SERVER['SERVER_PROTOCOL'] ) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0' ) . ' 403 Forbidden' );
+	exit;
+}
+
+/**
+ * Admin CP Group Form
+ */
+class _{class}
+{
+	/**
+	 * Process Form
+	 *
+	 * @param	\IPS\Helpers\Form		$form	The form
+	 * @param	\IPS\Member\Group		$group	Existing Group
+	 * @return	void
+	 */
+	public function process( &$form, $group )
+	{		
+		$form->add( new \IPS\Helpers\Form\Text( 'example' ) );
+	}
+	
+	/**
+	 * Save
+	 *
+	 * @param	array				$values	Values from form
+	 * @param	\IPS\Member\Group	$group	The group
+	 * @return	void
+	 */
+	public function save( $values, &$group )
+	{
+		$group->example = $values['example'];	
+	}
+}

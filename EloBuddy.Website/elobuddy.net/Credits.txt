@@ -1,0 +1,300 @@
+IPS Community Suite
+(c) Invision Power Services, Inc.
+
+Invision Power Services, Inc. is grateful to the following projects, whose work
+has been used throughout the IPS Community Suite to add style, flair and functionality
+to our product.
+
+AES implementation in PHP
+	Description: Used by \IPS\Text\Encrypt to provide two-way text encryption for storing certain data.
+	Location: system/3rd_party/AES
+	Included version: Last Updated: 22 July 2014
+	Website: http://www.movable-type.co.uk/scripts/aes-php.html
+	License: http://creativecommons.org/licenses/by/3.0/
+
+Base64.js Polyfill
+	Description: Polyfill for JS AtoB and BtoA methods in Chat
+	Location: /applications/chat/interface/base64/base64.js
+	Included version: 0.3.0
+	Website: https://github.com/davidchambers/Base64.js
+	License: http://www.apache.org/licenses/LICENSE-2.0
+
+Buzz.js
+	Description: HTML5 audio support for notifications & chat
+	Location: applications/core/interface/buzz
+	Included version: 1.1.10
+	Website: http://buzz.jaysalvat.com/
+	License: http://opensource.org/licenses/MIT
+
+CKEditor
+	Description: Provides the editor functionality for submitting content.
+	Location: In development: applications/core/dev/ckeditor (custom build with additional plugins and some code changes)
+	Included version: 4.5.9
+	Website: http://ckeditor.com
+	License: http://www.gnu.org/copyleft/lesser.html
+
+Codemirror (with C-like, CSS, HTMLMixed, JavaScript, PHP, SQL and XML modes and merge, search, and searchcursor addons)
+	Description: Provides code editor for adding code to content, editing templates in the AdminCP, etc.
+	Location: applications/core/interface/codemirror
+	Included version: 5.14.2
+	Website: http://codemirror.net
+	License: http://codemirror.net/LICENSE
+
+Cropper
+	Description: Provides cropping functionality for profile photos
+	Location: applications/core/interface/cropper
+	Included version: 0.8
+	Website: https://github.com/fengyuanchen/cropper
+	License: http://opensource.org/licenses/MIT
+
+Esrever
+	Description: Unicode-aware string reversing, used in Chat
+	Location: /applications/chat/interface/esrever/esrever.js
+	Included version: 0.2.0
+	Website: https://github.com/mathiasbynens/esrever
+	License: http://opensource.org/licenses/MIT
+	
+FontAwesome
+	Description: General icons for UI
+	Location: Font files in applications/core/interface/font and CSS in development in applications/core/dev/css/global/framework/fonts.css (mixed with other CSS and modified to use correct path to font files)
+	Included version: 4.6.0
+	Website: http://fortawesome.github.com/Font-Awesome
+	License: http://fortawesome.github.com/Font-Awesome/#license
+
+Google Charts
+	Description: Generates charts for statistics in the AdminCP
+	Location: Loaded from CDN https://www.google.com/jsapi
+	Website: https://developers.google.com/chart/
+
+google-code-prettify
+	Description: Provides syntax highlighting for code posted in content, etc.
+	Location: In development: dev/js/library/prettify and applications/core/dev/css/global/framework/prettify.css
+	Included version: 4 March 2013
+	Website: http://code.google.com/p/google-code-prettify/
+	License: http://www.apache.org/licenses/LICENSE-2.0
+	
+google-diff-mode-patch
+	Description: @todo
+	Location: @todo
+	Included version: 19 November 2012
+	Website: https://code.google.com/p/google-diff-match-patch/
+	License: http://www.apache.org/licenses/LICENSE-2.0
+
+history.js
+	Description: HTML5 history API, used extensively in controllers
+	Location: /dev/js/library/jquery/jquery.history.js
+	Included version: 1.8b2
+	Website: https://github.com/browserstate/history.js
+	License: https://github.com/browserstate/history.js#license
+	
+HTML5shiv
+	Description: Provides some HTML5 compatability for IE8
+	Location: applications/core/interface/html5shiv/html5shiv.js
+	Included version: 3.7.2
+	Website: https://github.com/afarkas/html5shiv
+	License: License: http://opensource.org/licenses/MIT
+
+HTMLPurifier
+	Description: Validates and cleans submitted HTML for content
+	Location: system/3rd_party/HTMLPurifier
+	Included version: 4.7.0
+	Website: http://htmlpurifier.org
+	License: http://www.gnu.org/copyleft/lesser.html
+
+IcoMoon
+	Description: General icons for UI
+	Location: Font files in applications/core/interface/font and CSS in development in applications/core/dev/css/global/framework/fonts.css (mixed with other CSS and modified to use correct path to font files)
+	Website: https://icomoon.io/
+	License: http://creativecommons.org/licenses/by/4.0/
+	
+jQuery
+	Description: JavaScript Library
+	Location: In development: dev/js/library/jquery/jquery.js
+	Included version: 1.12.3
+	Website: http://jquery.com
+	License: http://jquery.org/license
+
+jQuery dotdotdot
+	Description: On-the-fly truncating of text in elements
+	Location: dev/js/library/jquery/jquery.dotdotdot.min.js
+	Included version: 1.7.4
+	Website: http://dotdotdot.frebsite.nl
+	License: http://opensource.org/licenses/MIT
+
+jquery.hoverintent.js
+	Description: Hover library for jQuery used for main navigation
+	Location: dev/js/library/jquery/jquery.hoverintent.js
+	Included version: 1.8.0
+	Website: http://cherne.net/brian/resources/jquery.hoverIntent.html
+	License: http://opensource.org/licenses/MIT
+	
+jQuery imagesLoaded plugin
+	Description: Plugin that can defer script execution until specified images have loaded
+	Location: dev/js/library/jquery/jquery.imagesloaded.js
+	Included version: 2.1.2 (3.x API isn't compatible with IPS4 at this time)
+	Website: http://desandro.github.io/imagesloaded/
+	License: http://opensource.org/licenses/MIT
+
+jQuery.menuaim.js
+	Description: Library that provides intelligent activation of menu items based on mouse movement
+	Location: applications/core/interface/jquery/jquery.menuaim.js
+	Included version: 1.1
+	Website: https://github.com/kamens/jQuery-menu-aim
+	License: http://opensource.org/licenses/MIT
+
+jQuery.nestedSortable.js
+	Description: Extends jqueryui's sortable with nested support
+	Location: applications/core/interface/jquery/jquery.nestedSortable.js
+	Included version: 2.0
+	Website: http://mjsarfatti.com/sandbox/nestedSortable/
+	License: http://opensource.org/licenses/MIT
+
+jQuery.rangyinputs.js
+	Description: Simple selection/caret manipulation in textboxes
+	Location: applications/core/interface/jquery/jquery.rangyinputs.js
+	Included version: 1.2.0
+	Website: https://github.com/timdown/rangyinputs
+	License: http://opensource.org/licenses/MIT
+
+jQuery.transform.js
+	Description: adds support for CSS transforms to jQuery's animate(), used in ips.ui.dialog.js
+	Location: dev/js/library/jquery/jquery.transform.js
+	Included version: 1.0
+	Website: https://github.com/louisremi/jquery.transform.js
+	License: http://opensource.org/licenses/MIT
+
+jQuery UI (core.js, widget.js, mouse.js, position.js, draggable.js, droppable.js, resizable.js, sortable.js, datepicker.js, progressbar.js)
+	Description: Javascript library for drag+drop, resizing, date polyfill
+	Location: applications/core/interface/jquery/jquery-ui.js
+	Included version: 1.11.4
+	Website: http://jqueryui.com
+	License: http://jquery.org/license
+
+jQuery UI TouchPunch
+	Description: Library that adds touch support to jquery ui
+	Location: /applications/core/interface/jquery/jquery-touchpunch.js
+	Included version: 0.2.3
+	Website: http://touchpunch.furf.com/
+	License: http://opensource.org/licenses/MIT
+	
+JSColor
+	Description: Color selector polyfill
+	Location: applications/core/interface/jscolor
+	Included version: 1.4.5 (2.x API isn't compatible with IPS4 at this time)
+	Website: http://jscolor.com
+	License: http://www.gnu.org/copyleft/lesser.html
+
+JShrink
+	Description: Provides JavaScript minifcation
+	Location: system/3rd_party/JShrink
+	Included version: 1.1.0
+	Website: https://github.com/tedious/JShrink
+	License: https://github.com/tedious/JShrink/blob/master/LICENSE
+
+jsTimezoneDetect
+	Description: Provides timezone detection
+	Location: dev/js/library/jstz
+	Included version: 1.0.6
+	Website: https://bitbucket.org/pellepim/jstimezonedetect
+	License: http://www.opensource.org/licenses/mit-license.php
+
+Mustache.js
+	Description: JS templating engine
+	Location: dev/js/library/mustache/
+	Included version: 2.2.1
+	Website: http://github.com/janl/mustache.js
+	License: http://opensource.org/licenses/MIT
+
+Normalize.css
+	Description: Sets base CSS styles for consistency across browsers
+	Location: applications/core/dev/css/global/framework/normalize.css
+	Included version: 3.0.2
+	Website: http://necolas.github.io/normalize.css/
+	License: http://opensource.org/licenses/MIT
+
+parseUri
+	Description: Used to parse URLs in JS
+	Location: dev/js/framework/common/utils/ips.utils.url.js
+	Included version: 1.2.2
+	Website: http://blog.stevenlevithan.com/archives/parseuri
+	License: http://opensource.org/licenses/MIT
+
+Payment Method Icons
+	Description: Credit card logo icons for UI
+	Location: applications/nexus/dev/resources/front/cards
+	Website: http://www.dreamstale.com/free-download-payment-method-vector-icons/
+	License: http://creativecommons.org/licenses/by/3.0/
+
+PclZip
+	Description: Used by \IPS\Archive\Zip to provide zip handling features if the PHP Zip extension is not available
+	Location: system/3rd_party/pclzip
+	Included version: 2.8.2
+	Website: http://www.phpconcept.net/pclzip/
+	License: http://www.gnu.org/copyleft/lesser.html
+	
+PHP Diff Implementation
+	Description: Computes difference between two strings, used to display differences between content revisions, themes, etc.
+	Location: system/3rd_party/Diff
+	Included version: 11 Feb 2013
+	Website: http://code.stephenmorley.org/php/diff-implementation/
+	License: http://creativecommons.org/publicdomain/zero/1.0/legalcode
+	
+phpQuery
+	Description: Handles template hooks
+	Location: system/3rd_party/phpQuery
+	Included Version: 0.9.5
+	Website: https://code.google.com/p/phpquery
+	License: http://opensource.org/licenses/mit-license.php
+
+Plupload
+	Description: Facilitates uploading files
+	Location: applications/core/interface/codemirror
+	Included version: 2.1.8
+	Website: http://www.plupload.com
+	License: http://www.plupload.com/license/plupload_commercial_oem.txt
+
+Preloaders.net
+	Description: Animated gif preload imags
+	Website: http://preloaders.net/
+	License: http://preloaders.net/en/terms_of_use
+
+success.mp3 Notification Sound by RCP Tones
+	Description: "Success" sound used in ips.ui.uploader.js
+	Location: /applications/core/interface/sounds/success.mp3
+	Website: http://rcptones.com/dev_tones/
+	License: http://creativecommons.org/licenses/by/3.0/us/
+	
+Underscore.js
+	Description: General-purpose functional JS library
+	Location: dev/js/library/underscore/
+	Included version: 1.8.3
+	Website: http://underscorejs.org
+	License: https://github.com/documentcloud/underscore/blob/master/LICENSE
+
+Video.js
+	Description: HTML5 video player for Gallery
+	Location: applications/interface/videojs
+	Included version: 4.12.15
+	Website: http://www.videojs.com/
+	License: https://github.com/videojs/video.js/blob/master/LICENSE
+
+Whoops
+	Description: Provides error handling for development mode
+	Location: dev/Whoops
+	Included Version: 2.0.0
+	Website: http://filp.github.io/whoops/
+	License: https://github.com/filp/whoops/blob/master/LICENSE.md
+
+world-flags-sprite
+	Description: Flag icons for UI
+	Location: In development: Image files at applications/core/dev/resources/global, facilitated by custom CSS at applications/core/dev/css/global/flags.css
+	Included version: Last Updated Oct 2015
+	Website: https://github.com/lafeber/world-flags-sprite/
+	License: https://github.com/lafeber/world-flags-sprite/blob/master/LICENSE
+
+XRegExp (with addons)
+	Description: Advanced Regular Expression JS library, used in autolink editor plugin and search result highlighting
+	Location: In development: dev/js/library/xregexp/xregexp-all.js
+	Included Version: 3.1.0
+	Website: http://xregexp.com
+	License: http://mit-license.org

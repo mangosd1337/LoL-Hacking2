@@ -1,0 +1,2 @@
+﻿CKEDITOR.plugins.add("ipsemoticon",{icons:"ipsemoticon",hidpi:!0,init:function(a){a.addCommand("ipsEmoticon",{allowedContent:"",exec:function(a){var b=$("."+a.id).find(".cke_button__ipsemoticon");$("#"+b.attr("id")+"_menu").length||($("body").append(ips.templates.render("core.editor.emoticons",{id:b.attr("id"),editor:a.name})),$(document).trigger("contentChange",[$("body")]),b.ipsMenu({alignCenter:!0,closeOnClick:!1}))}});a.ui.addButton("ipsEmoticon",{label:ips.getString("editorEmoticonButton"),command:"ipsEmoticon",
+toolbar:"insert"})}});

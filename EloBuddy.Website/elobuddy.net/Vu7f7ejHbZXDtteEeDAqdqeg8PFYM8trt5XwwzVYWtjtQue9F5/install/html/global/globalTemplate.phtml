@@ -1,0 +1,92 @@
+<ips:template parameters="$title,$html,$initError=FALSE,$path=null" />
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>{$title}</title>
+		<link rel='stylesheet' href='css/reset.css' media='all'>
+		<link rel='stylesheet' href='css/fonts.css' media='all'>
+		<link rel='stylesheet' href='css/global.css' media='all'>
+		<link rel='stylesheet' href='css/layout.css' media='all'>
+		<link rel='stylesheet' href='css/messages.css' media='all'>
+		<link rel='stylesheet' href='css/misc.css' media='all'>
+		<link rel='stylesheet' href='css/forms.css' media='all'>
+		<link rel='stylesheet' href='css/typography.css' media='all'>
+		<link rel='stylesheet' href='css/buttons.css' media='all'>
+		<link rel='stylesheet' href='css/installer.css' media='all'>
+		<script type="text/javascript">
+			var IPS_TIMEOUT = 30;
+		</script>
+		<script src="js/jquery.min.js"></script>
+		<script src="js/multipleRedirect.js"></script>
+	</head>
+	<body class='ipsApp ipsApp_installer'>
+		
+		<div id='elInstaller_wrap'>
+			<div id='ipsLayout_header' class='ipsClearfix' role='banner'>
+				<header>
+					<a href='/' id='elSiteTitle'><span id='elLogo'><img src='img/logo.png' alt=''></span> {lang="banner"}</a>
+					<!--<div class='logged_in right'>
+						<ul id='user_links' class='ipsList_inline'>
+							<li><a href="{expression="\IPS\Http\Url::ips('docs/install_guide')"}" target="_blank">{lang="install_guide"}</a></li>
+						</ul>
+					</div>-->
+				</header>
+			</div>
+			<main id='elInstaller_body'>
+				{{if \IPS\Request::i()->controller !== 'done' and !$initError and ( \IPS\Dispatcher::i()->step || \IPS\Request::i()->start )}}
+					<div class='ipsPad ipsAreaBackground_light'>
+						<h1 class='ipsType_pageTitle'>
+							{lang="step_s" sprintf="$title"}
+						</h1>
+					</div>
+					<div class='ipsColumns ipsPad'>
+						<div class='ipsColumn ipsColumn_wide ipsPad' id='elInstaller_stepsWrap'>
+							<ul id='elInstaller_steps'>
+								{{foreach array( 1 => 'healthcheck', 2 => 'license', 3 => 'applications', 4 => 'serverdetails', 5 => 'admin', 6 => 'install' ) as $i => $lang}}
+									<li class='{{if \IPS\Dispatcher::i()->step == $i}}elInstaller_stepActive{{elseif \IPS\Dispatcher::i()->step > $i}}elInstaller_stepDone{{endif}}'>
+										<i class='{{if \IPS\Dispatcher::i()->step == $i or ( !\IPS\Dispatcher::i()->step and $i == 1 )}}fa fa-circle{{elseif \IPS\Dispatcher::i()->step > $i}}fa fa-check{{else}}fa fa-circle-o{{endif}}'></i>&nbsp;&nbsp;{lang="$lang"}
+									</li>
+								{{endforeach}}
+							</ul>
+						</div>
+						<div class='ipsColumn ipsColumn_fluid'>
+							<div class='ipsPad'>
+								{$html|raw}
+							</div>
+						</div>
+					</div>
+				{{elseif \IPS\Request::i()->controller === 'done'}}
+					<div class='ipsPad_double ipsType_center'>
+						<h1 class='ipsType_pageTitle' id='elInstaller_welcome'>{lang="done_banner"}</h1>
+						<p class='ipsType_normal ipsType_light'>
+							{lang="done_note"}
+						</p>
+						<br><br>
+						<a href='{expression="\IPS\Settings::i()->base_url"}' class='ipsButton ipsButton_large ipsButton_primary'>{lang="gotosuite"}</a>
+						<a href='{expression="rtrim( \IPS\Settings::i()->base_url, '/' ) . '/' . \IPS\CP_DIRECTORY"}' class='ipsButton ipsButton_large ipsButton_normal'>{lang="gotoacp"}</a>
+						<br><br>
+						<a href="{expression="\IPS\Http\Url::ips('docs/docs')"}" target="_blank">{lang="docs_link"}</a>
+					</div>
+				{{else}}
+					<div class='ipsPad_double ipsType_center'>
+						<h1 class='ipsType_pageTitle' id='elInstaller_welcome'>{lang="welcome_banner"}</h1>
+						<p class='ipsType_normal ipsType_light'>
+							{{if $initError}}
+								{lang="beforestart" sprintf="$path"}
+							{{else}}
+								{lang="beforestarto"}
+							{{endif}}
+						</p>
+						{{if $initError !== true}}
+							<br><br>
+							<a href='{url="start=1"}' class='ipsButton ipsButton_large ipsButton_primary'>{lang="start_installation"}</a>
+						{{endif}}
+						<br><br>
+						<a href="{expression="\IPS\Http\Url::ips('docs/install_guide')"}" target="_blank">{lang="install_guide"}</a>
+					</div>
+				{{endif}}
+			</main>
+		</div>
+	</body>
+</html>

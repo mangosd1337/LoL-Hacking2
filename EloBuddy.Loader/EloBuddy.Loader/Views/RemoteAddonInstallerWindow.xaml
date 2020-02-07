@@ -1,0 +1,168 @@
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="clr-namespace:EloBuddy.Loader.Controls"
+        xmlns:globals="clr-namespace:EloBuddy.Loader.Globals" xmlns:converter="clr-namespace:EloBuddy.Loader.Converter"
+        x:Class="EloBuddy.Loader.Views.RemoteAddonInstallerWindow" Height="380" Width="720" Loaded="Window_Loaded"
+        BorderThickness="1" BorderBrush="Black" WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        ContentRendered="Window_ContentRendered" Background="#FFFAFAFA" WindowStyle="None">
+    <Window.Resources>
+        <Style x:Key="DataGridCellStyle" TargetType="{x:Type DataGridCell}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                              VerticalAlignment="Center" Margin="10 0 10 0" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                    <Setter Property="BorderBrush" Value="{x:Null}" />
+                </Trigger>
+                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                    <Setter Property="BorderBrush" Value="{x:Null}" />
+                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsSelected" Value="true" />
+                        <Condition Property="Selector.IsSelectionActive" Value="false" />
+                    </MultiTrigger.Conditions>
+                    <Setter Property="BorderBrush" Value="{x:Null}" />
+                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                    <Setter Property="Foreground"
+                            Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                </MultiTrigger>
+                <Trigger Property="IsEnabled" Value="false">
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <globals:MultiLanguage x:Key="MultiLanguage" />
+        <converter:WindowTitleRandomizeConverter x:Key="WindowTitleConverter" />
+        <converter:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converter:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+    </Window.Resources>
+    <Window.Title>
+        <Binding Converter="{StaticResource WindowTitleConverter}" />
+    </Window.Title>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid VerticalAlignment="Top" Background="#FF40A6D1" Height="40" MouseMove="Grid_MouseMove">
+            <Grid.Effect>
+                <DropShadowEffect BlurRadius="10" ShadowDepth="3" Direction="270" Opacity="0.2" />
+            </Grid.Effect>
+            <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Margin="0,0,1,0"
+                        HorizontalAlignment="Right" RenderTransformOrigin="-0.275,0.575">
+                <!--<Button x:Name="CloseButton" Width="40" Height="40" Content=""
+                        Style="{DynamicResource CloseMinMaxButtonStyle}" BorderBrush="Transparent"
+                        Background="#FF40A6D1" Foreground="White" FontFamily="pack://application:,,,/font/#FontAwesome"
+                        FontSize="20px" VerticalContentAlignment="Bottom" Click="CancelButton_OnClick" />-->
+            </StackPanel>
+            <controls:HeaderDecoration Margin="0,0,1,0" Height="40" />
+            <Label Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.TitleAddonInstaller}"
+                   FontSize="20" FontWeight="SemiBold" Foreground="White" Margin="11,0,0,0" />
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="125*" />
+                <ColumnDefinition Width="461*"  />
+                <ColumnDefinition Width="125*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="11*" />
+                <RowDefinition Height="Auto" MinHeight="33" />
+                <RowDefinition Height="Auto" MinHeight="231" />
+                <RowDefinition Height="30*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Label Grid.Column="1" Grid.Row="1" Padding="0 5" x:Name="ProjectLabel"
+                   Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.LabelSelectAddon}"
+                   Visibility="{Binding IsLoading, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                   Foreground="#FF7E7E7E" FontSize="16" BorderThickness="1" />
+            <DataGrid ItemsSource="{Binding Items}"
+                      Visibility="{Binding IsLoading, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                      Grid.Column="1" Grid.Row="2" x:Name="ProjectsDataGrid" IsReadOnly="True" RowHeaderWidth="0"
+                      AutoGenerateColumns="False" CanUserReorderColumns="False"
+                      BorderBrush="#FFA6A4A4" CanUserAddRows="False" CanUserDeleteRows="False"
+                      HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}"
+                      CellStyle="{DynamicResource DataGridCellStyle}" CanUserSortColumns="True" RowHeight="28"
+                      FontSize="11.5" RenderTransformOrigin="0.5,0.5" Background="WhiteSmoke" MaxHeight="231">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="White" />
+                        <Setter Property="BorderBrush" Value="#FFFAFAFA" />
+                    </Style>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF40A6D1" />
+                </DataGrid.Resources>
+
+                <DataGrid.Columns>
+
+                    <DataGridTemplateColumn MinWidth="70">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding Install}" IsEnabled="{Binding Enabled}"  HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" Style="{DynamicResource RoundedCheckBoxStyle}"
+                                      HorizontalContentAlignment="Center" RenderTransformOrigin="0.5,0.5" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked">
+                                    <CheckBox.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="0.78" ScaleY="0.78" />
+                                            <SkewTransform />
+                                            <RotateTransform />
+                                        </TransformGroup>
+                                    </CheckBox.RenderTransform>
+                                </CheckBox>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock Text="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridCollumnInstall}"
+                            FontWeight="SemiBold" FontSize="15" Margin="10 0" Foreground="DimGray" />
+                        </DataGridTemplateColumn.Header>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn Width="250" Binding="{Binding AddonName}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock
+                            Text="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridCollumnAddon}"
+                            FontWeight="SemiBold" FontSize="15" Margin="10 0" Foreground="DimGray" VerticalAlignment="Stretch"/>
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Width="120" Binding="{Binding Status}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock
+                            Text="{Binding Source={StaticResource MultiLanguage}, Path=Text.DataGridCollumnStatus}"
+                            FontWeight="SemiBold" FontSize="15" Margin="10 0" Foreground="DimGray" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+
+            </DataGrid>
+            <ProgressBar Style="{DynamicResource FlatProgressBar}" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Column="1" Grid.Row="2" x:Name="StatusProgressBar" HorizontalAlignment="Stretch" Height="14"
+                     VerticalAlignment="Center" Background="{x:Null}" Foreground="#FF40A6D1" IsIndeterminate="True" />
+            <Label Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Column="1" Grid.Row="2" x:Name="StatusLabel" Content="Downloading data..." Foreground="#FF898888"
+               BorderThickness="1" Padding="0 5 5 5" FontSize="13" Margin="0 83 0 0"/>
+            <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="4" Margin="145,0,132,10" HorizontalAlignment="Center">
+                <Button x:Name="CancelButton" IsEnabled="{Binding IsWorking, Converter={StaticResource InverseBooleanConverter}}" Style="{DynamicResource RoundedSettingsButtonStyle}"
+                        Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.ButtonCancel2}"
+                        FontWeight="Bold" Foreground="#FF40A6D1" Padding="25 6" Background="#FFF7F7F7"
+                        BorderBrush="#FF40A6D1" BorderThickness="1" Click="CancelButton_OnClick" />
+                <Button Margin="5 0 0 0" x:Name="InstallButton" IsEnabled="{Binding IsWorking, Converter={StaticResource InverseBooleanConverter}}" Style="{DynamicResource RoundedSettingsButtonStyle}"
+                        Content="{Binding Source={StaticResource MultiLanguage}, Path=Text.ButtonInstall}"
+                        FontWeight="Bold" Foreground="White" Padding="25 6" Background="#FF40A6D1"
+                        BorderBrush="#FF40A6D1" BorderThickness="1" Click="InstallButton_OnClick"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

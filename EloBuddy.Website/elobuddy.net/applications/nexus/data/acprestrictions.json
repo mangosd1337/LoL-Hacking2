@@ -1,0 +1,179 @@
+{
+    "payments": {
+        "transactions": {
+            "transactions_manage": "transactions_manage",
+            "transactions_edit": "transactions_edit",
+            "transactions_refund": "transactions_refund",
+            "transactions_delete": "transactions_delete"
+        },
+        "invoices": {
+            "invoices_manage": "invoices_manage",
+            "invoices_add": "invoices_add",
+            "invoices_edit": "invoices_edit",
+            "chargetocard": "chargetocard",
+            "invoices_resend": "invoices_resend",
+            "invoices_delete": "invoices_delete",
+            "invoices_settings": "invoices_settings"
+        },
+        "shipping": {
+            "shiporders_manage": "shiporders_manage",
+            "shiporders_edit": "shiporders_edit",
+            "shiporders_delete": "shiporders_delete",
+            "shipmethods_manage": "shipmethods_manage"
+        },
+        "paymentsettings": {
+            "paymentsettings_overview": "paymentsettings_overview",
+            "gateways_manage": "gateways_manage",
+            "tax_manage": "tax_manage",
+            "fraud_manage": "fraud_manage",
+            "currencies_manage": "currencies_manage",
+            "checkout_settings": "checkout_settings",
+            "transaction_review_settings": "transaction_review_settings",
+            "email_copies_settings": "email_copies_settings"
+        },
+        "payouts": {
+            "payouts_manage": "payouts_manage",
+            "payouts_process": "payouts_process",
+            "payouts_cancel": "payouts_cancel",
+            "payouts_delete": "payouts_delete",
+            "payouts_settings": "payouts_settings"
+        },
+        "donations": {
+            "donations_manage": "donations_manage",
+            "donationgoals_manage": "donationgoals_manage"
+        },
+        "billingagreements": {
+            "billingagreements_view": "billingagreements_view",
+            "billingagreements_manage": "billingagreements_manage"
+        }
+    },
+    "customers": {
+        "purchases": {
+            "purchases_view": "purchases_view",
+            "purchases_edit": "purchases_edit",
+            "purchases_transfer": "purchases_transfer",
+            "purchases_cancel": "purchases_cancel",
+            "purchases_delete": "purchases_delete",
+            "lkeys_view": "lkeys_view",
+            "lkeys_reset": "lkeys_reset"
+        },
+        "customer_fields": {
+            "customer_fields_manage": "customer_fields_manage",
+            "customer_fields_add": "customer_fields_add",
+            "customer_fields_edit": "customer_fields_edit",
+            "customer_fields_delete": "customer_fields_delete"
+        },
+        "customers": {
+            "customers_view": "customers_view",
+            "customers_edit_details": "customers_edit_details",
+            "customers_edit_credit": "customers_edit_credit",
+            "customers_edit_cards": "customers_edit_cards",
+            "customers_void": "customers_void"
+        },
+        "referrals": {
+            "referrals_manage": "referrals_manage",
+            "referrals_commission_rules": "referrals_commission_rules",
+            "referrals_banners": "referrals_banners"
+        },
+        "notes": {
+            "customer_notes_view": "customer_notes_view",
+            "customer_notes_add": "customer_notes_add",
+            "customer_notes_edit": "customer_notes_edit",
+            "customer_notes_delete": "customer_notes_delete"
+        }
+    },
+    "support": {
+        "requests": {
+            "requests_manage": "requests_manage",
+            "requests_create": "requests_create",
+            "requests_merge": "requests_merge",
+            "requests_delete": "requests_delete",
+            "requests_reply_delete": "requests_reply_delete",
+            "requests_block_sev": "requests_block_sev",
+            "requests_ratings": "requests_ratings",
+            "requests_ratings_feedback": "requests_ratings_feedback"
+        },
+        "support_reports": {
+            "reports_manage": "reports_manage"
+        },
+        "settings": {
+            "settings_manage": "settings_manage",
+            "departments_manage": "departments_manage",
+            "stockactions_manage": "stockactions_manage",
+            "scfields_manage": "scfields_manage",
+            "severities_manage": "severities_manage",
+            "statuses_manage": "statuses_manage",
+            "autoresolve_manage": "autoresolve_manage",
+            "customerfeedback_manage": "customerfeedback_manage",
+            "outgoingemail_manage": "outgoingemail_manage",
+            "incomingemail_manage": "incomingemail_manage",
+            "support_display_settings": "support_display_settings"
+        },
+        "stats": {
+            "volume_manage": "volume_manage"
+        }
+    },
+    "store": {
+        "packages": {
+            "packages_manage": "packages_manage",
+            "packages_edit": "packages_edit",
+            "packages_delete": "packages_delete",
+            "packages_add": "packages_add"
+        },
+        "coupons": {
+            "coupons_manage": "coupons_manage",
+            "coupons_add": "coupons_add",
+            "coupons_edit": "coupons_edit",
+            "coupons_delete": "coupons_delete"
+        },
+        "settings": {
+            "settings_manage": "settings_manage"
+        },
+        "package_fields": {
+            "package_fields_manage": "package_fields_manage",
+            "package_fields_add": "package_fields_add",
+            "package_fields_edit": "package_fields_edit",
+            "package_fields_delete": "package_fields_delete"
+        }
+    },
+    "hosting": {
+        "queues": {
+            "queues_manage": "queues_manage",
+            "queues_add": "queues_add",
+            "queues_edit": "queues_edit",
+            "queues_delete": "queues_delete"
+        },
+        "servers": {
+            "servers_manage": "servers_manage",
+            "servers_add": "servers_add",
+            "servers_edit": "servers_edit",
+            "servers_delete": "servers_delete",
+            "servers_reboot": "servers_reboot",
+            "servers_audit": "servers_audit"
+        },
+        "monitoring": {
+            "monitoring_settings": "monitoring_settings",
+            "monitoring_eom_view": "monitoring_eom_view",
+            "monitoring_eom_add": "monitoring_eom_add",
+            "monitoring_eom_edit": "monitoring_eom_edit",
+            "monitoring_eom_delete": "monitoring_eom_delete"
+        },
+        "settings": {
+            "settings_manage": "settings_manage"
+        },
+        "errors": {
+            "errors_manage": "errors_manage"
+        }
+    },
+    "reports": {
+        "purchases": {
+            "purchases_manage": "purchases_manage"
+        },
+        "income": {
+            "income_manage": "income_manage"
+        },
+        "markets": {
+            "markets_manage": "markets_manage"
+        }
+    }
+}

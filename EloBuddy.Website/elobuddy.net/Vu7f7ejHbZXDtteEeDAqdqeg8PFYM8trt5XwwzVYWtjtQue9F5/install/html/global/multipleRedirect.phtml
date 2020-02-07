@@ -1,0 +1,17 @@
+<ips:template parameters="$url" />
+<div class="ipsMultipleRedirect" data-url="{$url}">
+	<noscript>
+		<a href='{$url->setQueryString( 'mr', 'MA==' )}' class="button">{lang="start"}</a>
+	</noscript>
+	<div class="no_js_hide">
+		<div class="ipsRedirect ipsRedirect_loading">
+			<img src="img/loading.gif" alt="" />
+		</div>
+		<div class="ipsRedirect_progress">
+			<div class="ipsProgressBar ipsProgressBar_animated">
+				<div class="ipsProgressBar_progress"></div>
+			</div>
+		</div>
+		<span class='ipsRedirect_message'></span>
+	</div>
+</div>

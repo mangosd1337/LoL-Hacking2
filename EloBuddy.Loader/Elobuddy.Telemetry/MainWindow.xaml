@@ -1,0 +1,15 @@
+﻿<Window x:Class="Elobuddy.Telemetry.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="728.333" Width="887.222">
+    <Grid>
+        <TextBox Name="UsernameTextBox" HorizontalAlignment="Left" Height="23" Margin="10,28,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <Label Content="Username" HorizontalAlignment="Left" Margin="10,2,0,0" VerticalAlignment="Top"/>
+        <PasswordBox Name="PasswordTextBox"  HorizontalAlignment="Left" Height="23" Margin="146,28,0,0" VerticalAlignment="Top" Width="120"/>
+        <Label Content="Password" HorizontalAlignment="Left" Margin="146,2,0,0" VerticalAlignment="Top"/>
+        <Button Content="Get Data" HorizontalAlignment="Left" Height="23" Margin="271,28,0,0" VerticalAlignment="Top" Width="82" Click="Button_Click"/>
+        <ComboBox HorizontalAlignment="Left" Margin="10,70,0,0" VerticalAlignment="Top" Width="256" IsReadOnly="True" Loaded="ComboBox_Loaded" SelectionChanged="ComboBox_SelectionChanged"/>
+        <TextBox Name="TextBlock1" HorizontalAlignment="Left" Height="528" Margin="10,97,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="859"/>
+
+    </Grid>
+</Window>

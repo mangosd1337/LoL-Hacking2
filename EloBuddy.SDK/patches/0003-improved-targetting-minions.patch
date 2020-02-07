@@ -1,0 +1,269 @@
+From 20ba97e4adce5db2c31142fab6d238d431f9dc64 Mon Sep 17 00:00:00 2001
+From: Javier <jachicao@uc.cl>
+Date: Fri, 5 Feb 2016 13:53:38 -0300
+Subject: [PATCH 3/8] improved targetting minions
+
+---
+ EloBuddy.SDK/Orbwalker.cs | 71 ++++++++++++++++---------------
+ 1 file changed, 36 insertions(+), 35 deletions(-)
+
+diff --git a/EloBuddy.SDK/Orbwalker.cs b/EloBuddy.SDK/Orbwalker.cs
+index c498aef..eab52c8 100644
+--- a/EloBuddy.SDK/Orbwalker.cs
++++ b/EloBuddy.SDK/Orbwalker.cs
+@@ -139,10 +139,10 @@ namespace EloBuddy.SDK
+             {
+                 if (value)
+                 {
+-                    _lastAutoAttackSent = Core.GameTickCount - InternalPing - (int) (Player.Instance.AttackDelay * 1000) - 175;
++                    _lastAutoAttackSent = Core.GameTickCount - InternalPing - (int)(Player.Instance.AttackDelay * 1000) - 175;
+                     _autoAttackStarted = false;
+                     _autoAttackCompleted = true;
+-                    LastAutoAttack = Core.GameTickCount - InternalPing - (int) (Player.Instance.AttackDelay * 1000);
++                    LastAutoAttack = Core.GameTickCount - InternalPing - (int)(Player.Instance.AttackDelay * 1000);
+                     LastMovementSent = 0;
+                 }
+                 else
+@@ -320,7 +320,7 @@ namespace EloBuddy.SDK
+                     _validAzirSoldiers = _azirSoldiers.Where(o => o.IsInRange(Player.Instance, 950)).ToList();
+                     AzirSoldierPreDashStatus = new Dictionary<int, bool>();
+ 
+-                    Obj_AI_Base.OnPlayAnimation += delegate(Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
++                    Obj_AI_Base.OnPlayAnimation += delegate (Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
+                     {
+                         var soldier = sender as Obj_AI_Minion;
+                         if (soldier != null && soldier.IsAlly && soldier.Name == "AzirSoldier" && _azirSoldiers.Contains(soldier))
+@@ -363,7 +363,7 @@ namespace EloBuddy.SDK
+                             }
+                         }
+                     };
+-                    Obj_AI_Base.OnBuffGain += delegate(Obj_AI_Base sender, Obj_AI_BaseBuffGainEventArgs args)
++                    Obj_AI_Base.OnBuffGain += delegate (Obj_AI_Base sender, Obj_AI_BaseBuffGainEventArgs args)
+                     {
+                         var soldier = sender as Obj_AI_Minion;
+                         if (soldier != null && soldier.IsAlly && soldier.Name == "AzirSoldier" && args.Buff.Caster.IsMe &&
+@@ -383,7 +383,7 @@ namespace EloBuddy.SDK
+                 case Champion.Rengar:
+ 
+                     var isDashing = false;
+-                    Obj_AI_Base.OnPlayAnimation += delegate(Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
++                    Obj_AI_Base.OnPlayAnimation += delegate (Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
+                     {
+                         if (sender.IsMe)
+                         {
+@@ -394,7 +394,7 @@ namespace EloBuddy.SDK
+                             }
+                         }
+                     };
+-                    Obj_AI_Base.OnNewPath += delegate(Obj_AI_Base sender, GameObjectNewPathEventArgs args)
++                    Obj_AI_Base.OnNewPath += delegate (Obj_AI_Base sender, GameObjectNewPathEventArgs args)
+                     {
+                         if (sender.IsMe)
+                         {
+@@ -452,7 +452,7 @@ namespace EloBuddy.SDK
+             if (Player.Instance.IsMelee)
+             {
+                 const int rangeSqr = 160000; //400 * 400
+-                OnUnkillableMinion += delegate(Obj_AI_Base target, UnkillableMinionArgs args)
++                OnUnkillableMinion += delegate (Obj_AI_Base target, UnkillableMinionArgs args)
+                 {
+                     if (ActiveModesFlags.HasFlag(ActiveModes.LastHit) || ActiveModesFlags.HasFlag(ActiveModes.LaneClear))
+                     {
+@@ -473,7 +473,7 @@ namespace EloBuddy.SDK
+             }
+ 
+             // LastTarget clearing
+-            GameObject.OnDelete += delegate(GameObject sender, EventArgs args)
++            GameObject.OnDelete += delegate (GameObject sender, EventArgs args)
+             {
+                 if (sender.IsStructure())
+                 {
+@@ -523,7 +523,7 @@ namespace EloBuddy.SDK
+             Menu.Add("laneClearChamps", new CheckBox("Attack champions in LaneClear mode"));
+             Menu.Add("pingInclude", new CheckBox("Include your ping into calculations"));
+             Menu.Add("paranoid", new CheckBox("Paranoid: Look as human as possible!", false));
+-            Menu.Add("holdRadius" + Player.Instance.ChampionName, new Slider("Hold radius", 100, 0, Math.Max(100, (int) (Player.Instance.GetAutoAttackRange() / 2))));
++            Menu.Add("holdRadius" + Player.Instance.ChampionName, new Slider("Hold radius", 100, 0, Math.Max(100, (int)(Player.Instance.GetAutoAttackRange() / 2))));
+             Menu.Add("delayMove", new Slider("Delay between movements in milliseconds", 80 + Random.Next(40), 0, 1000));
+ 
+             #endregion
+@@ -571,7 +571,7 @@ namespace EloBuddy.SDK
+             var useTick = new CheckBox("Use Game.OnTick (more fps)");
+             var useUpdate = new CheckBox("Update Game.OnUpdate (faster reaction)", false);
+ 
+-            useTick.OnValueChange += delegate(ValueBase<bool> sender, ValueBase<bool>.ValueChangeArgs args)
++            useTick.OnValueChange += delegate (ValueBase<bool> sender, ValueBase<bool>.ValueChangeArgs args)
+             {
+                 if (args.NewValue)
+                 {
+@@ -582,7 +582,7 @@ namespace EloBuddy.SDK
+                     useTick.CurrentValue = true;
+                 }
+             };
+-            useUpdate.OnValueChange += delegate(ValueBase<bool> sender, ValueBase<bool>.ValueChangeArgs args)
++            useUpdate.OnValueChange += delegate (ValueBase<bool> sender, ValueBase<bool>.ValueChangeArgs args)
+             {
+                 if (args.NewValue)
+                 {
+@@ -779,7 +779,7 @@ namespace EloBuddy.SDK
+         internal static void _OnPostAttack(Obj_AI_Base sender)
+         {
+             // Set to a more precise last auto attack time
+-            LastAutoAttack = Core.GameTickCount - (int) (sender.AttackCastDelay * 1000) - InternalPing;
++            LastAutoAttack = Core.GameTickCount - (int)(sender.AttackCastDelay * 1000) - InternalPing;
+ 
+             // Trigger the after attack event
+             if (Game.Ping < 50)
+@@ -800,7 +800,7 @@ namespace EloBuddy.SDK
+             }
+             else if (sender is Obj_AI_Turret && args.Target is Obj_AI_Base)
+             {
+-                LastTargetTurrets[sender.NetworkId] = (Obj_AI_Base) args.Target;
++                LastTargetTurrets[sender.NetworkId] = (Obj_AI_Base)args.Target;
+             }
+         }
+ 
+@@ -889,7 +889,7 @@ namespace EloBuddy.SDK
+             // Create list
+             var potentialTargets = new List<AttackableUnit>();
+             // Check for the modes from the most important one to the least imprtant one
+-            foreach (var mode in Enum.GetValues(typeof (ActiveModes)).Cast<ActiveModes>().Where(mode => mode != ActiveModes.None && ActiveModesFlags.HasFlag(mode)))
++            foreach (var mode in Enum.GetValues(typeof(ActiveModes)).Cast<ActiveModes>().Where(mode => mode != ActiveModes.None && ActiveModesFlags.HasFlag(mode)))
+             {
+                 AttackableUnit structure;
+                 switch (mode)
+@@ -1096,7 +1096,7 @@ namespace EloBuddy.SDK
+                     var soldier = target.AzirSoldiersInRange().FirstOrDefault();
+                     if (soldier != null)
+                     {
+-                        return (int) (soldier.AttackCastDelay * 1000);
++                        return (int)(soldier.AttackCastDelay * 1000);
+                     }
+                     break;
+ 
+@@ -1108,7 +1108,7 @@ namespace EloBuddy.SDK
+                     break;
+             }
+ 
+-            return (int) (Player.Instance.AttackCastDelay * 1000);
++            return (int)(Player.Instance.AttackCastDelay * 1000);
+         }
+ 
+         internal static int GetAttackDelay(this Obj_AI_Base target)
+@@ -1118,15 +1118,15 @@ namespace EloBuddy.SDK
+                 var soldier = target.AzirSoldiersInRange().FirstOrDefault();
+                 if (soldier != null)
+                 {
+-                    return (int) (soldier.AttackDelay * 1000);
++                    return (int)(soldier.AttackDelay * 1000);
+                 }
+             }
+-            return (int) (Player.Instance.AttackDelay * 1000);
++            return (int)(Player.Instance.AttackDelay * 1000);
+         }
+ 
+         private static int GetProjectileTravelTime(Obj_AI_Minion minion)
+         {
+-            return IsMelee ? 0 : (int) Math.Max(0, (Player.Instance.Distance(minion) / Player.Instance.BasicAttack.MissileSpeed) * 1000);
++            return IsMelee ? 0 : (int)Math.Max(0, (Player.Instance.Distance(minion) / Player.Instance.BasicAttack.MissileSpeed) * 1000);
+         }
+ 
+         internal static bool HasTurretTargetting(this Obj_AI_Minion minion)
+@@ -1223,7 +1223,7 @@ namespace EloBuddy.SDK
+         internal static void RecalculateLasthittableMinions()
+         {
+             // Refresh sets
+-            foreach (var type in Enum.GetValues(typeof (TargetMinionType)).Cast<TargetMinionType>())
++            foreach (var type in Enum.GetValues(typeof(TargetMinionType)).Cast<TargetMinionType>())
+             {
+                 CurrentMinionsLists[type] = new List<Obj_AI_Minion>();
+             }
+@@ -1245,7 +1245,7 @@ namespace EloBuddy.SDK
+ 
+             // Calculate values for all of the minions
+             CurrentMinionValues.Clear();
+-            var extraTime = CanAutoAttack ? 0 : (int) (Player.Instance.AttackDelay * 1000 - (Core.GameTickCount - InternalPing - LastAutoAttack));
++            var extraTime = CanAutoAttack ? 0 : (int)(Player.Instance.AttackDelay * 1000 - (Core.GameTickCount - InternalPing - LastAutoAttack));
+             var canMove = CanMove;
+             foreach (var minion in TickCachedMinions)
+             {
+@@ -1258,11 +1258,8 @@ namespace EloBuddy.SDK
+                     Handle = minion,
+                     LastHitProjectileTime =
+                         time + extraTime +
+-                        (!Player.Instance.IsInAutoAttackRange(minion)
+-                            ? Math.Max(0,
+-                                (int) (1000 * (Player.Instance.Distance(minion) - Player.Instance.GetAutoAttackRange(minion)) / Player.Instance.MoveSpeed) + InternalPing + 250)
+-                            : 0),
+-                    LaneClearProjectileTime = time + (int) (1.5f * minion.GetAttackDelay())
++                        Math.Max(0, (int)(1000 * (Player.Instance.Distance(minion) - Player.Instance.GetAutoAttackRange(minion)) / Player.Instance.MoveSpeed) + InternalPing + 250),
++                    LaneClearProjectileTime = time + (int)(1.25f * minion.GetAttackDelay())
+                 };
+ 
+                 // Predict values health
+@@ -1328,25 +1325,25 @@ namespace EloBuddy.SDK
+                     case TargetMinionType.LaneClear:
+                         if (!_onlyLastHit)
+                         {
+-                            LaneClearMinion = entry.Value.Where(Player.Instance.IsInAutoAttackRange).OrderBy(o => o.Health).FirstOrDefault();
+                             CurrentMinionsLists[entry.Key] =
+                                 entry.Value.OrderByDescending(
+                                     minion => FreezePriority ? CurrentMinionValues[minion.NetworkId].LaneClearHealth : (1 / CurrentMinionValues[minion.NetworkId].LaneClearHealth)).ToList();
++                            LaneClearMinion = entry.Value.FirstOrDefault(Player.Instance.IsInAutoAttackRange);
+                         }
+                         break;
+ 
+                     case TargetMinionType.LastHit:
+-                        LastHitMinion = entry.Value.Where(Player.Instance.IsInAutoAttackRange).OrderByDescending(o => o.MaxHealth).FirstOrDefault();
+-                        CurrentMinionsLists[entry.Key] = entry.Value.OrderByDescending(o => CurrentMinionValues[o.NetworkId].LastHitHealth).ToList();
++                        CurrentMinionsLists[entry.Key] = entry.Value.OrderByDescending(o => o.MaxHealth).ThenBy(o => CurrentMinionValues[o.NetworkId].LastHitHealth).ToList();
++                        LastHitMinion = entry.Value.FirstOrDefault(Player.Instance.IsInAutoAttackRange);
+                         break;
+ 
+                     case TargetMinionType.PriorityLastHitWaiting:
+-                        PriorityLastHitWaitingMinion = entry.Value.Where(Player.Instance.IsInAutoAttackRange).OrderByDescending(o => o.MaxHealth).FirstOrDefault();
+-                        CurrentMinionsLists[entry.Key] = entry.Value.OrderByDescending(o => CurrentMinionValues[o.NetworkId].LaneClearHealth).ToList();
++                        CurrentMinionsLists[entry.Key] = entry.Value.OrderByDescending(o => o.MaxHealth).ThenBy(o => CurrentMinionValues[o.NetworkId].LaneClearHealth).ToList();
++                        PriorityLastHitWaitingMinion = entry.Value.FirstOrDefault(Player.Instance.IsInAutoAttackRange);
+                         break;
+ 
+                     case TargetMinionType.UnKillable:
+-                        CurrentMinionsLists[entry.Key] = entry.Value.OrderByDescending(o => CurrentMinionValues[o.NetworkId].LastHitHealth).ToList();
++                        CurrentMinionsLists[entry.Key] = entry.Value.OrderBy(o => CurrentMinionValues[o.NetworkId].LastHitHealth).ToList();
+                         break;
+                 }
+             }
+@@ -1364,7 +1361,7 @@ namespace EloBuddy.SDK
+ 
+             internal bool IsUnkillable
+             {
+-                get { return LastHitHealth <= 0; }
++                get { return LastHitHealth < 0; }
+             }
+             internal bool IsLastHittable
+             {
+@@ -1372,7 +1369,11 @@ namespace EloBuddy.SDK
+             }
+             internal bool IsAlmostLastHittable
+             {
+-                get { return GetAutoAttackDamage(Handle) > (Handle.HasTurretTargetting() ? LastHitHealth : LaneClearHealth); }
++                get
++                {
++                    var health = (Handle.HasTurretTargetting() ? LastHitHealth : LaneClearHealth);
++                    return health <= GetAutoAttackDamage(Handle) && health < Handle.Health;
++                }
+             }
+ 
+             internal void PredictHealths()
+@@ -1388,7 +1389,7 @@ namespace EloBuddy.SDK
+ 
+         public static void RegisterKeyBind(KeyBind key, ActiveModes mode)
+         {
+-            key.OnValueChange += delegate(ValueBase<bool> sender, ValueBase<bool>.ValueChangeArgs args)
++            key.OnValueChange += delegate (ValueBase<bool> sender, ValueBase<bool>.ValueChangeArgs args)
+             {
+                 if (args.NewValue)
+                 {
+-- 
+1.9.4.msysgit.2
+

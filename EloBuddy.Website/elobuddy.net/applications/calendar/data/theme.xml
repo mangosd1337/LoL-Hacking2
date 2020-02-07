@@ -1,0 +1,2440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<theme name="Default" author_name="Invision Power Services, Inc" author_url="http://www.invisionpower.com">
+ <template template_group="browse" template_name="birthday" template_data="$table, $headers, $rows" template_location="front" template_app="calendar"><![CDATA[{{foreach $rows as $row}}
+	<li class='ipsGrid_span6 ipsPhotoPanel ipsPhotoPanel_mini ipsClearfix'>
+		{template="userPhoto" app="core" group="global" params="\IPS\Member::load( $row['member_id'] ), 'mini'"}
+		<div>
+			<h3 class='ipsType_normal ipsType_reset ipsTruncate ipsTruncate_line'>{member="name" id="$row['member_id']"}</h3>
+			<span class='ipsType_light'>
+				{{if $row['bday_year']}}
+				{lang="member_age" pluralize="\IPS\Member::load( $row['member_id'] )->age( \IPS\calendar\Date::getDate( \IPS\Request::i()->y ?: NULL, \IPS\Request::i()->m ?: NULL, \IPS\Request::i()->d ?: NULL ) )"}{{endif}}
+			</span>
+		</div>
+	</li>
+{{endforeach}}]]></template>
+ <template template_group="browse" template_name="birthdaysTable" template_data="$table, $headers, $rows, $quickSearch" template_location="front" template_app="calendar"><![CDATA[<div data-baseurl='{$table->baseUrl}' data-resort='{$table->resortKey}' data-controller='core.global.core.table' {{if $table->getPaginationKey() != 'page'}}data-pageParam='{$table->getPaginationKey()}'{{endif}}>
+
+	{{if $table->pages > 1}}
+		<div class="ipsButtonBar ipsPad_half ipsClearfix ipsClear">
+			<div data-role="tablePagination">
+				{template="pagination" group="global" app="core" location="global" params="$table->baseUrl, $table->pages, $table->page, $table->limit, TRUE, $table->getPaginationKey()"}
+			</div>
+		</div>
+	{{endif}}
+
+
+	{{if count( $rows )}}
+		<ol class='ipsGrid ipsGrid_collapsePhone ipsPad ipsClear {{foreach $table->classes as $class}}{$class} {{endforeach}}' id='elTable_{$table->uniqueId}' data-role="tableRows" itemscope itemtype="http://schema.org/ItemList">
+			{template="$table->rowsTemplate[1]" params="$table, $headers, $rows" object="$table->rowsTemplate[0]"}
+		</ol>
+	{{else}}
+		<div class='ipsType_center ipsPad'>
+			<p class='ipsType_large ipsType_light'>{lang="no_rows_in_table"}</p>
+			{{if method_exists( $table, 'container' ) AND $table->container() !== NULL}}
+				{{if $table->container()->can('add')}}
+					<a href='{$table->container()->url()->setQueryString( 'do', 'add' )}' class='ipsButton ipsButton_primary ipsButton_medium'>
+						{lang="submit_first_row"}
+					</a>
+				{{endif}}
+			{{endif}}
+		</div>
+	{{endif}}
+				
+	{{if $table->pages > 1}}
+		<div class="ipsButtonBar ipsPad_half ipsClearfix ipsClear">
+			<div data-role="tablePagination">
+				{template="pagination" group="global" app="core" location="global" params="$table->baseUrl, $table->pages, $table->page, $table->limit, TRUE, $table->getPaginationKey()"}
+			</div>
+		</div>
+	{{endif}}
+</div>]]></template>
+ <template template_group="browse" template_name="calendarDay" template_data="$calendars, $date, $featured, $birthdays, $birthdayCount, $events, $tomorrow, $yesterday, $today, $thisCalendar, $jump" template_location="front" template_app="calendar"><![CDATA[
+<div class='ipsGrid ipsGrid_collapsePhone ipsPager cCalendarNav ipsSpacer_bottom' data-ipsSticky data-ipsSticky-disableIn='phone'>
+	<div class='ipsGrid_span3 ipsType_left ipsPager_prev'>
+		<a href="{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&id={$thisCalendar->_id}&y={$yesterday->year}&m={$yesterday->mon}&d={$yesterday->mday}" seoTemplate="calendar_calday" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&y={$yesterday->year}&m={$yesterday->mon}&d={$yesterday->mday}" seoTemplate="calendar_day"}{{endif}}" title='{lang="cal_month_day" sprintf="$yesterday->monthName, $yesterday->mday, $yesterday->year"}' rel='prev nofollow' data-action='changeView'>
+			<span class='ipsPager_type ipsType_normal'>{lang="prev_day"}</span>
+			<span class='ipsPager_title ipsType_light'>{lang="cal_month_day" sprintf="$yesterday->monthName, $yesterday->mday, $yesterday->year"}</span>
+		</a>
+	</div>
+	<div class='ipsGrid_span6 ipsType_center ipsPad cCalendarNav' data-role='calendarNav'>
+		<h1 class='ipsType_pageTitle ipsType_center'>{lang="cal_month_day" sprintf="$date->monthName, $date->mday, $date->year"}</h1>
+		<ul class='ipsButton_split ipsType_noBreak'>
+			<li><a href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=month&id={$thisCalendar->_id}&y={$date->year}&m={$date->mon}" seoTemplate="calendar_calmonth" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=month&y={$date->year}&m={$date->mon}" seoTemplate="calendar_month"}{{endif}}' title='{lang="cal_month_title" sprintf="$date->monthName, $date->year"}' class='ipsButton ipsButton_light ipsButton_verySmall' data-action='changeView'>{lang="month"}</a></li>
+			<li><a href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=week&id={$thisCalendar->_id}&w={$date->year}-{$date->mon}-{$date->mday}" seoTemplate="calendar_calweek" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=week&w={$date->year}-{$date->mon}-{$date->mday}" seoTemplate="calendar_week"}{{endif}}' title='{lang="cal_week_title" sprintf="$date->firstDayOfWeek('monthNameShort'), $date->firstDayOfWeek('mday'), $date->firstDayOfWeek('year'), $date->lastDayOfWeek('monthNameShort'),	$date->lastDayOfWeek('mday'), $date->lastDayOfWeek('year')"}' class='ipsButton ipsButton_light ipsButton_verySmall' data-action='changeView'>{lang="week"}</a></li>
+			<li><a href='#' class='ipsButton ipsButton_primary ipsButton_verySmall' title='{lang="cal_month_day" sprintf="$date->monthName, $date->mday, $date->year"}' data-action='changeView'>{lang="day"}</a></li>
+			<li><a href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=stream&id={$thisCalendar->_id}&y={$date->year}&m={$date->mon}" seoTemplate="calendar_calstream" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=stream&y={$date->year}&m={$date->mon}" seoTemplate="calendar_stream"}{{endif}}' title='{lang="cal_month_stream_title" sprintf="$date->monthName, $date->year"}' class='ipsButton ipsButton_light ipsButton_verySmall' data-action='changeView'><span class='ipsResponsive_hidePhone ipsResponsive_inline'>{lang="event_stream"}</span><span class='ipsResponsive_showPhone ipsResponsive_inline'>{lang="event_stream_short"}</span></a></li>
+		</ul>
+	</div>
+	<div class='ipsGrid_span3 ipsType_right ipsPager_next'>
+		<a href="{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&id={$thisCalendar->_id}&y={$tomorrow->year}&m={$tomorrow->mon}&d={$tomorrow->mday}" seoTemplate="calendar_calday" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&y={$tomorrow->year}&m={$tomorrow->mon}&d={$tomorrow->mday}" seoTemplate="calendar_day"}{{endif}}" title='{lang="cal_month_day" sprintf="$tomorrow->monthName, $tomorrow->mday, $tomorrow->year"}' rel='next nofollow' data-action='changeView'>
+			<span class='ipsPager_type ipsType_normal'>{lang="next_day"}</span>
+			<span class='ipsPager_title ipsType_light'>{lang="cal_month_day" sprintf="$tomorrow->monthName, $tomorrow->mday, $tomorrow->year"}</span>
+		</a>
+	</div>
+</div>
+
+{{if count( $birthdays )}}
+<div class='ipsColumns ipsColumns_collapseTablet'>
+	<div class='ipsColumn ipsColumn_fluid'>
+{{endif}}
+<h2 class='ipsType_sectionTitle ipsType_reset'>{lang="events_happening_today"}</h2>
+{{if $events['count'] > 0}}
+	<ol class='cCalendarDay ipsDataList ipsSpacer_bottom'>
+		{{if isset( $events['allDay'] ) && count( $events['allDay'] )}}
+			<li class='ipsDataItem cCalendarDay_allDay'>
+				<div class='ipsDataItem_generic ipsDataItem_size5 cCalendarDay_hour cCalendarDay_allDay ipsAreaBackground ipsPad'>
+					<h2 class='ipsType_reset'>{lang="day_view_all_day"}</h2>
+				</div>
+				<div class='ipsDataItem_main ipsAreaBackground_light ipsPad'>
+					<div class='cCalendarDay_eventList' data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='500'>
+						<div data-role='patchworkList'>
+							{{foreach $events['allDay'] as $event}}
+								<div data-role='patchworkItem'>
+									{template="eventBlock" app="calendar" group="view" params="$event, $date, true"}
+								</div>
+							{{endforeach}}
+						</div>
+					</div>
+				</div>
+			</li>
+		{{endif}}
+
+		{{foreach $events as $hour => $hourEvents}}
+			{{if count( $hourEvents ) && $hour !== 'allDay' && $hour !== 'count'}}
+				<li class='ipsDataItem'>
+					<div class='ipsDataItem_generic ipsDataItem_size5 cCalendarDay_hour ipsAreaBackground ipsPad'>
+						<h2 class='ipsType_reset'>
+							{{if \IPS\calendar\Date::usesAmPm()}}
+								{expression="\IPS\calendar\Date::getTwelveHour( $hour )"}<br><span>{expression="\IPS\calendar\Date::getAmPm( $hour )"}</span>
+							{{else}}
+								{$hour}<br><span>:00</span>
+							{{endif}}
+						</h2>
+					</div>
+					<div class='ipsDataItem_main ipsAreaBackground_light ipsPad'>
+						<div class='cCalendarDay_eventList' data-ipsPatchwork data-ipsPatchwork-minColSize='300' data-ipsPatchwork-maxColSize='500'>
+							<div data-role='patchworkList'>
+								{{foreach $hourEvents as $idx => $event}}
+									<div data-role='patchworkItem'>
+										{template="eventBlock" app="calendar" group="view" params="$event, $date, true"}
+									</div>
+								{{endforeach}}
+							</div>
+						</div>
+					</div>
+				</li>
+			{{endif}}
+		{{endforeach}}
+	</ol>
+{{else}}
+	<div class='ipsPad ipsAreaBackground ipsSpacer_bottom'><span class='ipsType_light ipsType_large'>{lang="no_events_today"}</span></div>
+{{endif}}
+
+{{if count( $birthdays ) }}
+	</div>
+	<div class='ipsColumn ipsColumn_medium'>
+		{{foreach $birthdays AS $bdayDate => $birthday}}
+			<h2 class='ipsType_sectionTitle ipsType_reset'>{lang="birthdays_today" pluralize="$birthdayCount[ $bdayDate ]"}</h2>
+			<ul class='ipsDataList ipsDataList_reducedSpacing'>
+				{{foreach $birthday AS $member}}
+					<li class='ipsDataItem ipsClearfix'>
+						<div class='ipsDataItem_main ipsPhotoPanel ipsPhotoPanel_tiny ipsClearfix'>
+							{template="userPhoto" app="core" group="global" params="$member, 'tiny'"}
+							<div>
+								{$member->link()|raw}
+								{{if $member->bday_year}}<br>
+								{lang="member_age" pluralize="$member->age( $date )"}{{endif}}
+							</div>
+						</div>
+					</li>
+				{{endforeach}}
+				{{if count($birthday) < $birthdayCount[ $bdayDate ]}}
+					<li class='ipsDataItem ipsClearfix ipsAreaBackground_light ipsPad ipsPad_half ipsType_center'>
+						<a data-ipsDialog data-ipsDialog-title='{lang="birthdays_today" pluralize="$birthdayCount[ $bdayDate ]"}' data-ipsDialog-size="narrow" href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=day&id={$thisCalendar->_id}&y={$date->year}&m={$date->mon}&d={$date->mday}&show=birthdays" seoTemplate="calendar_calday" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=day&y={$date->year}&m={$date->mon}&d={$date->mday}&show=birthdays" seoTemplate="calendar_day"}{{endif}}'>{lang="birthdays_view_all"}</a>
+					</li>
+				{{endif}}
+			</ul>
+		{{endforeach}}
+	</div>
+</div>
+{{endif}}]]></template>
+ <template template_group="browse" template_name="calendarFeatured" template_data="$featured, $date" template_location="front" template_app="calendar"><![CDATA[
+{{if count($featured) }}
+	<hr class='ipsHr'>
+	<h2 class='ipsType_reset ipsType_sectionTitle'>{lang="featured_events"}</h2>
+	<div class='ipsAreaBackground ipsPad'>
+		<div class='ipsCarousel ipsClearfix' data-ipsCarousel>
+			<ul class='cCalendarCarousel ipsClearfix' data-role="carouselItems">
+				{{foreach $featured as $event}}
+					<li class='ipsCarousel_item'>
+						{template="eventBlock" app="calendar" group="view" params="$event, $date, true, false"}
+					</li>
+				{{endforeach}}
+			</ul>
+			<span class='ipsCarousel_shadow ipsCarousel_shadowLeft'></span>
+			<span class='ipsCarousel_shadow ipsCarousel_shadowRight'></span>
+			<a href='#' class='ipsCarousel_nav ipsHide' data-action='prev'><i class='fa fa-chevron-left'></i></a>
+			<a href='#' class='ipsCarousel_nav ipsHide' data-action='next'><i class='fa fa-chevron-right'></i></a>
+		</div>
+	</div>
+{{endif}}]]></template>
+ <template template_group="browse" template_name="calendarHeader" template_data="$calendars, $thisCalendar, $jump, $downloadLinks" template_location="front" template_app="calendar"><![CDATA[
+<div class="ipsPageHeader ipsPad_half ipsClearfix ipsSpacer_bottom" id='elCalendarsHeader'>
+	{{if $thisCalendar}}
+		<div class='ipsPos_right ipsResponsive_noFloat'>
+			{template="follow" app="core" group="global" params="'calendar', 'calendar', $thisCalendar->id, \IPS\calendar\Event::containerFollowerCount( $thisCalendar )"}
+		</div>
+	{{endif}}
+	<span class="ipsType_pageTitle">
+		<a href='#elCalendars_menu' id='elCalendars' data-ipsMenu data-ipsMenu-appendTo="#elCalendarsHeader" class='ipsType_blendLinks'>{{if $thisCalendar}}{$thisCalendar->_title}{{else}}{lang="all_calendars"}{{endif}} &nbsp;<i class='fa fa-caret-down'></i></a>
+		&nbsp;&nbsp;<a href='#elCalendarSettings_menu' id='elCalendarSettings' data-ipsMenu data-ipsMenu-alignCenter data-ipsMenu-appendTo="#elCalendarsHeader" class='ipsType_blendLinks'><i class='fa fa-cog'></i></a>
+		{{if ( $thisCalendar AND $thisCalendar->can('add') ) OR ( !$thisCalendar AND \IPS\calendar\Calendar::canOnAny('add') )}}
+			&nbsp;&nbsp;
+			{{if $thisCalendar}}
+				<a href='{url="app=calendar&module=calendar&controller=submit&calendar={$thisCalendar->id}" seoTemplate="calendar_submit"}' class='ipsButton ipsButton_important ipsButton_small ipsResponsive_hidePhone ipsResponsive_inlineBlock'>{lang="create_event"}</a>
+			{{else}}
+				<a href='{url="app=calendar&module=calendar&controller=submit" seoTemplate="calendar_submit"}' class='ipsButton ipsButton_important ipsButton_small ipsResponsive_hidePhone ipsResponsive_inlineBlock'>{lang="create_event"}</a>
+			{{endif}}
+		{{endif}}
+		<a href='#elCalendarJump' data-ipsMenu data-ipsMenu-menuID='elCalendarJump' data-ipsMenu-closeOnClick='false' class='ipsButton ipsButton_light ipsButton_small ipsResponsive_showDesktop ipsResponsive_inlineBlock'>{lang="jump_to"} <i class='fa fa-caret-down'></i></a>		
+	</span>
+</div>
+
+{$jump->customTemplate( array( \IPS\Theme::i()->getTemplate( 'browse' ), 'dateJump' ) )|raw}
+
+<ul class='ipsMenu ipsMenu_auto ipsHide' id='elCalendars_menu'>
+	<li class='ipsMenu_item'><a href='{url="app=calendar&module=calendar&controller=view" seoTemplate="calendar"}'><span class='cCalendarIcon cEvents_style_blank'></span> {lang="all_calendars"}</a></li>
+	{{foreach $calendars as $calendar}}
+		<li class='ipsMenu_item'><a href='{$calendar->url()}'><span class='cCalendarIcon cEvents_style{$calendar->id}'></span> {$calendar->_title}</a></li>
+	{{endforeach}}
+</ul>
+<ul class='ipsMenu ipsMenu_auto ipsHide' id='elCalendarSettings_menu'>
+	<li class='ipsMenu_title'>{{if $thisCalendar}}{lang="with_calendar" sprintf="$thisCalendar->_title"}{{else}}{lang="with_all_calendars"}{{endif}}</li>
+	<li class='ipsMenu_item'><a href='{{if $thisCalendar}}{$downloadLinks['iCalCalendar']}{{else}}{$downloadLinks['iCalAll']}{{endif}}'><i class='fa fa-download'></i> {lang="download_webcal"}</a></li>
+	<li class='ipsMenu_item'><a href='{expression="str_replace( array( 'http://', 'https://' ), 'webcal://', $thisCalendar ? $downloadLinks['iCalCalendar'] : $downloadLinks['iCalAll'] )"}'><i class='fa fa-calendar'></i> {lang="subscribe_webcal"}</a></li>
+</ul>
+
+<hr class='ipsHr'>]]></template>
+ <template template_group="browse" template_name="calendarMonth" template_data="$calendars, $date, $featured, $birthdays, $events, $today, $thisCalendar, $jump, $startDates=array()" template_location="front" template_app="calendar"><![CDATA[<div class='ipsGrid ipsGrid_collapsePhone ipsPager cCalendarNav ipsSpacer_bottom' data-ipsSticky data-ipsSticky-disableIn='phone'>
+	<div class='ipsGrid_span3 ipsType_left ipsPager_prev'>
+		<a href="{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=month&id={$thisCalendar->_id}&y={$date->lastMonth('year')}&m={$date->lastMonth('mon')}" seoTemplate="calendar_calmonth" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&y={$date->lastMonth('year')}&m={$date->lastMonth('mon')}" seoTemplate="calendar_month"}{{endif}}" title='{lang="cal_month_title" sprintf="$date->lastMonth('monthName'), $date->lastMonth('year')"}' rel='prev' data-action='changeView'>
+			<span class='ipsPager_type ipsType_normal'>{lang="previous_month"}</span>
+			<span class='ipsPager_title ipsType_light'>{lang="cal_month_title" sprintf="$date->lastMonth('monthName'), $date->lastMonth('year')"}</span>
+		</a>
+	</div>
+	<div class='ipsGrid_span6 ipsType_center ipsPad' data-role='calendarNav'>
+		<h1 class='ipsType_pageTitle ipsType_center'>{lang="cal_month_title" sprintf="$date->monthName, $date->year"}</h1>
+		<ul class='ipsButton_split ipsType_noBreak'>
+			<li><a href='#' class='ipsButton ipsButton_primary ipsButton_verySmall' title='{lang="cal_month_title" sprintf="$date->monthName, $date->year"}' data-action='changeView'>{lang="month"}</a></li>
+			<li><a href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=week&id={$thisCalendar->_id}&w={$date->year}-{$date->mon}-{$date->mday}" seoTemplate="calendar_calweek" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=week&w={$date->year}-{$date->mon}-{$date->mday}" seoTemplate="calendar_week"}{{endif}}' title='{lang="cal_week_title" sprintf="$date->firstDayOfWeek('monthNameShort'), $date->firstDayOfWeek('mday'), $date->firstDayOfWeek('year'), $date->lastDayOfWeek('monthNameShort'),	$date->lastDayOfWeek('mday'), $date->lastDayOfWeek('year')"}' class='ipsButton ipsButton_light ipsButton_verySmall' data-action='changeView'>{lang="week"}</a></li>
+			<li><a href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=day&id={$thisCalendar->_id}&y={$date->year}&m={$date->mon}&d={$date->mday}" seoTemplate="calendar_calday" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=day&y={$date->year}&m={$date->mon}&d={$date->mday}" seoTemplate="calendar_day"}{{endif}}' title='{lang="cal_month_day" sprintf="$date->monthName, $date->mday, $date->year"}' class='ipsButton ipsButton_light ipsButton_verySmall' data-action='changeView'>{lang="day"}</a></li>
+			<li><a href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=stream&id={$thisCalendar->_id}&y={$date->year}&m={$date->mon}" seoTemplate="calendar_calstream" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=stream&y={$date->year}&m={$date->mon}" seoTemplate="calendar_stream"}{{endif}}' title='{lang="cal_month_stream_title" sprintf="$date->monthName, $date->year"}' class='ipsButton ipsButton_light ipsButton_verySmall' data-action='changeView'><span class='ipsResponsive_hidePhone ipsResponsive_inline'>{lang="event_stream"}</span><span class='ipsResponsive_showPhone ipsResponsive_inline'>{lang="event_stream_short"}</span></a></li>
+		</ul>
+	</div>
+	<div class='ipsGrid_span3 ipsType_right ipsPager_next'>
+		<a href="{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=month&id={$thisCalendar->_id}&y={$date->nextMonth('year')}&m={$date->nextMonth('mon')}" seoTemplate="calendar_calmonth" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&y={$date->nextMonth('year')}&m={$date->nextMonth('mon')}" seoTemplate="calendar_month"}{{endif}}" title='{lang="cal_month_title" sprintf="$date->nextMonth('monthName'), $date->nextMonth('year')"}' rel='next' data-action='changeView'>
+			<span class='ipsPager_type ipsType_normal'>{lang="next_month"}</span>
+			<span class='ipsPager_title ipsType_light'>{lang="cal_month_title" sprintf="$date->nextMonth('monthName'), $date->nextMonth('year')"}</span>
+		</a>
+	</div>
+</div>
+
+<table class='cCalendar' data-controller='calendar.front.browse.monthView'>
+	<tr>
+		{{foreach \IPS\calendar\Date::getDayNames() as $day }}
+			<th class='ipsPad_half ipsAreaBackground_dark' data-short='{$day['abbreviated']}' data-veryShort='{$day['letter']}'><span>{$day['full']}</span></th>
+		{{endforeach}}
+	</tr>
+	<tr>
+		{{for $i=0; $i < $date->firstDayOfMonth('wday'); $i++ }}
+			<td class='cCalendar_nonDate'>&nbsp;</td>
+		{{endfor}}
+
+		{{for $j=$i+$date->lastDayOfMonth('mday'), $k=1; $i < $j; $i++, $k++ }}
+			{{$k = str_pad( $k, 2, '0', STR_PAD_LEFT );}}
+			{{if $i%7 == 0}}
+				</tr>
+				<tr>
+			{{endif}}
+			<td class='cCalendar_date{{if $k == 1}} cCalendar_firstDay{{endif}}{{if $today->mysqlDatetime( FALSE ) == $date->year . '-' . $date->mon . '-' . $k }} cCalendar_today{{endif}}{{if isset( $events[ $date->year . '-' . $date->mon . '-' . $k ] )}} cCalendar_hasEvents{{endif}}'>
+				<div>
+					<a href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&id={$thisCalendar->_id}&y={$date->year}&m={$date->mon}&d={$k}" seoTemplate="calendar_calday" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&y={$date->year}&m={$date->mon}&d={$k}" seoTemplate="calendar_day"}{{endif}}' class='ipsType_blendLinks cCalendar_dayNumber'>{$k}</a>
+					{{if ( $thisCalendar AND $thisCalendar->can('add') ) OR ( !$thisCalendar AND \IPS\calendar\Calendar::canOnAny('add') )}}
+						<a href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=submit&id={$thisCalendar->_id}&y={$date->year}&m={$date->mon}&d={$k}" seoTemplate="calendar_submit"}{{else}}{url="app=calendar&module=calendar&controller=submit&y={$date->year}&m={$date->mon}&d={$k}" seoTemplate="calendar_submit"}{{endif}}' data-ipsTooltip title='{lang="add_event"}' class='ipsButton ipsButton_verySmall ipsButton_primary cCalendar_miniAddEvent'><i class='ipsType_small fa fa-plus'></i></a>
+					{{endif}}
+					{{if isset( $events[ $date->year . '-' . $date->mon . '-' . $k ] )}}
+						<ul class='cEvents_wrapper'>
+							{{if isset( $events[ $date->year . '-' . $date->mon . '-' . $k ]['ranged'] )}}
+								<li class='cEvents_ranged'>
+									<ul class='cEvents'>
+										{{foreach $events[ $date->year . '-' . $date->mon . '-' . $k ]['ranged'] as $event }}
+											<li class='cEvents_event cEvents_style{$event->calendar_id}{{if $event->nextOccurrence( \IPS\calendar\Date::getDate( $date->year, $date->mon, $k ), 'startDate' ) AND $event->nextOccurrence( \IPS\calendar\Date::getDate( $date->year, $date->mon, $k ), 'startDate' )->mysqlDatetime( FALSE ) == $date->year . '-' . $date->mon . '-' . $k }}{{$startDates[ $event->id ] = $date->year . '-' . $date->mon . '-' . $k;}} cEvents_first{{endif}}{{if $event->nextOccurrence( \IPS\calendar\Date::getDate( $date->year, $date->mon, $k ) ?: $event->nextOccurrence( \IPS\calendar\Date::getDate( $date->year, $date->mon, $k ), 'startDate' ), 'endDate' ) AND $event->nextOccurrence( \IPS\calendar\Date::getDate( $date->year, $date->mon, $k ) ?: $event->nextOccurrence( \IPS\calendar\Date::getDate( $date->year, $date->mon, $k ), 'startDate' ), 'endDate' )->mysqlDatetime( FALSE ) == $date->year . '-' . $date->mon . '-' . $k }} cEvents_last{{endif}}' data-eventID='{$event->id}'>
+												<a href='{$event->url()}' data-ipsHover data-ipsHover-target='{$event->url('hovercard')->setQuerystring( 'sd', isset( $startDates[ $event->id ] ) ? $startDates[ $event->id ] : $date->year . '-' . $date->mon . '-' . $k )}' title='{$event->title}'>{{if !$event->all_day}}<span class='cEvents_time'>{$event->_start_date->localeTime( FALSE )}</span> {{endif}}{truncate="$event->title" length="15"}{{if $event->hidden() === 1}} <i class='fa fa-warning'></i>{{endif}}</a>
+											</li>
+										{{endforeach}}
+									</ul>
+								</li>
+							{{endif}}
+							{{if isset( $events[ $date->year . '-' . $date->mon . '-' . $k ]['single'] )}}
+								<li class='cEvents_single'>
+									<ul class='cEvents'>
+										{{foreach $events[ $date->year . '-' . $date->mon . '-' . $k ]['single'] as $event }}
+											<li class='cEvents_event cEvents_style{$event->calendar_id}' data-eventID='{$event->id}'>
+												<a href='{$event->url()}' data-ipsHover data-ipsHover-target='{$event->url('hovercard')->setQuerystring( 'sd', $date->year . '-' . $date->mon . '-' . $k )}' title='{$event->title}'>{{if !$event->all_day}}<span class='cEvents_time'>{$event->_start_date->localeTime( FALSE )}</span> {{endif}}{truncate="$event->title" length="15"}{{if $event->hidden() === 1}} <i class='fa fa-warning'></i>{{endif}}</a>
+											</li>
+										{{endforeach}}
+									</ul>
+								</li>
+							{{endif}}
+						</ul>
+					{{endif}}
+					{{if isset( $birthdays[ $date->mon . $k ] ) AND $birthdays[ $date->mon . $k ] }}
+						<p class='cCalendar_birthdays ipsType_light'><a class='ipsType_blendLinks' href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&id={$thisCalendar->_id}&y={$date->year}&m={$date->mon}&d={$k}" seoTemplate="calendar_calday" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&y={$date->year}&m={$date->mon}&d={$k}" seoTemplate="calendar_day"}{{endif}}'>{lang="birthdays_count" pluralize="$birthdays[ $date->mon . $k ]"}</a></p>
+					{{endif}}
+				</div>
+			</td>
+		{{endfor}}
+
+		{{for ; $i%7 != 0; $i++}}
+			<td class='cCalendar_nonDate'>&nbsp;</td>
+		{{endfor}}
+	</tr>
+</table>]]></template>
+ <template template_group="browse" template_name="calendarStream" template_data="$calendars, $date, $featured, $events, $thisCalendar, $jump, $pagination" template_location="front" template_app="calendar"><![CDATA[
+<div class='ipsGrid ipsGrid_collapsePhone ipsPager cCalendarNav ipsSpacer_bottom' data-ipsSticky data-ipsSticky-disableIn='phone'>
+	<div class='ipsGrid_span3 ipsType_left ipsPager_prev'>
+		<a href="{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=stream&id={$thisCalendar->_id}&y={$date->lastMonth('year')}&m={$date->lastMonth('mon')}" seoTemplate="calendar_calstream" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=stream&y={$date->lastMonth('year')}&m={$date->lastMonth('mon')}" seoTemplate="calendar_stream"}{{endif}}" title='{lang="cal_month_stream_title" sprintf="$date->lastMonth('monthName'), $date->lastMonth('year')"}' rel='prev nofollow' data-action='changeView'>
+			<span class='ipsPager_type ipsType_normal'>{lang="previous_month"}</span>
+			<span class='ipsPager_title ipsType_light'>{lang="cal_month_title" sprintf="$date->lastMonth('monthName'), $date->lastMonth('year')"}</span>
+		</a>
+	</div>
+	<div class='ipsGrid_span6 ipsType_center ipsPad' data-role='calendarNav'>
+		<h1 class='ipsType_pageTitle ipsType_center'>{lang="cal_month_title" sprintf="$date->monthName, $date->year"}</h1>
+		<ul class='ipsButton_split ipsType_noBreak'>
+			<li><a href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=month&id={$thisCalendar->_id}&y={$date->year}&m={$date->mon}" seoTemplate="calendar_calmonth" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=month&y={$date->year}&m={$date->mon}" seoTemplate="calendar_month"}{{endif}}' title='{lang="cal_month_title" sprintf="$date->monthName, $date->year"}' class='ipsButton ipsButton_light ipsButton_verySmall' data-action='changeView'>{lang="month"}</a></li>
+			<li><a href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=week&id={$thisCalendar->_id}&w={$date->year}-{$date->mon}-{$date->mday}" seoTemplate="calendar_calweek" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=week&w={$date->year}-{$date->mon}-{$date->mday}" seoTemplate="calendar_week"}{{endif}}' title='{lang="cal_week_title" sprintf="$date->firstDayOfWeek('monthNameShort'), $date->firstDayOfWeek('mday'), $date->firstDayOfWeek('year'), $date->lastDayOfWeek('monthNameShort'),	$date->lastDayOfWeek('mday'), $date->lastDayOfWeek('year')"}' class='ipsButton ipsButton_light ipsButton_verySmall' data-action='changeView'>{lang="week"}</a></li>
+			<li><a href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=day&id={$thisCalendar->_id}&y={$date->year}&m={$date->mon}&d={$date->mday}" seoTemplate="calendar_calday" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=day&y={$date->year}&m={$date->mon}&d={$date->mday}" seoTemplate="calendar_day"}{{endif}}' title='{lang="cal_month_day" sprintf="$date->monthName, $date->mday, $date->year"}' class='ipsButton ipsButton_light ipsButton_verySmall' data-action='changeView'>{lang="day"}</a></li>
+			<li><a href='#' class='ipsButton ipsButton_primary ipsButton_verySmall' title='{lang="cal_month_stream_title" sprintf="$date->monthName, $date->year"}' data-action='changeView'><span class='ipsResponsive_hidePhone ipsResponsive_inline'>{lang="event_stream"}</span><span class='ipsResponsive_showPhone ipsResponsive_inline'>{lang="event_stream_short"}</span></a></li>
+		</ul>
+	</div>
+	<div class='ipsGrid_span3 ipsType_right ipsPager_next'>
+		<a href="{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=stream&id={$thisCalendar->_id}&y={$date->nextMonth('year')}&m={$date->nextMonth('mon')}" seoTemplate="calendar_calstream" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=stream&y={$date->nextMonth('year')}&m={$date->nextMonth('mon')}" seoTemplate="calendar_stream"}{{endif}}" title='{lang="cal_month_stream_title" sprintf="$date->nextMonth('monthName'), $date->nextMonth('year')"}' rel='next nofollow' data-action='changeView'>
+			<span class='ipsPager_type ipsType_normal'>{lang="next_month"}</span>
+			<span class='ipsPager_title ipsType_light'>{lang="cal_month_title" sprintf="$date->nextMonth('monthName'), $date->nextMonth('year')"}</span>
+		</a>
+	</div>
+</div>
+
+{{if $thisCalendar}}
+	{template="pagination" group="global" app="core" location="global" params="\IPS\Http\Url::internal( 'app=calendar&module=calendar&controller=view&view=stream&id=' . $thisCalendar->_id . '&y=' . $date->year . '&m=' . $date->mon, NULL, 'calendar_calstream', $thisCalendar->title_seo ), $pagination['pages'], $pagination['page'], $pagination['limit']"}
+{{else}}
+	{template="pagination" group="global" app="core" location="global" params="\IPS\Http\Url::internal( 'app=calendar&module=calendar&controller=view&view=stream&y=' . $date->year . '&m=' . $date->mon, NULL, 'calendar_stream' ), $pagination['pages'], $pagination['page'], $pagination['limit']"}
+{{endif}}
+<br><br>
+<section class='ipsAreaBackground ipsPad' id='calendarStream'>
+	{{if count($events) }}
+		<div data-ipsPatchwork data-ipsPatchwork-minColSize='200' data-ipsPatchwork-maxColSize='350'>
+			<div class='ipsList_reset' data-role='patchworkList'>
+				{{foreach $events as $event}}
+					<div data-role='patchworkItem'>
+						{template="eventBlock" app="calendar" group="view" params="$event, $date, TRUE, array( 240, 185 ), TRUE"}
+					</div>
+				{{endforeach}}
+			</div>
+		</div>
+	{{else}}
+		<div class='ipsType_light ipsType_large'>{lang="no_events_month"}</div>
+	{{endif}}
+</section>
+<br>
+{{if $thisCalendar}}
+	{template="pagination" group="global" app="core" location="global" params="\IPS\Http\Url::internal( 'app=calendar&module=calendar&controller=view&view=stream&id=' . $thisCalendar->_id . '&y=' . $date->year . '&m=' . $date->mon, NULL, 'calendar_calstream', $thisCalendar->title_seo ), $pagination['pages'], $pagination['page'], $pagination['limit']"}
+{{else}}
+	{template="pagination" group="global" app="core" location="global" params="\IPS\Http\Url::internal( 'app=calendar&module=calendar&controller=view&view=stream&y=' . $date->year . '&m=' . $date->mon, NULL, 'calendar_stream' ), $pagination['pages'], $pagination['page'], $pagination['limit']"}
+{{endif}}]]></template>
+ <template template_group="browse" template_name="calendarWeek" template_data="$calendars, $date, $featured, $birthdays, $events, $nextWeek, $lastWeek, $days, $today, $thisCalendar, $jump, $startDates=array()" template_location="front" template_app="calendar"><![CDATA[
+<div class='ipsGrid ipsGrid_collapsePhone ipsPager cCalendarNav ipsSpacer_bottom' data-ipsSticky data-ipsSticky-disableIn='phone'>
+	<div class='ipsGrid_span3 ipsType_left ipsPager_prev'>
+		<a href="{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=week&id={$thisCalendar->_id}&w={$lastWeek->year}-{$lastWeek->mon}-{$lastWeek->mday}" seoTemplate="calendar_calweek" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=week&w={$lastWeek->year}-{$lastWeek->mon}-{$lastWeek->mday}" seoTemplate="calendar_week"}{{endif}}" title='{lang="cal_week_title" sprintf="$lastWeek->firstDayOfWeek('monthNameShort'), $lastWeek->firstDayOfWeek('mday'), $lastWeek->firstDayOfWeek('year'), $lastWeek->lastDayOfWeek('monthNameShort'), $lastWeek->lastDayOfWeek('mday'), $lastWeek->lastDayOfWeek('year')"}' rel='prev nofollow' data-action='changeView'>
+			<span class='ipsPager_type ipsType_normal'>{lang="previous_week"}</span>
+			<span class='ipsPager_title ipsType_light'>
+				<span class='ipsResponsive_inline ipsResponsive_hidePhone'>
+					{lang="cal_week_title" sprintf="$lastWeek->firstDayOfWeek('monthNameShort'), $lastWeek->firstDayOfWeek('mday'), $lastWeek->firstDayOfWeek('year'), $lastWeek->lastDayOfWeek('monthNameShort'), $lastWeek->lastDayOfWeek('mday'), $lastWeek->lastDayOfWeek('year')"}
+				</span>
+				<span class='ipsResponsive_inline ipsResponsive_showPhone'>
+					{lang="cal_week_title_wb" sprintf="$lastWeek->firstDayOfWeek('monthNameShort'), $lastWeek->firstDayOfWeek('mday'), $lastWeek->firstDayOfWeek('year')"}
+				</span>
+			</span>
+		</a>
+	</div>
+	<div class='ipsGrid_span6 ipsType_center ipsPad' data-role='calendarNav'>
+		<h1 class='ipsType_pageTitle ipsType_center'>{lang="cal_week_title" sprintf="$date->firstDayOfWeek('monthNameShort'), $date->firstDayOfWeek('mday'), $date->firstDayOfWeek('year'), $date->lastDayOfWeek('monthNameShort'), $date->lastDayOfWeek('mday'), $date->lastDayOfWeek('year')"}</h1>
+		<ul class='ipsButton_split ipsType_noBreak'>
+			<li><a href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=month&id={$thisCalendar->_id}&y={$date->year}&m={$date->mon}" seoTemplate="calendar_calmonth" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=month&y={$date->year}&m={$date->mon}" seoTemplate="calendar_month"}{{endif}}' title='{lang="cal_month_title" sprintf="$date->monthName, $date->year"}' class='ipsButton ipsButton_light ipsButton_verySmall' data-action='changeView'>{lang="month"}</a></li>
+			<li><a href='#' class='ipsButton ipsButton_primary ipsButton_verySmall' title='{lang="cal_week_title" sprintf="$date->firstDayOfWeek('monthNameShort'), $date->firstDayOfWeek('mday'), $date->firstDayOfWeek('year'), $date->lastDayOfWeek('monthNameShort'), $date->lastDayOfWeek('mday'), $date->lastDayOfWeek('year')"}' data-action='changeView'>{lang="week"}</a></li>
+			{{if in_array( $today, $days )}}
+				<li><a href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=day&id={$thisCalendar->_id}&y={$date->year}&m={$date->mon}&d={$today->mday}" seoTemplate="calendar_calday" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=day&y={$date->year}&m={$date->mon}&d={$today->mday}" seoTemplate="calendar_day"}{{endif}}' title='{lang="cal_month_day" sprintf="$date->monthName, $today->mday, $date->year"}' class='ipsButton ipsButton_light ipsButton_verySmall' data-action='changeView'>{lang="day"}</a></li>
+			{{else}}
+				<li><a href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=day&id={$thisCalendar->_id}&y={$date->year}&m={$date->mon}&d=1" seoTemplate="calendar_calday" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=day&y={$date->year}&m={$date->mon}&d=1" seoTemplate="calendar_day"}{{endif}}' title='{lang="cal_month_day" sprintf="$date->monthName, $date->mday, $date->year"}' class='ipsButton ipsButton_light ipsButton_verySmall' data-action='changeView'>{lang="day"}</a></li>
+			{{endif}}
+			<li><a href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=stream&id={$thisCalendar->_id}&y={$date->year}&m={$date->mon}" seoTemplate="calendar_calstream" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=stream&y={$date->year}&m={$date->mon}" seoTemplate="calendar_stream"}{{endif}}' title='{lang="cal_month_stream_title" sprintf="$date->monthName, $date->year"}' class='ipsButton ipsButton_light ipsButton_verySmall' data-action='changeView'><span class='ipsResponsive_hidePhone ipsResponsive_inline'>{lang="event_stream"}</span><span class='ipsResponsive_showPhone ipsResponsive_inline'>{lang="event_stream_short"}</span></a></li>
+		</ul>
+	</div>
+	<div class='ipsGrid_span3 ipsType_right ipsPager_next'>
+		<a href="{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&view=week&id={$thisCalendar->_id}&w={$nextWeek->year}-{$nextWeek->mon}-{$nextWeek->mday}" seoTemplate="calendar_calweek" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&view=week&w={$nextWeek->year}-{$nextWeek->mon}-{$nextWeek->mday}" seoTemplate="calendar_week"}{{endif}}" title='{lang="cal_week_title" sprintf="$nextWeek->firstDayOfWeek('monthNameShort'), $nextWeek->firstDayOfWeek('mday'), $nextWeek->firstDayOfWeek('year'), $nextWeek->lastDayOfWeek('monthNameShort'), $nextWeek->lastDayOfWeek('mday'), $nextWeek->lastDayOfWeek('year')"}' rel='next nofollow' data-action='changeView'>
+			<span class='ipsPager_type ipsType_normal'>{lang="next_week"}</span>
+			<span class='ipsPager_title ipsType_light'>
+				<span class='ipsResponsive_inline ipsResponsive_hidePhone'>
+					{lang="cal_week_title" sprintf="$nextWeek->firstDayOfWeek('monthNameShort'), $nextWeek->firstDayOfWeek('mday'), $nextWeek->firstDayOfWeek('year'), $nextWeek->lastDayOfWeek('monthNameShort'), $nextWeek->lastDayOfWeek('mday'), $nextWeek->lastDayOfWeek('year')"}
+				</span>
+				<span class='ipsResponsive_inline ipsResponsive_showPhone'>
+					{lang="cal_week_title_wb" sprintf="$nextWeek->firstDayOfWeek('monthNameShort'), $nextWeek->firstDayOfWeek('mday'), $nextWeek->firstDayOfWeek('year')"}
+				</span>
+			</span>
+		</a>
+	</div>
+</div>
+
+<div class='ipsAreaBackground ipsPad ipsBox ipsBox_transparent'>
+	<ul class='ipsList_reset cCalendarWeek'>
+		{{foreach $days as $day}}
+		<li class='ipsColumns ipsColumns_collapsePhone ipsBox'>
+			<div class='ipsColumn ipsColumn_wide ipsAreaBackground_light cCalendarWeek_day {{if $today->year == $day->year AND $today->mon == $day->mon AND $today->mday == $day->mday}} cCalendar_today{{endif}}'>
+				<div class='ipsPad'>
+					<h2 class='ipsType_sectionHead'><strong><a class='ipsType_blendLinks' href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&id={$thisCalendar->_id}&y={$day->year}&m={$day->mon}&d={$day->mday}" seoTemplate="calendar_calday" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&y={$day->year}&m={$day->mon}&d={$day->mday}" seoTemplate="calendar_day"}{{endif}}'>{$day->dayName}</a></strong></h2>
+					<p class='ipsType_reset ipsType_light ipsType_uppercase'>{lang="cal_month_day" sprintf="$day->monthName, $day->mday, $day->year"}</p>
+				</div>
+			</div>
+			<div class='ipsColumn ipsColumn_fluid ipsAreaBackground_reset'>
+				<div class='ipsPad'>
+					{{if isset( $events[ $day->year . '-' . $day->mon . '-' . $day->mday ] )}}
+						<ul class='cEvents_wrapper'>
+							{{if isset( $events[ $day->year . '-' . $day->mon . '-' . $day->mday ]['ranged'] )}}
+								<li class='cEvents_ranged'>
+									<ul class='cEvents'>
+										{{foreach $events[ $day->year . '-' . $day->mon . '-' . $day->mday ]['ranged'] as $event }}
+											<li class='cEvents_event cEvents_style{$event->calendar_id}{{if $event->nextOccurrence( $day, 'startDate' ) AND $event->nextOccurrence( $day, 'startDate' )->mysqlDatetime( FALSE ) == $day->mysqlDatetime( FALSE ) }}{{$startDates[ $event->id ] = $day->mysqlDatetime( FALSE );}} cEvents_first{{endif}}{{if $event->nextOccurrence( $day ?: $event->nextOccurrence( $day, 'startDate' ), 'endDate' ) AND $event->nextOccurrence( $day ?: $event->nextOccurrence( $day, 'startDate' ), 'endDate' )->mysqlDatetime( FALSE ) == $day->mysqlDatetime( FALSE ) }} cEvents_last{{endif}}'>
+												<a href='{$event->url()}' data-ipsHover data-ipsHover-target='{$event->url('hovercard')->setQuerystring( 'sd', isset( $startDates[ $event->id ] ) ? $startDates[ $event->id ] : $day->mysqlDatetime( FALSE ) )}'>{$event->title}{{if $event->hidden() === 1}} <i class='fa fa-warning'></i>{{endif}}</a>
+											</li>
+										{{endforeach}}
+									</ul>
+								</li>
+							{{endif}}
+							{{if isset( $events[ $day->year . '-' . $day->mon . '-' . $day->mday ]['single'] )}}
+								<li class='cEvents_single'>
+									<ul class='cEvents'>
+										{{foreach $events[ $day->year . '-' . $day->mon . '-' . $day->mday ]['single'] as $event }}
+											<li class='cEvents_event cEvents_style{$event->calendar_id}'>
+												<a href='{$event->url()}' data-ipsHover data-ipsHover-target='{$event->url('hovercard')->setQuerystring( 'sd', $day->year . '-' . $day->mon . '-' . $day->mday )}'>{$event->title}{{if $event->hidden() === 1}} <i class='fa fa-warning'></i>{{endif}}</a>
+											</li>
+										{{endforeach}}
+									</ul>
+								</li>
+							{{endif}}
+						</ul>
+					{{else}}
+						<span class='ipsType_light ipsType_medium'>{lang="no_events_today"}</span>
+					{{endif}}
+					{{if isset( $birthdays[ $day->mon . $day->mday ] ) AND $birthdays[ $day->mon . $day->mday ] }}
+						<p class='cCalendar_birthdays ipsType_light'><a class='ipsType_blendLinks' href='{{if $thisCalendar}}{url="app=calendar&module=calendar&controller=view&id={$thisCalendar->_id}&y={$day->year}&m={$day->mon}&d={$day->mday}" seoTemplate="calendar_calday" seoTitle="$thisCalendar->title_seo"}{{else}}{url="app=calendar&module=calendar&controller=view&y={$day->year}&m={$day->mon}&d={$day->mday}" seoTemplate="calendar_day"}{{endif}}'>{lang="birthdays_today" pluralize="$birthdays[ $day->mon . $day->mday ]"}</a></p>
+					{{endif}}
+				</div>
+			</div>
+		</li>
+		{{endforeach}}
+	</ul>
+</div>]]></template>
+ <template template_group="browse" template_name="calendarWrapper" template_data="$calendar, $calendars, $thisCalendar, $jump, $date, $featured, $downloadLinks" template_location="front" template_app="calendar"><![CDATA[
+{template="calendarHeader" group="browse" app="calendar" params="$calendars, $thisCalendar, $jump, $downloadLinks"}
+
+<div data-controller='calendar.front.browse.main' class='ipsSpacer_top'>
+{$calendar|raw}
+</div>
+
+<ul class="ipsToolList ipsToolList_horizontal ipsResponsive_showPhone ipsResponsive_block ipsClearfix ipsSpacer_top">
+	{{if ( $thisCalendar AND $thisCalendar->can('add') ) OR ( !$thisCalendar AND \IPS\calendar\Calendar::canOnAny('add') )}}
+		<li><a href='{url="app=calendar&module=calendar&controller=submit" seoTemplate="calendar_submit"}' class='ipsButton ipsButton_important ipsButton_normal ipsButton_fullWidth'>{lang="create_event"}</a></li>
+		<li><a href='#elCalendarJump' data-ipsMenu data-ipsMenu-menuID='elCalendarJump' data-ipsMenu-closeOnClick='false' class='ipsButton ipsButton_light ipsButton_fullWidth ipsButton_normal'>{lang="jump_to"} <i class='fa fa-caret-down'></i></a></li>
+	{{endif}}
+</ul>
+
+{template="calendarFeatured" group="browse" app="calendar" params="$featured, $date"}]]></template>
+ <template template_group="browse" template_name="dateJump" template_data="$id, $action, $elements, $hiddenValues, $actionButtons, $uploadField, $class='', $attributes=array(), $sidebar, $form=NULL" template_location="front" template_app="calendar"><![CDATA[<div id='elCalendarJump' class='ipsMenu ipsMenu_medium ipsHide'>
+	<form accept-charset='utf-8' class="ipsPad ipsForm ipsForm_vertical" method='post' action='{$action}' data-ipsForm>
+		<input type="hidden" name="{$id}_submitted" value="1">
+		{{foreach $hiddenValues as $k => $v}}
+			<input type="hidden" name="{$k}" value="{$v}">
+		{{endforeach}}
+		<ul class='ipsList_reset'>
+			{{foreach $elements as $collection}}
+				{{foreach $collection as $input}}
+					{{if $input instanceof \IPS\Helpers\Form\Date}}
+						<li class='ipsFieldRow ipsFieldRow_fullWidth'>
+							<input type="date" data-control="date" placeholder="{lang="jump_to_placeholder"}" name='{$input->name}' id='{$input->htmlId}' {{if $input->required === TRUE}}required{{endif}} value="{{if $input->defaultValue instanceof \IPS\DateTime}}{$input->defaultValue->format('Y-m-d')}{{endif}}">
+						</li>
+					{{else}}
+						{$input->rowHtml($form)|raw}
+					{{endif}}
+				{{endforeach}}
+			{{endforeach}}
+			<li class='ipsFieldRow'>
+				<input type="submit" class="ipsButton ipsButton_primary ipsButton_fullWidth ipsButton_small" value="{lang="calendar_jump"}">
+			</li>
+			<li class='ipsFieldRow'>
+				<input type="submit" class="ipsButton ipsButton_light ipsButton_fullWidth ipsButton_small" value="{lang="calendar_jump_today"}" name="goto">
+			</li>
+		</ul>
+	</form>
+</div>]]></template>
+ <template template_group="global" template_name="commentTableHeader" template_data="$comment, $event" template_location="front" template_app="calendar"><![CDATA[
+<div class='ipsDataList ipsAreaBackground_light ipsClearfix'>
+	<div class='ipsDataItem'>
+		<div class='ipsDataItem_generic ipsDataItem_size2'>
+			{{$date = ( $event->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' ) == NULL ) ? $event->lastOccurrence() : $event->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' );}}
+			<time datetime='{$date->mysqlDatetime()}' class='ipsCalendarDate ipsCalendarDate_large'>
+				<span class='ipsCalendarDate_month'>{$date->monthNameShort}</span>
+				<span class='ipsCalendarDate_date'>{$date->mday}</span>
+			</time>
+		</div>
+		<div class='ipsDataItem_main'>
+			<h3 class='ipsType_sectionHead'><a href='{$event->url()}'title='{lang="view_this_event" sprintf="$event->title"}'>{$event->title}</a></h3>
+			<p class='ipsType_normal ipsType_light ipsType_blendLinks ipsType_reset'>{lang="in"} <a href='{$event->container()->url()}'>{$event->container()->_title}</a></p>
+			{{if $event->container()->allow_reviews}}
+				{template="rating" group="global" location="front" app="core" params="'large', $event->rating, \IPS\Settings::i()->reviews_rating_out_of"} &nbsp;&nbsp;
+			{{endif}}
+
+			<span class='ipsType_medium ipsType_reset'>{{if $event->container()->allow_comments}}&nbsp;&nbsp;{{if !$event->comments}}<span class='ipsType_light'>{{endif}}<i class='fa fa-comment'></i> {$event->comments}{{endif}}{{if !$event->comments}}</span>{{endif}}</span>
+		</div>
+	</div>
+</div>]]></template>
+ <template template_group="global" template_name="embedCalendar_event" template_data="$event, $url" template_location="front" template_app="calendar"><![CDATA[<div class='ipsEmbedded ipsEmbedded_withImage'>
+	<div class='ipsEmbedded_headerArea'>
+		<h4 class='ipsType_reset ipsType_normal ipsTruncate ipsTruncate_line'><i class='fa fa-calendar' data-ipsTooltip title='{lang="embed_calendar_event"}'></i> &nbsp;<a href='{$url}' title='{lang="view_this_event" sprintf="$event->title"}' target='_top'>{$event->title}</a></h4>
+	</div>
+	<div class='ipsEmbedded_image cCalendarEmbed_calendar'>
+		<a href='{$event->url()}' target='_top'>
+			<time datetime='{$event->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )->mysqlDatetime()}' class='ipsCalendarDate'>
+				<span class='ipsCalendarDate_month'>{$event->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )->monthNameShort}</span>
+				<span class='ipsCalendarDate_date'>{$event->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )->mday}</span>
+			</time>
+		</a>
+	</div>
+	<div class='ipsEmbedded_content'>
+		<p class='ipsType_reset ipsType_medium'>
+			<time itemprop='startDate' content='{expression="$event->_start_date->format( 'Y-m-d' )"}'>
+				{$event->_start_date->dayName} {$event->_start_date->mday} {$event->_start_date->monthName} {$event->_start_date->year}{{if !$event->all_day}}, {$event->_start_date->localeTime( FALSE )}{{endif}}
+			</time>
+			{{if $event->_end_date}}
+				<br><em class='ipsType_light'>{lang="until"}</em>
+				<time itemprop='startDate' content='{expression="$event->_end_date->format( 'Y-m-d' )"}'>
+					{$event->_end_date->dayName} {$event->_end_date->mday} {$event->_end_date->monthName} {$event->_end_date->year}{{if !$event->all_day}}, {$event->_end_date->localeTime( FALSE )}{{endif}}
+				</time>
+			{{endif}}
+		</p>
+		<ul class='ipsList_inline ipsType_small ipsEmbedded_stats'>
+			{{if $event->rsvp}}
+				<li>
+					<i class='fa fa-user'></i> {lang="x_users_going" pluralize="count( $event->attendees( 1 ) )"}
+				</li>
+			{{endif}}
+			{{if $event->container()->allow_reviews}}
+				<li>
+					<span itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+						<meta itemprop='ratingValue' content='{$event->averageReviewRating()}'>
+						<meta itemprop='reviewCount' content='{$event->reviews}'>
+						{template="rating" group="global" location="front" app="core" params="'small', $event->averageReviewRating(), \IPS\Settings::i()->reviews_rating_out_of, $event->memberReviewRating()"}
+					</span>
+				</li>
+			{{endif}}
+			{{if $event->container()->allow_comments}}
+				<li>
+					<i class='fa fa-comment'></i> {lang="num_comments" pluralize="$event->comments"}</a>
+				</li>
+			{{endif}}
+		</ul>
+	</div>
+</div>]]></template>
+ <template template_group="global" template_name="manageFollowRow" template_data="$table, $headers, $rows, $includeFirstCommentInCommentCount=TRUE" template_location="front" template_app="calendar"><![CDATA[{{if count( $rows )}}
+	{{foreach $rows as $row}}
+	{{$idField = $row::$databaseColumnId;}}
+		<li class="ipsDataItem ipsDataItem_responsivePhoto {{if $row->unread()}}ipsDataItem_unread{{endif}} {{if method_exists( $row, 'tableClass' ) && $row->tableClass()}}ipsDataItem_{$row->tableClass()}{{endif}} {{if $row->hidden()}}ipsModerated{{endif}}" data-controller='core.front.system.manageFollowed' data-followID='{$row->_followData['follow_area']}-{$row->_followData['follow_rel_id']}'>
+			<div class='ipsDataItem_generic ipsDataItem_size2'>
+				{{if $row->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )}}
+					<time datetime='{$row->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )->mysqlDatetime()}' class='ipsCalendarDate ipsCalendarDate_large'>
+						<span class='ipsCalendarDate_month'>{$row->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )->monthNameShort}</span>
+						<span class='ipsCalendarDate_date'>{$row->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )->mday}</span>
+					</time>
+				{{else}}
+					<time datetime='{$row->lastOccurrence( 'startDate' )->mysqlDatetime()}' class='ipsCalendarDate ipsCalendarDate_large'>
+						<span class='ipsCalendarDate_month'>{$row->lastOccurrence( 'startDate' )->monthNameShort}</span>
+						<span class='ipsCalendarDate_date'>{$row->lastOccurrence( 'startDate' )->mday}</span>
+					</time>
+				{{endif}}
+			</div>
+			<div class='ipsDataItem_main ipsPos_middle'>
+				<h4 class='ipsDataItem_title ipsType_break ipsType_normal'>
+					{{if $row->mapped('locked')}}
+						<i class="fa fa-lock"></i>
+					{{endif}}
+
+					{{if $row->mapped('pinned') || $row->mapped('featured') || $row->hidden() === -1 || $row->hidden() === 1}}
+						<span>
+							{{if $row->hidden() === -1}}
+								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{$row->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+							{{elseif $row->hidden() === 1}}
+								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+							{{endif}}							
+							{{if $row->mapped('pinned')}}
+								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="pinned"}'><i class='fa fa-thumb-tack'></i></span>
+							{{endif}}
+							{{if $row->mapped('featured')}}
+								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+							{{endif}}
+						</span>
+					{{endif}}
+
+					{{if $row->prefix()}}
+						{template="prefix" group="global" app="core" params="$row->prefix( TRUE ), $row->prefix()"}
+					{{endif}}
+					
+					<a href='{$row->url()}'>
+						{{if $row->mapped('title')}}{wordbreak="$row->mapped('title')"}{{else}}<em class="ipsType_light">{lang="content_deleted"}</em>{{endif}}
+					</a>
+				</h4>
+				<div class='ipsDataItem_meta ipsType_light ipsType_blendLinks' data-ipsTruncate data-ipsTruncate-size='2 lines' data-ipsTruncate-type='remove'>
+					{{if method_exists( $row, 'tableDescription' )}}
+						{$row->tableDescription()|raw}
+					{{else}}
+                        {lang="byline" htmlsprintf="$row->author()->link( $row->warningRef() )"}{datetime="$row->__get( $row::$databaseColumnMap['date'] )"}
+						{lang="in"} <a href="{$row->container()->url()}">{$row->container()->_title}</a>
+					{{endif}}
+				</div>				
+			</div>
+
+			<div class='ipsDataItem_generic ipsDataItem_size1 ipsType_center ipsType_large'>
+				<span class='ipsBadge ipsBadge_icon ipsBadge_new {{if !$row->_followData['follow_is_anon']}}ipsHide{{endif}}' data-role='followAnonymous' data-ipsTooltip title='{lang="follow_is_anon"}'><i class='fa fa-eye-slash'></i></span>
+			</div>
+
+			<div class='ipsDataItem_generic ipsDataItem_size6'>
+				<ul class='ipsList_reset'>
+					<li title='{lang="follow_when"}' data-role='followDate'><i class='fa fa-clock-o'></i> {datetime="$row->_followData['follow_added']"}</li>
+					<li title='{lang="follow_how"}' data-role='followFrequency'>
+						{{if $row->_followData['follow_notify_freq'] == 'none'}}
+							<i class='fa fa-bell-slash-o'></i>
+						{{else}}
+							<i class='fa fa-bell'></i>
+						{{endif}} {lang="follow_freq_{$row->_followData['follow_notify_freq']}"}
+					</li>
+				</ul>
+			</div>
+
+			<div class='ipsDataItem_generic ipsDataItem_size6 ipsType_center'>
+				{template="manageFollow" group="system" app="core" params="$row->_followData['follow_app'], $row->_followData['follow_area'], $row->_followData['follow_rel_id']"}
+			</div>
+
+			{{if $table->canModerate()}}
+				<div class='ipsDataItem_modCheck'>
+					<span class='ipsCustomInput'>
+						<input type='checkbox' data-role='moderation' name="moderate[{$row->$idField}]" data-actions="{expression="implode( ' ', $table->multimodActions( $row ) )"}" data-state='{{if $row->tableStates()}}{$row->tableStates()}{{endif}}'>
+						<span></span>
+					</span>
+				</div>
+			{{endif}}
+
+		</li>
+	{{endforeach}}
+{{endif}}
+]]></template>
+ <template template_group="global" template_name="rows" template_data="$table, $headers, $rows" template_location="front" template_app="calendar"><![CDATA[{{if count( $rows )}}
+	{{foreach $rows as $row}}
+		<li class="ipsDataItem {{if method_exists( $row, 'tableClass' ) && $row->tableClass()}}ipsDataItem_{$row->tableClass()}{{endif}} {{if $row->hidden()}}ipsModerated{{endif}}">
+			<div class='ipsDataItem_generic ipsDataItem_size3 ipsPos_top'>
+				{{if $row->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )}}
+					<time datetime='{$row->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )->mysqlDatetime()}' class='ipsCalendarDate ipsCalendarDate_large'>
+						<span class='ipsCalendarDate_month'>{$row->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )->monthNameShort}</span>
+						<span class='ipsCalendarDate_date'>{$row->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )->mday}</span>
+					</time>
+				{{else}}
+					<time datetime='{$row->lastOccurrence( 'startDate' )->mysqlDatetime()}' class='ipsCalendarDate ipsCalendarDate_large'>
+						<span class='ipsCalendarDate_month'>{$row->lastOccurrence( 'startDate' )->monthNameShort}</span>
+						<span class='ipsCalendarDate_date'>{$row->lastOccurrence( 'startDate' )->mday}</span>
+					</time>
+				{{endif}}
+			</div>
+			<div class='ipsDataItem_main'>
+				<h4 class='ipsDataItem_title ipsType_sectionHead ipsType_break'>
+					{{if $row->mapped('locked')}}
+						<i class="fa fa-lock"></i>
+					{{endif}}
+					
+					{{if $row->mapped('pinned') || $row->mapped('featured') || $row->hidden() === -1 || $row->hidden() === 1}}
+						{{if $row->hidden() === -1}}
+							<span class="ipsBadge ipsBadge_small ipsBadge_icon ipsBadge_warning" data-ipsTooltip title='{$row->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+						{{elseif $row->hidden() === 1}}
+							<span class="ipsBadge ipsBadge_small ipsBadge_icon ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+						{{endif}}
+						{{if $row->mapped('pinned')}}
+							<span class="ipsBadge ipsBadge_small ipsBadge_icon ipsBadge_positive" data-ipsTooltip title='{lang="pinned"}'><i class='fa fa-thumb-tack'></i></span>
+						{{endif}}
+						{{if $row->mapped('featured')}}
+							<span class="ipsBadge ipsBadge_small ipsBadge_icon ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+						{{endif}}
+					{{endif}}
+					
+					{{if $row->prefix()}}
+						{template="prefix" group="global" app="core" params="$row->prefix( TRUE ), $row->prefix()"}
+					{{endif}}
+					
+					<a href='{$row->url()}' class='ipsType_break' {{if $row->tableHoverUrl}}data-ipsHover{{endif}}>
+						{{if $row->mapped('title')}}{wordbreak="$row->mapped('title')"}{{else}}<em class="ipsType_light">{lang="content_deleted"}</em>{{endif}}
+					</a>
+				</h4>
+				<div class='ipsDataItem_meta ipsType_light ipsType_blendLinks'>
+					{$row->eventBlurb()|raw}
+				</div>
+
+				{{if $row->rsvp}}
+					{{if $attendees = $row->attendees() and isset( $attendees[1][ \IPS\Member::loggedIn()->member_id ] ) }}
+						<p class='ipsType_large ipsType_success'><strong><i class='fa fa-check-circle'></i> {lang="you_are_going_to_this"}</strong></p>
+					{{else}}
+						<p class='ipsType_large ipsType_light ipsFaded'><strong><i class='fa fa-times-circle'></i> {lang="you_are_not_going_to_this"}</strong></p>
+					{{endif}}
+
+					{{if count( $attendees[1] )}}
+						<ul class='ipsList_inline'>
+							<li class='ipsType_light'>{lang="rsvp_attend_event"}:</li>
+							{{foreach $attendees[1] as $idx => $attendee}}
+								{{if $idx < 6}}
+									<li>{template="userPhoto" group="global" app="core" params="$attendee, 'tiny', NULL, NULL, TRUE"}</li>
+								{{endif}}
+							{{endforeach}}
+							{{if count( $attendees[1] ) > 5}}
+								<li class='ipsType_light'>{lang="and_x_more" sprintf="count( $attendees[1] ) - 5"}</li>
+							{{endif}}
+						</ul>
+					{{endif}}
+				{{endif}}
+				{{if count( $row->tags() )}}
+					<ul class='ipsTags ipsList_inline'>
+						{{foreach $row->tags() as $tag}}
+							<li><a href="{url="app=core&module=search&controller=search&tags={$tag}" seoTemplate="tags"}">{$tag}</a></li>
+						{{endforeach}}
+					</ul>
+				{{endif}}
+			</div>
+			<div class='ipsDataItem_generic ipsDataItem_size8'>
+				{{if $row->container()->allow_reviews}}
+					{template="rating" group="global" location="front" app="core" params="'large', $row->averageReviewRating(), \IPS\Settings::i()->reviews_rating_out_of, $row->memberReviewRating()"}&nbsp;&nbsp; <span class='ipsType_normal ipsType_light'>({lang="num_reviews" pluralize="$row->reviews"})</span>
+				{{endif}}
+				{{if $row->container()->allow_comments}}
+					<p class='ipsType_normal'>
+						{{if $row->comments}}
+							<a href='{$row->url()->setQueryString( 'tab', 'comments' )->setFragment('replies')}'>
+						{{endif}}
+						<i class='fa fa-comment'></i> {lang="num_comments" pluralize="$row->comments"}
+						{{if $row->comments}}
+							</a>
+						{{endif}}
+					</p>
+				{{endif}}
+			</div>
+			{{if $table->canModerate()}}
+				<div class='ipsDataItem_modCheck'>
+					{{$idField = $row::$databaseColumnId;}}
+					<span class='ipsCustomInput'>
+						<input type='checkbox' data-role='moderation' name="moderate[{$row->$idField}]" data-actions="{expression="implode( ' ', $table->multimodActions( $row ) )"}" data-state='{{if $row->tableStates()}}{$row->tableStates()}{{endif}}'>
+						<span></span>
+					</span>
+				</div>
+			{{endif}}
+		</li>
+	{{endforeach}}
+{{endif}}]]></template>
+ <template template_group="global" template_name="searchResultCommentSnippet" template_data="$indexData, $nextOccurance, $startDate, $endDate, $allDay, $reviewRating, $condensed" template_location="front" template_app="calendar"><![CDATA[{{if $condensed}}
+	<time datetime='{$nextOccurance->mysqlDatetime()}' class='ipsCalendarDate ipsCalendarDate_small ipsPos_left'>
+		<span class='ipsCalendarDate_month'>{$nextOccurance->monthNameShort}</span>
+		<span class='ipsCalendarDate_date'>{$nextOccurance->mday}</span>
+	</time>
+{{else}}
+	<div class='ipsColumns ipsColumns_collapsePhone ipsColumns_noSpacing'>
+		<div class='ipsColumn ipsColumn_narrow'>
+			<time datetime='{$nextOccurance->mysqlDatetime()}' class='ipsCalendarDate ipsCalendarDate_large ipsPos_center'>
+				<span class='ipsCalendarDate_month'>{$nextOccurance->monthNameShort}</span>
+				<span class='ipsCalendarDate_date'>{$nextOccurance->mday}</span>
+			</time>
+		</div>
+		<div class='ipsColumn ipsColumn_fluid'>
+			<div class='ipsStream_comment ipsPad'>
+				<p class='ipsType_reset ipsType_normal'>
+					<strong class='ipsType_normal'>
+						<time itemprop='startDate' content='{expression="$startDate->format( 'Y-m-d' )"}'>
+							{$startDate->dayName} {$startDate->mday} {$startDate->monthName} {$startDate->year}{{if !$allDay}}, {$startDate->localeTime( FALSE )}{{endif}}
+						</time>
+						{{if $endDate}}
+							{lang="until_lc"}
+							<time itemprop='endDate' content='{expression="$endDate->format( 'Y-m-d' )"}'>
+								{$endDate->dayName} {$endDate->mday} {$endDate->monthName} {$endDate->year}{{if !$allDay}}, {$endDate->localeTime( FALSE )}{{endif}}
+							</time>
+						{{endif}}
+					</strong>
+				</p>
+				{{if $reviewRating !== NULL}}
+					{template="rating" app="core" params="'medium', $reviewRating" group="global"}
+				{{endif}}
+				{{if trim( $indexData['index_content'] ) !== ''}}
+					<div class='ipsType_richText ipsType_break ipsType_medium ipsSpacer_top ipsSpacer_half' {{if !( \IPS\Dispatcher::i()->application->directory == 'core' and \IPS\Dispatcher::i()->module and \IPS\Dispatcher::i()->module->key == 'search' )}}data-ipsTruncate data-ipsTruncate-type='remove' data-ipsTruncate-size='3 lines'{{else}}data-searchable data-findTerm{{endif}}>
+						{$indexData['index_content']|raw}
+					</div>
+				{{endif}}
+			</div>
+		</div>
+	</div>
+{{endif}}]]></template>
+ <template template_group="global" template_name="searchResultEventSnippet" template_data="$indexData, $itemData, $nextOccurance, $startDate, $endDate, $allDay, $condensed" template_location="front" template_app="calendar"><![CDATA[{{if $condensed}}
+	<time datetime='{$nextOccurance->mysqlDatetime()}' class='ipsCalendarDate ipsCalendarDate_small ipsPos_left'>
+		<span class='ipsCalendarDate_month'>{$nextOccurance->monthNameShort}</span>
+		<span class='ipsCalendarDate_date'>{$nextOccurance->mday}</span>
+	</time>
+{{else}}
+	<div class='ipsColumns ipsColumns_collapsePhone'>
+		<div class='ipsColumn ipsColumn_narrow'>
+			<time datetime='{$nextOccurance->mysqlDatetime()}' class='ipsCalendarDate ipsCalendarDate_large ipsPos_center'>
+				<span class='ipsCalendarDate_month'>{$nextOccurance->monthNameShort}</span>
+				<span class='ipsCalendarDate_date'>{$nextOccurance->mday}</span>
+			</time>
+		</div>
+		<div class='ipsColumn ipsColumn_fluid ipsStream_snippetInfo'>
+			<strong class='ipsType_normal'>
+				<time itemprop='startDate' content='{expression="$startDate->format( 'Y-m-d' )"}'>
+					{$startDate->dayName} {$startDate->mday} {$startDate->monthName} {$startDate->year}{{if !$allDay}}, {$startDate->localeTime( FALSE )}{{endif}}
+				</time>
+				{{if $endDate}}
+					{lang="until_lc"}
+					<time itemprop='endDate' content='{expression="$endDate->format( 'Y-m-d' )"}'>
+						{$endDate->dayName} {$endDate->mday} {$endDate->monthName} {$endDate->year}{{if !$allDay}}, {$endDate->localeTime( FALSE )}{{endif}}
+					</time>
+				{{endif}}
+			</strong>
+
+			{{if trim( $indexData['index_content'] ) !== ''}}
+				<div class='ipsSpacer_top ipsSpacer_half ipsType_richText ipsType_break ipsType_medium' {{if !( \IPS\Dispatcher::i()->application->directory == 'core' and \IPS\Dispatcher::i()->module and \IPS\Dispatcher::i()->module->key == 'search' )}}data-ipsTruncate data-ipsTruncate-type='remove' data-ipsTruncate-size='2 lines'{{else}}data-searchable data-findTerm{{endif}}>
+					{$indexData['index_content']|raw}
+				</div>
+			{{endif}}
+		</div>
+	</div>
+{{endif}}]]></template>
+ <template template_group="livesearch" template_name="calendar" template_data="$calendar" template_location="admin" template_app="calendar"><![CDATA[<li class='ipsPad_half ipsClearfix' data-role='result'>
+	<a href='{url="app=calendar&module=calendars&controller=calendars&do=form&id="}{$calendar->id}' class='ipsPos_left'>{$calendar->_title}</a>
+</li>
+
+]]></template>
+ <template template_group="modcp" template_name="approvalQueueItem" template_data="$item, $ref, $container, $title" template_location="front" template_app="calendar"><![CDATA[<div id="elApprovePanel" class='ipsBox'>
+	<article itemscope="" itemtype="http://schema.org/Comment" class="ipsClearfix ipsClear">
+		<div class='ipsPad'>
+			<p class="ipsPos_right ipsPad_half">
+				<a href='{$item->url()}' class='ipsType_normal ipsType_light'>
+					<i class='fa fa-{$item::$icon}'></i> {lang="$item::$title"}
+				</a>
+			</p>
+			<div class="ipsPhotoPanel ipsPhotoPanel_small ipsClearfix"> 
+				{template="userPhoto" group="global" params="$item->author()"}
+				<div>
+					<a href="#user{$item->author()->member_id}_menu" id="user{$item->author()->member_id}" class="ipsType_sectionHead" data-ipsmenu="">{$item->author()->name} &nbsp;<i class="fa fa-caret-down"></i></a>
+					<ul class="ipsMenu ipsMenu_auto ipsMenu_withStem ipsHide" id="user{$item->author()->member_id}_menu">
+						{{if \IPS\Member::loggedIn()->modPermission('mod_can_warn')}}
+							<li class='ipsMenu_item'><a href='{url="app=core&module=system&controller=warnings&do=warn&id={$item->author()->member_id}&ref={$ref}" seoTemplate="warn_add" seoTitle="$item->author()->members_seo_name"}' data-ipsDialog data-ipsDialog-title="{lang="warn_member" sprintf="$item->author()->name"}" data-ipsDialog-remoteSubmit data-ipsDialog-flashMessage="{lang="warning_issued"}" data-role="warnUserDialog">{lang="warn_user"}</a></li>
+						{{endif}}
+						{{if $item->author()->member_id != \IPS\Member::loggedIn()->member_id}}
+							{{if $item->author()->members_bitoptions['bw_is_spammer']}}
+								<li class='ipsMenu_item' data-ipsMenuValue='spamFlagButton'><a href='{url="app=core&module=system&controller=moderation&do=flagAsSpammer&id={$item->author()->member_id}&s=0" seoTemplate="flag_as_spammer" seoTitle="$item->author()->members_seo_name" csrf="true"}' data-confirm data-confirmSubMessage="{lang="spam_unflag_confirm"}">{lang="spam_unflag"}</a></li>
+							{{else}}
+								<li class='ipsMenu_item' data-ipsMenuValue='spamFlagButton'><a href='{url="app=core&module=system&controller=moderation&do=flagAsSpammer&id={$item->author()->member_id}&s=1" seoTemplate="flag_as_spammer" seoTitle="$item->author()->members_seo_name" csrf="true"}' data-confirm>{lang="spam_flag"}</a></li>
+							{{endif}}
+						{{endif}}
+						<li class="ipsMenu_item"><a href='{url="app=core&module=messaging&controller=messenger&do=compose&to={$item->author()->member_id}" seoTemplate="messenger_compose"}' data-ipsDialog data-ipsDialog-title='{lang="compose_new"}' data-ipsDialog-remoteSubmit data-ipsDialog-flashMessage="{lang="message_sent"}">{lang="message_send"}</a></li>
+					</ul>
+					{{if $container}}
+						<p class='ipsType_reset'>{lang="posted_in_container"} <a href="{$container->url()}">{$container->_title}</a></p>
+					{{endif}}
+					<p class="ipsType_light ipsType_reset">{lang="date_replied" htmlsprintf="\IPS\DateTime::ts( $item->mapped('date') )->html(FALSE)"}</p>
+				</p>
+				<p class='ipsType_normal ipsType_reset'>
+					<time itemprop='startDate' content='{expression="$item->_start_date->format( 'Y-m-d' )"}'>
+					{{if $item->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )}}
+						{$item->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )->calendarDate()}{{if !$item->all_day}}, {$item->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )->localeTime( FALSE )} {{endif}}
+					{{else}}
+						{$item->lastOccurrence( 'startDate' )->calendarDate()}{{if !$item->all_day}} {$item->lastOccurrence( 'startDate' )->localeTime( FALSE )} {{endif}}
+					{{endif}}
+					</time>
+					{{if $item->_end_date}}
+						&nbsp;&nbsp;<i class='fa fa-arrow-circle-right ipsType_large ipsType_light'></i>&nbsp;&nbsp;
+						<time itemprop='endDate' content='{expression="$item->_end_date->format( 'Y-m-d' )"}'>
+					{{if $item->nextOccurrence( $item->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' ) ?: \IPS\calendar\Date::getDate(), 'endDate' )}}
+						{$item->nextOccurrence( $item->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' ) ?: \IPS\calendar\Date::getDate(), 'endDate' )->calendarDate()}{{if !$item->all_day}}, {$item->nextOccurrence( $item->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' ) ?: \IPS\calendar\Date::getDate(), 'endDate' )->localeTime( FALSE )}{{endif}}
+					{{else}}
+						{$item->lastOccurrence( 'endDate' )->calendarDate()}{{if !$item->all_day}} {$item->lastOccurrence( 'endDate' )->localeTime( FALSE )}{{endif}}
+					{{endif}}
+						</time>
+					{{endif}}
+				</p>
+				</div>
+			</div>
+		</div>
+		<div class='ipsAreaBackground_light ipsPad'>
+			<div class='ipsBox'>
+				<h2 class="ipsType_sectionTitle ipsType_blendLinks"><a href="{$item->url()}">{$title}</a></h2>
+				<div class="ipsType_richText ipsPost ipsType_normal ipsPad">
+					{$item->content()|raw}
+				</div>
+			</div>
+		</div>
+	</article>
+</div>
+]]></template>
+ <template template_group="submit" template_name="datesForm" template_data="$name, $value, $timeZones, $error=''" template_location="front" template_app="calendar"><![CDATA[
+<div data-controller='calendar.front.submit.dates' id='eventDateSelection' class='ipsAreaBackground_light ipsPad'>
+	{{if $error}}
+		<div class="ipsMessage ipsMessage_error">{lang="$error"}</div>
+	{{endif}}
+	<div class='ipsGrid ipsGrid_collapsePhone'>
+		<div class='ipsGrid_span5 ipsType_center ipsBox' id='elDateGrid_start'>
+			<h2 class='ipsType_sectionTitle ipsType_reset'>{lang="submit_event_start"}</h2>
+			<div class='ipsPad'>
+				<div class='cCalendarSubmit_field'>
+					<i class='fa fa-calendar'></i>
+					<input type="date" data-summaryControl name="event_dates[start_date]" value="{{if $value['start_date'] instanceof \IPS\DateTime}}{$value['start_date']->format('Y-m-d')}{{else}}{$value['start_date']}{{endif}}" data-preferredFormat="{{if $value['start_date'] instanceof \IPS\DateTime}}{$value['start_date']->fullYearLocaleDate()}{{else}}{$value['start_date']}{{endif}}" required aria-required='true' class="ipsField_short" data-control="date" placeholder='{expression="mb_strtoupper( str_replace( 'y', 'yy', \IPS\Member::loggedIn()->language()->preferredDateFormat() ) )"}'>
+				</div>
+				<div class='cCalendarSubmit_field' id='start_time_wrap'>
+					<i class='fa fa-clock-o'></i>
+					<input name="event_dates[start_time]" id="start_time" type="time" size='12' class="ipsField_short" placeholder="HH:MM" step='60' min='00:00' value="{$value['start_time']}">
+				</div>
+				<br><br>
+				<ul class='ipsList_inline'>
+					<li>
+						<span class='ipsCustomInput'>
+							<input type="checkbox" role="checkbox" name="event_dates[single_day]" {{if isset($value['single_day']) AND $value['single_day']}}checked aria-checked='true'{{endif}} value="1" id="check_single_day">
+							<span></span>
+						</span> <label for='check_single_day'>{lang="event_single_day"}</label>
+					</li>
+					<li>
+						<span class='ipsCustomInput'>
+							<input type="checkbox" role="checkbox" name="event_dates[all_day]" {{if isset($value['all_day']) AND $value['all_day']}}checked aria-checked='true'{{endif}} value="1" id="check_all_day"> 
+							<span></span>
+						</span> <label for='check_all_day'>{lang="event_all_day"}</label>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class='ipsGrid_span2 ipsType_center' id='elDateGrid_arrow'>
+			<strong><i class='fa fa-angle-right'></i></strong>
+		</div>
+		<div class='ipsGrid_span5 ipsType_center ipsBox' id='elDateGrid_end'>
+			<h2 class='ipsType_sectionTitle ipsType_reset'>{lang="submit_event_end"}</h2>
+			<div class='ipsPad'>
+				<div class='cCalendarSubmit_field' id='event_end_date_wrap'>
+					<i class='fa fa-calendar'></i>
+					<input type="date" name="event_dates[end_date]" value="{{if $value['end_date'] instanceof \IPS\DateTime}}{$value['end_date']->format('Y-m-d')}{{else}}{$value['end_date']}{{endif}}" data-preferredFormat="{{if $value['end_date'] instanceof \IPS\DateTime}}{$value['end_date']->fullYearLocaleDate()}{{else}}{{if $value['start_date'] instanceof \IPS\DateTime}}{$value['start_date']->fullYearLocaleDate()}{{else}}{$value['end_date']}{{endif}}{{endif}}" class="ipsField_short" data-control="date" id="event_end_date" placeholder='{expression="mb_strtoupper( str_replace( 'y', 'yy', \IPS\Member::loggedIn()->language()->preferredDateFormat() ) )"}'>
+				</div>
+				<div class='cCalendarSubmit_field' id='end_time_wrap'>
+					<i class='fa fa-clock-o'></i>
+					<input name="event_dates[end_time]" id="end_time" type="time" size='12' class="ipsField_short" placeholder="HH:MM" step='60' min='00:00' value="{$value['end_time']}">
+				</div>
+			</div>
+		</div>
+	</div>
+	<br>
+
+	<div class='ipsBox ipsPad ipsType_center'>
+		<strong class='ipsType_light'>{lang="submit_event_summary"}</strong>
+		<p class='ipsType_large ipsType_reset'>
+			<span data-role='dateSummary'></span>
+		</p>
+		<p class='ipsType_normal' id='elRepeatRow_hidden'>
+			<span class='ipsCustomInput'>
+				<input type='checkbox' role='checkbox' name='event_dates[event_repeat]' value='1' id="elRepeatCb" {{if isset($value['event_repeat']) AND $value['event_repeat']}}checked aria-checked='true'{{endif}}>
+				<span></span>
+			</span> <label for='elRepeatCb'>{lang="submit_event_repeats_check"}</label>
+		</p>
+		<div id='elRepeatRow_shown' class='ipsJS_hide'>
+			<br>
+			<strong class='ipsType_light'>{lang="submit_event_repeats"}</strong>
+			<p class='ipsType_normal ipsType_reset'>
+				<span id='elRecurEdit' data-ipsMenu data-ipsMenu-closeOnClick='false' data-ipsMenu-appendTo="#eventDateSelection" class='ipsType_normal ipsCursor_pointer'><span data-role='recurringSummary'></span> <i class='fa fa-caret-down'></i></span> &nbsp;&nbsp;<a href='#' id='elRecurRemove' class='ipsType_small'>[{lang="submit_event_remove_repeat"}]</a>
+			</p>
+		</div>
+	</div>
+
+	<p class='ipsType_right ipsType_small ipsType_light ipsType_blendLinks' id='elTimezone'>
+		<a href='#elTimezoneSelector_menu' id='elTimezoneSelector' data-ipsMenu data-ipsMenu-closeOnClick="false" data-ipsMenu-appendTo="#eventDateSelection"><i class='fa fa-globe'></i> {lang="event_timezone"}: <em data-role="timezone_display"></em> &nbsp;<i class='fa fa-caret-down'></i></a>
+	</p>
+
+	<div id='elTimezoneSelector_menu' class='ipsHide ipsMenu'>
+		<div class='ipsPad'>
+			<select name="event_dates[event_timezone]" id="event_timezone">
+				{{foreach $timeZones as $k => $v}}
+					<option value='{$k}' {{if $value['event_timezone'] == $k }}selected{{endif}} data-abbreviated="{$v['short']}">{$v['text']}</option>
+				{{endforeach}}
+			</select>
+		</div>
+		<div class='ipsAreaBackground_light ipsClearfix ipsPad ipsType_center'>
+			<button class='ipsButton ipsButton_primary ipsButton_verySmall' role='button' data-action="updateTimezone">{lang="change"}</button>
+		</div>
+	</div>
+
+
+	<div id='elRecurEdit_menu' class='ipsHide ipsMenu ipsMenu_wide ipsPad'>
+		<ul>
+			<li class='ipsFieldRow'>
+				<label class='ipsFieldRow_label' for=''>{lang="event_rpm_repeats"}</label>
+				<div class='ipsFieldRow_content'>
+					{template="select" group="forms" app="core" location="front" params="'event_dates[event_repeats]', $value['event_repeats'], FALSE, array( 'daily' => \IPS\Member::loggedIn()->language()->addToStack('event_rpm_repeats_daily'), 'weekly' => \IPS\Member::loggedIn()->language()->addToStack('event_rpm_repeats_weekly'), 'monthly' => \IPS\Member::loggedIn()->language()->addToStack('event_rpm_repeats_monthly'), 'yearly' => \IPS\Member::loggedIn()->language()->addToStack('event_rpm_repeats_yearly') ), FALSE, '', FALSE, array( 'daily' => array( 'repeatFreqPer_day' ), 'weekly' => array( 'elRepeatOn', 'repeatFreqPer_week' ), 'monthly' => array( 'repeatFreqPer_month' ), 'yearly' => array( 'repeatFreqPer_year' ) ), 'event_repeats'"}
+				</div>
+			</li>
+			<li class='ipsFieldRow'>
+				<label class='ipsFieldRow_label' for=''>{lang="event_rpm_repeatevery"}</label>
+				<div class='ipsFieldRow_content'>
+					{template="select" group="forms" app="core" location="front" params="'event_dates[event_repeat_freq]', $value['event_repeat_freq'], FALSE, array_combine( range( 1, 30 ), range( 1, 30 ) ), FALSE, '', FALSE, array(), 'event_repeat_freq'"}
+					<span id='repeatFreqPer_day' {{if $value['event_repeats'] and $value['event_repeats'] != 'daily'}}style="display:none"{{endif}}>{lang="event_rpm_repeatevery_day"}</span>
+					<span id='repeatFreqPer_week' {{if $value['event_repeats'] != 'weekly'}}style="display:none"{{endif}}>{lang="event_rpm_repeatevery_week"}</span>
+					<span id='repeatFreqPer_month' {{if $value['event_repeats'] != 'monthly'}}style="display:none"{{endif}}>{lang="event_rpm_repeatevery_month"}</span>
+					<span id='repeatFreqPer_year' {{if $value['event_repeats'] != 'yearly'}}style="display:none"{{endif}}>{lang="event_rpm_repeatevery_year"}</span>
+				</div>
+			</li>
+			<li class='ipsFieldRow' id='elRepeatOn'>
+				<span class='ipsFieldRow_label'>{lang="event_rpm_repeaton"}</span>
+				<ul class='ipsFieldRow_content ipsList_reset'>
+					{{foreach \IPS\calendar\Date::getDayNames() as $day }}
+						<li class='ipsFieldRow_inlineCheckbox'>
+							<span class='ipsCustomInput'>
+								<input type="checkbox" role="checkbox" name="event_dates[repeat_freq_on_{$day['ical']}]" value="1" id="check_repeat_freq_on_{$day['ical']}" data-iCal='{$day['ical']}' {{if ( isset( $value['repeat_freq_on_' . $day['ical'] ] ) AND $value['repeat_freq_on_' . $day['ical'] ] )}}checked aria-checked='true'{{endif}}>
+								<span></span>
+							</span> <label for="check_repeat_freq_on_{$day['ical']}">{$day['abbreviated']}</label>
+						</li>
+					{{endforeach}}
+				</ul>
+			</li>
+			<li class='ipsFieldRow'>
+				<span class='ipsFieldRow_label' for=''>{lang="event_rpm_ends"}</span>
+				<ul class='ipsFieldRow_content ipsField_fieldList'>
+					<li>
+						<input type='radio' name='event_dates[repeat_end]' id='event_repeat_end_never' value='never'{{if !$value['repeat_end_occurrences'] AND !$value['repeat_end_date']}} checked{{endif}}>
+						<div class='ipsField_fieldList_content'>
+							<label for="event_repeat_end_never">{lang="event_rpm_ends_never"}</label>
+						</div>
+					</li>
+					<li>
+						<input type='radio' name='event_dates[repeat_end]' id='event_repeat_end_afterx' value='after'{{if $value['repeat_end_occurrences']}} checked{{endif}}>
+						<div class='ipsField_fieldList_content'>
+							<label for="event_repeat_end_afterx">{lang="event_rpm_ends_afterx"}</label> <input type='number' name='event_dates[repeat_end_occurrences]' class='cCalendar_shortInput' size='4' min='1' value='{$value['repeat_end_occurrences']}'> {lang="event_rpm_ends_occurrencesx"}
+						</div>
+					</li>
+					<li>
+						<input type='radio' name='event_dates[repeat_end]' id='event_repeat_end_ondate' value='date'{{if $value['repeat_end_date']}} checked{{endif}}>
+						<div class='ipsField_fieldList_content'>
+							<label for="event_repeat_end_ondate">{lang="event_rpm_ends_date"}</label> <input type='date' name='event_dates[repeat_end_date]' class='cCalendar_shortInput' size='10' value='{{if $value['repeat_end_date'] instanceof \IPS\calendar\Date}}{$value['repeat_end_date']->mysqlDatetime( FALSE )}{{endif}}'>
+						</div>
+					</li>
+				</ul>
+			</li>
+			<li class='ipsFieldRow'>
+				<div class='ipsFieldRow_content ipsType_center'>
+					<button type='button' class='ipsButton ipsButton_light' role='button' data-action="updateRepeat">{lang="ok"}</button>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>]]></template>
+ <template template_group="submit" template_name="submitForm" template_data="$id, $action, $elements, $hiddenValues, $actionButtons, $uploadField, $class=''" template_location="front" template_app="calendar"><![CDATA[
+<form accept-charset='utf-8' class="ipsForm {$class}" action="{$action}" method="post" {{if $uploadField}}enctype="multipart/form-data"{{endif}} data-ipsForm>
+	<input type="hidden" name="{$id}_submitted" value="1">
+	{{foreach $hiddenValues as $k => $v}}
+		<input type="hidden" name="{$k}" value="{$v}">
+	{{endforeach}}
+	{{if $uploadField}}
+		<input type="hidden" name="MAX_FILE_SIZE" value="{$uploadField}">
+		<input type="hidden" name="plupload" value="{expression="md5( uniqid() )"}">
+	{{endif}}
+	
+	<ul class='ipsForm ipsForm_vertical'>
+		{{foreach $elements as $collection}}
+			{{foreach $collection as $inputName => $input}}
+				{{if $inputName == 'event_dates'}}
+					{$input->html()|raw}
+				{{endif}}
+			{{endforeach}}
+		{{endforeach}}
+	</ul>
+	<br>
+
+	<div class='ipsBox'>
+		<ul class='ipsForm ipsPad ipsForm_vertical'>
+			{{foreach $elements as $collection}}
+				{{foreach $collection as $inputName => $input}}
+					{{if $inputName != 'event_dates'}}
+						{$input|raw}
+					{{endif}}
+				{{endforeach}}
+			{{endforeach}}
+		</ul>
+		<br>
+		<div class='ipsAreaBackground ipsPad ipsType_center'>
+			<button type='submit' class='ipsButton ipsButton_large ipsButton_primary'>{lang="submit_event"}</button>
+		</div>
+	</div>
+</form>]]></template>
+ <template template_group="submit" template_name="submitPage" template_data="$output" template_location="front" template_app="calendar"><![CDATA[{template="pageHeader" group="global" app="core" params="\IPS\Member::loggedIn()->language()->addToStack('add_cal_event_header')"}
+
+{$output|raw}]]></template>
+ <template template_group="view" template_name="attendees" template_data="$event" template_location="front" template_app="calendar"><![CDATA[<div class="ipsPrint">
+	<h1>{setting="board_name"}</h1>
+	<h2>{lang="event_attendees" sprintf="$event->title"}</h2>
+	<h4 class='date'>
+		{$event->_start_date->dayName} {$event->_start_date->mday} {$event->_start_date->monthName}, {$event->_start_date->year}{{if !$event->all_day}}, {$event->_start_date->localeTime( FALSE )}{{endif}}
+		{{if $event->_end_date}} - {$event->_end_date->dayName} {$event->_end_date->mday} {$event->_end_date->monthName}, {$event->_end_date->year} {{if !$event->all_day}}, {$event->_end_date->localeTime( FALSE )}{{endif}}{{endif}}
+	</h4>
+	<div></div>
+	<div></div>
+
+	<h3>{lang="event_rsvp_attendees"}</h3>
+	<ul>
+		{{if count( $event->attendees( \IPS\calendar\Event::RSVP_YES ) ) }}
+			{{foreach $event->attendees( \IPS\calendar\Event::RSVP_YES ) as $attendee }}
+				<li>{$attendee->name}</li>
+			{{endforeach}}
+		{{else}}
+			<li><em>{lang="no_rsvps_yet"}</em></li>
+		{{endif}}
+	</ul>
+
+	{{if count( $event->attendees( \IPS\calendar\Event::RSVP_MAYBE ) ) }}
+		<div></div>
+		<h3>{lang="rsvp_maybe_attendees"}</h3>
+		<ul>
+			{{foreach $event->attendees( \IPS\calendar\Event::RSVP_MAYBE ) as $attendee }}
+				<li>{$attendee->name}</li>
+			{{endforeach}}
+		</ul>
+	{{endif}}
+
+	{{if count( $event->attendees( \IPS\calendar\Event::RSVP_NO ) ) }}
+		<div></div>
+		<h3>{lang="rsvp_notgoing_attendees"}</h3>
+		<ul>
+			{{foreach $event->attendees( \IPS\calendar\Event::RSVP_NO ) as $attendee }}
+				<li>{$attendee->name}</li>
+			{{endforeach}}
+		</ul>
+	{{endif}}
+</div>]]></template>
+ <template template_group="view" template_name="comments" template_data="$event" template_location="front" template_app="calendar"><![CDATA[<div class='' data-controller='core.front.core.commentFeed, core.front.core.ignoredComments' {{if settings.auto_polling_enabled}}data-autoPoll{{endif}} data-baseURL='{$event->url()}' {{if $event->isLastPage()}}data-lastPage{{endif}} data-feedID='event-{$event->id}' id='comments'>
+	{{if $event->commentPageCount() > 1}}
+		{$event->commentPagination( array( 'tab' ) )|raw}
+		<br><br>
+	{{endif}}
+	<div data-role='commentFeed' data-controller='core.front.core.moderation'>
+		{{if ( $comments = $event->comments() and count( $comments ) )}}
+			<form action="{$event->url()->csrf()->setQueryString( 'do', 'multimodComment' )}" method="post" data-ipsPageAction data-role='moderationTools'>
+				{{$commentCount=0; $timeLastRead = $event->timeLastRead(); $lined = FALSE;}}
+				{{foreach $comments as $comment}}
+					{{if !$lined and $timeLastRead and $timeLastRead->getTimestamp() < $comment->mapped('date')}}
+						{{if $lined = TRUE and $commentCount}}
+							<hr class="ipsCommentUnreadSeperator">
+						{{endif}}
+					{{endif}}
+					{{$commentCount++;}}
+					{$comment->html()|raw}
+				{{endforeach}}
+				{template="commentMultimod" app="core" group="global" params="$event"}
+			</form>
+		{{else}}
+			<p class='ipsType_normal ipsType_light ipsType_center' data-role='noComments'>{lang="no_comments"}</p>
+		{{endif}}
+	</div>
+	{{if $event->commentPageCount() > 1}}
+		<hr class='ipsHr'>
+		{$event->commentPagination( array( 'tab' ) )|raw}
+	{{endif}}
+	{{if $event->commentForm() || $event->locked() || \IPS\Member::loggedIn()->restrict_post || \IPS\Member::loggedIn()->members_bitoptions['unacknowledged_warnings']}}
+		<a id='replyForm'></a>
+		<div data-role='replyArea' class='ipsBox ipsBox_transparent ipsAreaBackground ipsPad {{if !$event->canComment()}}cTopicPostArea_noSize{{endif}} ipsSpacer_top'>
+			{{if $event->commentForm()}}
+				{{if $event->locked()}}
+					<p class='ipsType_reset ipsType_warning ipsComposeArea_warning ipsSpacer_bottom ipsSpacer_half'><i class='fa fa-info-circle'></i> {lang="event_locked_can_comment"}</p>
+				{{endif}}
+				{$event->commentForm()|raw}
+				{{else}}
+				{{if $event->locked()}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'event_locked_cannot_comment'"}
+				{{elseif \IPS\Member::loggedIn()->restrict_post}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'restricted_cannot_comment', \IPS\Member::loggedIn()->warnings(5,NULL,'rpa'), \IPS\Member::loggedIn()->restrict_post"}
+				{{elseif \IPS\Member::loggedIn()->members_bitoptions['unacknowledged_warnings']}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'unacknowledged_warning_cannot_post', \IPS\Member::loggedIn()->warnings( 1, FALSE )"}
+				{{endif}}
+			{{endif}}
+		</div>
+	{{endif}}
+</div>]]></template>
+ <template template_group="view" template_name="coverPhotoOverlay" template_data="$event" template_location="front" template_app="calendar"><![CDATA[<div class='cEvent_details'>
+	<h1 class='ipsType_pageTitle ipsTruncate ipsTruncate_line'>
+		{{if $event->prefix()}}
+			{template="prefix" group="global" app="core" params="$event->prefix( TRUE ), $event->prefix()"}
+		{{endif}}
+
+		{{if $event->locked()}}<i class='fa fa-lock'></i> {{endif}}
+
+		{{if $event->mapped('pinned') || $event->mapped('featured') || $event->hidden() === -1 || $event->hidden() === 1}}
+			{{if $event->hidden() === -1}}
+				<span class="ipsBadge ipsBadge_icon ipsBadge_warning" data-ipsTooltip title='{$event->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+			{{elseif $event->hidden() === 1}}
+				<span class="ipsBadge ipsBadge_icon ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+			{{endif}}
+			{{if $event->mapped('pinned')}}
+				<span class="ipsBadge ipsBadge_icon ipsBadge_positive" data-ipsTooltip title='{lang="pinned"}'><i class='fa fa-thumb-tack'></i></span>
+			{{endif}}
+			{{if $event->mapped('featured')}}
+				<span class="ipsBadge ipsBadge_icon ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+			{{endif}}
+		{{endif}}
+
+		<span itemprop='name'>{$event->title}</span>
+	</h1>
+	<p class='ipsType_normal ipsType_reset'>
+		<time itemprop='startDate' content='{expression="$event->_start_date->format( 'Y-m-d' )"}'>
+			{{if $event->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )}}
+				{$event->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )->calendarDate()}{{if !$event->all_day}}, {$event->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' )->localeTime( FALSE )} {{endif}}
+			{{else}}
+				{$event->lastOccurrence( 'startDate' )->calendarDate()}{{if !$event->all_day}} {$event->lastOccurrence( 'startDate' )->localeTime( FALSE )} {{endif}}
+			{{endif}}
+		</time>
+		{{if $event->_end_date}}
+			&nbsp;&nbsp;<i class='fa fa-arrow-circle-right ipsType_large ipsType_light'></i>&nbsp;&nbsp;
+			<time itemprop='endDate' content='{expression="$event->_end_date->format( 'Y-m-d' )"}'>
+				{{if $event->nextOccurrence( $event->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' ) ?: \IPS\calendar\Date::getDate(), 'endDate' )}}
+					{$event->nextOccurrence( $event->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' ) ?: \IPS\calendar\Date::getDate(), 'endDate' )->calendarDate()}{{if !$event->all_day}}, {$event->nextOccurrence( $event->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' ) ?: \IPS\calendar\Date::getDate(), 'endDate' )->localeTime( FALSE )}{{endif}}
+				{{else}}
+					{$event->lastOccurrence( 'endDate' )->calendarDate()}{{if !$event->all_day}} {$event->lastOccurrence( 'endDate' )->localeTime( FALSE )}{{endif}}
+				{{endif}}
+			</time>
+		{{endif}}
+	</p>
+</div>]]></template>
+ <template template_group="view" template_name="eventBlock" template_data="$event, $date, $truncate=FALSE, $map=array( 300, 200 ), $revertToFirst=FALSE" template_location="front" template_app="calendar"><![CDATA[{{$coverPhoto = $event->coverPhoto();}}
+<div class='cCalendarBlock ipsAreaBackground_reset ipsBox'>
+	<div class='ipsPageHead_special ipsCoverPhoto' data-controller='core.front.core.coverPhoto' data-coverOffset='{$coverPhoto->offset}'>
+		{{if $coverPhoto->file}}
+			<div class='ipsCoverPhoto_container'>
+				<img src='{$coverPhoto->file->url}' class='ipsCoverPhoto_photo'>
+			</div>
+		{{endif}}
+		<div class='ipsColumns'>
+			<div class='ipsColumn ipsColumn_fixed ipsColumn_veryNarrow ipsPos_center'>
+				<img src='{$event->author()->photo}' class="ipsUserPhoto ipsUserPhoto_mini" alt=''>
+			</div>
+			<div class='ipsColumn ipsColumn_fluid'>
+				<h2 class='ipsType_pageTitle ipsType_blendLinks'><a href='{$event->url()}' title='{$event->title}'>{truncate="$event->title" length="18"}{{if $event->hidden() === 1}} <span class="ipsBadge ipsBadge_icon ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>{{endif}}</a></h2>
+			</div>
+		</div>
+	</div>
+	<br>
+	<div class='ipsPad ipsClearfix'>
+		<h3 class='ipsType_reset'>
+			{{$startDate = $event->nextOccurrence( $date, 'startDate' );}}
+			{{if $revertToFirst AND $startDate->mon > $date->mon}}
+				{{$startDate = $event->nextOccurrence( \IPS\calendar\Date::getDate( $date->year, $date->mon, 1 ), 'startDate' );}}
+			{{endif}}
+			{{if $startDate}}
+				{$startDate->calendarDate()}{{if !$event->all_day}} {$startDate->localeTime( FALSE )} {{endif}}
+				{{if $event->_end_date AND $event->nextOccurrence( $startDate ?: $date, 'endDate' ) }}
+					- {$event->nextOccurrence( $startDate ?: $date, 'endDate' )->calendarDate()}{{if !$event->all_day}} {$event->nextOccurrence( $startDate ?: $date, 'endDate' )->localeTime( FALSE )}{{endif}}
+				{{endif}}
+			{{else}}
+				{$event->lastOccurrence( 'startDate' )->calendarDate()}{{if !$event->all_day}} {$event->lastOccurrence( 'startDate' )->localeTime( FALSE )} {{endif}}
+				{{if $event->_end_date AND $event->lastOccurrence( 'endDate' ) }}
+					- {$event->lastOccurrence( 'endDate' )->calendarDate()}{{if !$event->all_day}} {$event->lastOccurrence( 'endDate' )->localeTime( FALSE )}{{endif}}
+				{{endif}}
+			{{endif}}
+		</h3>
+		{{if $event->recurring}}<p class='ipsType_reset ipsType_normal ipsType_light'>{$event->_recurring_text}</p><br>{{endif}}
+		<div class='ipsType_richText ipsType_medium' {{if ( \IPS\Request::i()->isAjax() or $truncate ) && $event->content}}data-ipsTruncate data-ipsTruncate-type='remove' data-ipsTruncate-size='5 lines'{{endif}}>
+			{{if $event->content}}
+				{{if \IPS\Request::i()->isAjax() or $truncate}}
+					{$event->truncated()|raw}
+				{{else}}
+					{$event->content|raw}
+				{{endif}}
+			{{endif}}
+			<p class='ipsType_medium ipsType_richText ipsSpacer_both'><a href='{$event->url()}'>{lang="event_details"}</a></p>
+		</div>
+		{{if $map !== FALSE AND $event->map( $map[0], $map[1] )}}
+			<div class='ipsAreaBackground_light cCalendarBlock_map ipsPad_half'>
+				{$event->map( $map[0], $map[1] )|raw}
+			</div>
+		{{endif}}
+		<br>
+		<a href='{$event->container()->url()}' class='ipsPos_right ipsResponsive_noFloat cEvents_event cEvents_eventSmall cEvents_style{$event->container()->id}'>{$event->container()->_title}</a>
+		{{if $event->container()->allow_comments}}<a href='{$event->url()->setQueryString( 'tab', 'comments' )}' class='ipsType_medium ipsType_noBreak'>{lang="event_comment_count" pluralize="$event->comments"}</a>{{endif}}
+		{{if $event->container()->allow_comments AND $event->container()->allow_reviews}}&middot;{{endif}}
+		{{if $event->container()->allow_reviews}}<a href='{$event->url()->setQueryString( 'tab', 'reviews' )}' class='ipsType_medium ipsType_noBreak'>{lang="event_review_count" pluralize="$event->reviews"}</a>{{endif}}
+		{{if $event->rsvp }}
+			<hr class='ipsHr'>
+			<h4 class='ipsType_reset'><strong>{lang="event_rsvp_attendees_list" pluralize="$event->attendeeCount( \IPS\calendar\Event::RSVP_YES )"}</strong></h4>
+			{{if count( $event->attendees( \IPS\calendar\Event::RSVP_YES, 5 ) )}}
+				<ul class='ipsList_inline ipsList_noSpacing ipsSpacer_top ipsSpacer_half'>
+					{{foreach $event->attendees( \IPS\calendar\Event::RSVP_YES, 5 ) as $attendee}}
+						<li>{template="userPhoto" app="core" group="global" params="$attendee, 'tiny'"}</li>
+					{{endforeach}}
+				</ul>
+			{{endif}}
+		{{endif}}
+	</div>
+</div>]]></template>
+ <template template_group="view" template_name="eventBlocks" template_data="$events" template_location="front" template_app="calendar"><![CDATA[
+<ul class='ipsDataList ipsDataList_reducedSpacing'>
+	{{foreach $events as $event}}
+		<li class='ipsDataItem'>
+			<div class='ipsDataItem_icon cCalendar_date_overlay'>
+				{{$nextOccurrence = $event->nextOccurrence( \IPS\calendar\Date::getDate(), 'startDate' ) ?: $event->lastOccurrence();}}
+				<time datetime='{$nextOccurrence->mysqlDatetime()}' class='ipsCalendarDate'>
+					<span class='ipsCalendarDate_month'>{$nextOccurrence->monthNameShort}</span>
+					<span class='ipsCalendarDate_date'>{$nextOccurrence->mday}</span>
+				</time>
+			</div>
+			<div class='ipsDataItem_main'>
+				<a href="{$event->url()}" title='{lang="view_this_event" sprintf="$event->title"}'>{$event->title}</a><br>
+				<span class='ipsType_light ipsType_medium'>{lang="byline_nodate" sprintf="$event->author()->name"}</span><br>
+			</div>
+		</li>
+	{{endforeach}}
+</ul>]]></template>
+ <template template_group="view" template_name="eventSidebar" template_data="$event, $attendees, $tabId=''" template_location="front" template_app="calendar"><![CDATA[
+{{if $event->map( 250, 250 )}}
+	<div class='ipsPad_half ipsType_center ipsAreaBackground'>
+		{$event->map( 250, 250 )|raw}
+	</div>
+	<br>
+{{endif}}
+
+{{if $event->rsvp }}
+	{template="rsvpControls" group="view" params="$event, $attendees"}
+	<br>
+
+	<div class='ipsBox'>
+		<h3 class='ipsType_reset ipsType_sectionHead ipsHide'>{lang="event_rsvp_attendees"}</h3>
+		<div class='ipsTabs ipsTabs_small ipsTabs_stretch ipsClearfix' id='elAttendees{$tabId}' data-ipsTabBar data-ipsTabBar-contentArea='#elAttendees{$tabId}_content'>
+			<a href='#elAttendees{$tabId}' data-action='expandTabs'><i class='fa fa-caret-down'></i></a>
+			<ul role="tablist">
+				<li>
+					<a href='#ipsTabs_elAttendees{$tabId}_elGoing_panel' id='elGoing' class='ipsTabs_item ipsTabs_activeItem ipsType_center' role="tab" aria-selected='true'>{lang="rsvp_attendees"} {{if count($attendees[1])}}({expression="count($attendees[1])"}){{endif}}</a>
+				</li>
+				{{if $event->rsvp_limit == -1}}
+					<li>
+						<a href='#ipsTabs_elAttendees{$tabId}_elMaybe_panel' id='elMaybe' class='ipsTabs_item ipsType_center' role="tab" aria-selected='false'>{lang="rsvp_maybe_attendees"} {{if count($attendees[2])}}({expression="count($attendees[2])"}){{endif}}</a>
+					</li>	
+				{{endif}}	
+				<li>
+					<a href='#ipsTabs_elAttendees{$tabId}_elNotGoing_panel' id='elNotGoing' class='ipsTabs_item ipsType_center' role="tab" aria-selected='false'>{lang="rsvp_notgoing_attendees"} {{if count($attendees[0])}}({expression="count($attendees[0])"}){{endif}}</a>
+				</li>
+			</ul>
+		</div>
+		<div id='elAttendees{$tabId}_content' class='ipsTabs_panels'>
+			<div id="ipsTabs_elAttendees{$tabId}_elGoing_panel" class='ipsTabs_panel ipsAreaBackground_reset ipsPad'>
+				{{if count($attendees[1]) }}
+					<ul class='ipsGrid ipsList_reset'>
+						{{foreach $attendees[1] as $attendee}}
+							<li class='ipsGrid_span3' itemprop='attendee' itemscope itemtype="http://schema.org/Person">
+	 							<a href='{$attendee->url()}' itemprop='url' title="{$attendee->name}" data-ipsTooltip>
+	 								<img src='{$attendee->photo}' class='ipsUserPhoto ipsUserPhoto_mini' alt='' itemprop='image'>
+	 								<span class='ipsHide' itemprop='name'>{$attendee->name}</span>
+	 							</a>
+	 						</li>
+						{{endforeach}}
+					</ul>
+				{{else}}
+					<p class='ipsType_light ipsPad ipsType_center'>
+						{lang="no_rsvps_yet"}
+					</p>
+				{{endif}}
+			</div>
+			{{if $event->rsvp_limit == -1}}
+				<div id="ipsTabs_elAttendees{$tabId}_elMaybe_panel" class='ipsTabs_panel ipsAreaBackground_reset ipsPad'>
+					{{if count($attendees[2]) }}
+						<ul class='ipsGrid ipsList_reset'>
+							{{foreach $attendees[2] as $attendee}}
+								<li class='ipsGrid_span3' itemprop='attendee' itemscope itemtype="http://schema.org/Person">
+		 							<a href='{$attendee->url()}' itemprop='url' title="{$attendee->name}" data-ipsTooltip>
+		 								<img src='{$attendee->photo}' class='ipsUserPhoto ipsUserPhoto_mini' alt='' itemprop='image'>
+		 								<span class='ipsHide' itemprop='name'>{$attendee->name}</span>
+		 							</a>
+		 						</li>
+							{{endforeach}}
+						</ul>
+					{{else}}
+						<p class='ipsType_light ipsPad ipsType_center'>{lang="no_maybe_rsvps_yet"}</p>
+					{{endif}}
+				</div>
+			{{endif}}
+			<div id="ipsTabs_elAttendees{$tabId}_elNotGoing_panel" class='ipsTabs_panel ipsAreaBackground_reset ipsPad'>
+				{{if count($attendees[0]) }}
+					<ul class='ipsGrid ipsList_reset'>
+						{{foreach $attendees[0] as $attendee}}
+							<li class='ipsGrid_span3' itemprop='attendee' itemscope itemtype="http://schema.org/Person">
+	 							<a href='{$attendee->url()}' itemprop='url' title="{$attendee->name}" data-ipsTooltip>
+	 								<img src='{$attendee->photo}' class='ipsUserPhoto ipsUserPhoto_mini' alt='' itemprop='image'>
+	 								<span class='ipsHide' itemprop='name'>{$attendee->name}</span>
+	 							</a>
+	 						</li>
+						{{endforeach}}
+					</ul>
+				{{else}}
+					<p class='ipsType_light ipsPad ipsType_center'>{lang="no_decline_rsvps_yet"}</p>
+				{{endif}}
+			</div>
+
+			{{if count($attendees[0]) OR count($attendees[1]) OR count($attendees[2]) }}
+				<div class='ipsPad_half ipsType_center ipsType_medium ipsAreaBackground_light'>
+					<a href='{$event->url('downloadRsvp')->csrf()}' class=''><i class='fa fa-arrow-circle-o-down'></i> {lang="rsvp_download"}</a>
+				</div>
+			{{endif}}
+		</div>
+	</div>
+{{endif}}]]></template>
+ <template template_group="view" template_name="reviews" template_data="$event" template_location="front" template_app="calendar"><![CDATA[<div data-controller='core.front.core.commentFeed' {{if settings.auto_polling_enabled}}data-autoPoll{{endif}} data-baseURL='{$event->url()}' {{if $event->isLastPage('reviews')}}data-lastPage{{endif}} data-feedID='event-{$event->id}-reviews' id='reviews'>
+	{{if $event->canReview()}}
+		{{if $event->locked()}}
+			<strong class='ipsType_warning'><i class='fa fa-info-circle'></i> {lang="item_locked_can_review"}</strong>
+		{{endif}}
+		<div id='elEventReviewForm'>
+			{$event->reviewForm()|raw}
+		</div>
+	{{else}}
+		{{if $event->locked()}}
+			{template="commentUnavailable" group="forms" location="front" app="core" params="'item_locked_cannot_comment'"}
+		{{elseif \IPS\Member::loggedin()->restrict_post}}
+			{template="commentUnavailable" group="forms" location="front" app="core" params="'restricted_cannot_comment', \IPS\Member::loggedIn()->restrict_post"}
+		{{endif}}
+	{{endif}}
+	{{if count( $event->reviews() )}}
+		<hr class='ipsHr'>
+		<div class="ipsClearfix">
+			{{if $event->reviewPageCount() > 1}}
+				<div class="ipsPos_left">
+					{$event->reviewPagination( array( 'tab', 'sort' ) )|raw}
+				</div>
+			{{endif}}
+			<div class="ipsClearfix ipsResponsive_showDesktop ipsPos_right">
+				<ul class="ipsButtonRow ipsPos_left ipsClearfix">
+					<li data-action="tableFilter" data-filter="helpful">
+						<a href="{$event->url()->setQueryString( array( 'tab' => 'reviews', 'page' => 1, 'sort' => 'helpful' ) )}" class="{{if !isset( request.sort ) or request.sort != 'newest'}}ipsButtonRow_active{{endif}}" data-action="filterClick">{lang="most_helpful"}</a>
+					</li>
+					<li data-action="tableFilter" data-filter="newest">
+						<a href="{$event->url()->setQueryString( array( 'tab' => 'reviews', 'page' => 1, 'sort' => 'newest' ) )}" class="{{if isset( request.sort ) and request.sort == 'newest'}}ipsButtonRow_active{{endif}}" data-action="filterClick">{lang="newest"}</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<br>
+		<div data-role='commentFeed' data-controller='core.front.core.moderation'>
+			<form action="{$event->url()->csrf()->setQueryString( 'do', 'multimodReview' )}" method="post" data-ipsPageAction data-role='moderationTools'>
+				{{$reviewCount=0; $timeLastRead = $event->timeLastRead(); $lined = FALSE;}}
+				{{foreach $event->reviews() as $review}}
+					{{if !$lined and $timeLastRead and $timeLastRead->getTimestamp() < $review->mapped('date')}}
+						{{if $lined = TRUE and $reviewCount}}
+							<hr class="ipsCommentUnreadSeperator">
+						{{endif}}
+					{{endif}}
+					{{$reviewCount++;}}
+					{$review->html()|raw}
+				{{endforeach}}
+				{template="commentMultimod" app="core" group="global" params="$event, 'review'"}
+			</form>
+		</div>
+		{{if $event->reviewPageCount() > 1}}
+			<hr class='ipsHr'>
+			{$event->reviewPagination( array( 'tab', 'sort' ) )|raw}
+		{{endif}}
+	{{elseif !$event->canReview()}}
+		<p class="ipsType_normal ipsType_light ipsType_reset" data-role="noReviews">{lang="no_reviews"}</p>
+	{{endif}}
+</div>]]></template>
+ <template template_group="view" template_name="rsvpControls" template_data="$event, $attendees" template_location="front" template_app="calendar"><![CDATA[<!-- Don't use IDs here, this template is called twice in view -->
+{{if \IPS\Member::loggedIn()->member_id AND ( isset( $attendees[0][ \IPS\Member::loggedIn()->member_id ] ) OR isset( $attendees[1][ \IPS\Member::loggedIn()->member_id ] ) OR isset( $attendees[2][ \IPS\Member::loggedIn()->member_id ] ) )}}
+	<div class='ipsAreaBackground_reset ipsPad ipsBox'>
+		<p class='ipsType_large ipsType_center ipsType_reset'>
+			<strong>
+				{{if isset( $attendees[1][ \IPS\Member::loggedIn()->member_id ] )}}
+					<span class='ipsType_success'><i class='fa fa-check-circle'></i> {lang="you_are_going"}</span>
+				{{else}}
+					{lang="confirm_attendance"}
+				{{endif}}
+			</strong>
+		</p>
+		<br>
+		<ul class="ipsToolList ipsToolList_vertical">
+			{{if isset( $attendees[2][ \IPS\Member::loggedIn()->member_id ] )}}
+				<li>
+					<a href='{$event->url('rsvp')->setQueryString( 'action', 'yes' )->csrf()}' class='ipsButton ipsButton_important ipsButton_fullWidth'>{lang="rsvp_attend_event"}</a>
+				</li>
+				<li>
+					<a href='{$event->url('rsvp')->setQueryString( 'action', 'no' )->csrf()}' class='ipsButton ipsButton_veryLight ipsButton_fullWidth ipsButton_verySmall'>{lang="rsvp_notgoing_event"}</a>
+				</li>
+			{{else}}
+				<li class='ipsType_center'>
+					<a href='{$event->url('rsvp')->setQueryString( 'action', 'leave' )->csrf()}' class=''>{lang="rsvp_leave_event"}</a>
+				</li>
+			{{endif}}
+		</ul>
+	</div>
+{{elseif $event->can('rsvp')}}
+	<div class='ipsAreaBackground_reset ipsPad ipsBox'>
+		{{if $event->rsvp_limit > 0 AND count($attendees[1]) >= $event->rsvp_limit}}
+			<div class='ipsMessage ipsMessage_info'>{lang="rsvp_limit_reached"}</div>
+		{{else}}
+			{{if $event->rsvp_limit > 0}}<div class='ipsMessage ipsMessage_info'>{lang="rsvp_limit_info" pluralize="count($attendees[1])" sprintf="$event->rsvp_limit"}</div>{{endif}}
+			<a href='{$event->url('rsvp')->setQueryString( 'action', 'yes' )->csrf()}' class='ipsButton ipsButton_important ipsButton_fullWidth'>{lang="rsvp_attend_event"}</a>
+			<br>
+			<div class='ipsGrid'>
+				{{if $event->rsvp_limit == -1}}<div class='ipsGrid_span6'><a href='{$event->url('rsvp')->setQueryString( 'action', 'maybe' )->csrf()}' class='ipsButton ipsButton_primary ipsButton_fullWidth ipsButton_verySmall'>{lang="rsvp_maybe_event"}</a></div>{{endif}}
+				<div class='ipsGrid_span{{if $event->rsvp_limit == -1}}6{{else}}12{{endif}}'><a href='{$event->url('rsvp')->setQueryString( 'action', 'no' )->csrf()}' class='ipsButton ipsButton_primary ipsButton_fullWidth ipsButton_verySmall'>{lang="rsvp_notgoing_event"}</a></div>
+			</div>
+		{{endif}}
+	</div>
+{{endif}}]]></template>
+ <template template_group="view" template_name="view" template_data="$event, $commentsAndReviews, $attendees" template_location="front" template_app="calendar"><![CDATA[<div itemscope itemtype="http://schema.org/Event">
+	<header class='ipsClearfix ipsSpacer_bottom'>
+		<div id="elEventHeader">{$event->coverPhoto()|raw}</div>
+		<div id='elEventHeader_details' class='ipsClearfix ipsAreaBackground ipsPad'>
+			<a href='{$event->container()->url()}' class='ipsPos_right ipsResponsive_noFloat cEvents_event cEvents_eventSmall cEvents_style{$event->container()->id}'>{$event->container()->_title}</a>
+			<div class="ipsPhotoPanel ipsPhotoPanel_tiny ipsPhotoPanel_notPhone ipsClearfix">
+				{template="userPhoto" app="core" group="global" params="$event->author(), 'tiny'"}
+				<div>
+					<p class="ipsType_reset ipsType_normal ipsType_blendLinks">
+						{lang="event_created_by" htmlsprintf="$event->author()->link( $event->warningRef() )"}
+					</p>
+					{{if $event->container()->allow_reviews}}
+						<span itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+							<meta itemprop='ratingValue' content='{$event->averageReviewRating()}'>
+							<meta itemprop='reviewCount' content='{$event->reviews}'>
+							{template="rating" group="global" location="front" app="core" params="'large', $event->averageReviewRating(), \IPS\Settings::i()->reviews_rating_out_of, $event->memberReviewRating()"}&nbsp;&nbsp; <span class='ipsType_medium ipsType_light'>({lang="num_reviews" pluralize="$event->reviews"})</span>
+						</span>
+					{{endif}}
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<section>
+		{{if $event->hidden() === 1 and $event->canUnhide()}}
+		<div class="ipsMessage ipsMessage_warning ipsSpacer_top">
+			<p class="ipsType_reset">{lang="event_pending_approval"}</p>
+			<ul class='ipsList_inline ipsSpacer_top'>
+				<li><a href="{$event->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unhide' ) )}" class="ipsButton ipsButton_positive ipsButton_verySmall" title='{lang="approve_title_event"}'><i class="fa fa-check"></i> {lang="approve"}</a></li>
+				{{if $event->canDelete()}}
+				<li><a href='{$event->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'delete' ) )}' data-confirm  title='{lang="event_delete_title"}' class='ipsButton ipsButton_negative ipsButton_verySmall'><i class='fa fa-times'></i> {lang="delete"}</a></li>
+				{{endif}}
+			</ul>
+		</div>
+		{{endif}}
+
+		{{if $event->rsvp || $event->map( 270, 270 ) }}
+			<div class='ipsColumns ipsColumns_collapsePhone'>
+				<aside class='ipsColumn ipsColumn_wide'>
+					<div class='ipsAreaBackground_light'>
+						{template="eventSidebar" group="view" params="$event, $attendees, 'Mob'"}
+					</div>
+				</aside>
+				<div class='ipsColumn ipsColumn_fluid'>
+		{{endif}}
+			<div class='ipsBox ipsPad ipsClearfix'>
+				{{if $event->recurring}}
+					<div class='ipsClearfix'>
+				{{endif}}
+						<div class='ipsPos_right ipsResponsive_noFloat ipsResponsive_hidePhone'>
+							{template="follow" app="core" group="global" params="'calendar', 'event', $event->id, $event->followers()->count( TRUE )"}
+						</div>
+
+				{{if $event->recurring}}
+						<p class='ipsType_medium ipsType_light ipsType_reset'><i class='fa fa-repeat'></i> {$event->_recurring_text}</p>
+					</div>
+				{{endif}}	
+				<h2 class='ipsType_sectionHead ipsSpacer_bottom'>{lang="event_details"}</h2>
+				
+				{{if count( $event->tags() )}}
+					{template="tags" group="global" app="core" params="$event->tags()"}
+					<br>
+				{{endif}}
+				<div class='ipsComment_content ipsType_medium'>
+					<div class='ipsClear ipsType_normal ipsType_richText ipsType_break'>
+						{$event->content()|raw}
+					</div>
+				</div>
+
+				{{if $event->_album}}
+					<br>
+					<div class='ipsAreaBackground_light ipsPad_half'>
+						<h3 class='ipsType_normal ipsType_reset ipsSpacer_bottom ipsSpacer_half'>{lang="event_images"}</h3>
+						{$event->_album|raw}
+					</div>
+				{{endif}}
+
+				<hr class='ipsHr'>
+
+				{{if $event instanceof \IPS\Content\Reputation and settings.reputation_enabled}}
+					<div class='ipsPos_right ipsResponsive_noFloat'>
+						{template="reputation" app="core" group="global" params="$event"}
+					</div>
+				{{endif}}
+
+				<ul class='ipsToolList ipsToolList_horizontal ipsPos_left ipsClearfix ipsResponsive_noFloat'>
+					{{if $event->canEdit() or $event->canFeature() or $event->canUnfeature() or $event->canHide() or $event->canUnhide() or $event->canMove() or $event->canLock() or $event->canUnlock() or $event->canDelete()}}
+						<li>
+							<a href='#elEventActions_menu' id='elEventActions' class='ipsButton ipsButton_light ipsButton_verySmall ipsButton_fullWidth' data-ipsMenu>{lang="manage_event"} <i class='fa fa-caret-down'></i></a>
+							<ul id='elEventActions_menu' class='ipsMenu ipsMenu_auto ipsHide'>
+								{{if $event->canEdit()}}				
+									<li class='ipsMenu_item'><a href='{$event->url()->csrf()->setQueryString( array( 'do' => 'edit' ) )}' title='{lang="calendar_edit_details_title"}'>{lang="calendar_edit_details"}</a></li>
+								{{endif}}
+								{{if $event->canFeature()}}				
+									<li class='ipsMenu_item'><a href='{$event->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'feature' ) )}' title='{lang="feature_title_event"}'>{lang="feature"}</a></li>
+								{{endif}}
+								{{if $event->canUnfeature()}}				
+									<li class='ipsMenu_item'><a href='{$event->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unfeature' ) )}' title='{lang="unfeature_title_event"}'>{lang="unfeature"}</a></li>
+								{{endif}}
+								{{if $event->canHide()}}				
+									<li class='ipsMenu_item'><a href='{$event->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'hide' ) )}' title='{lang="hide_title_event"}' data-ipsDialog data-ipsDialog-title="{lang="hide"}">{lang="hide"}</a></li>
+								{{endif}}
+								{{if $event->canUnhide()}}				
+									<li class='ipsMenu_item'><a href='{$event->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unhide' ) )}' title='{{if $event->hidden() === 1}}{lang="approve_title_event"}{{else}}{lang="unhide_title_event"}{{endif}}'>{{if $event->hidden() === 1}}{lang="approve"}{{else}}{lang="unhide"}{{endif}}</a></li>
+								{{endif}}
+								{{if $event->canLock()}}				
+									<li class='ipsMenu_item'><a href='{$event->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'lock' ) )}' title='{lang="lock_title_event"}'>{lang="lock"}</a></li>
+								{{endif}}
+								{{if $event->canUnlock()}}				
+									<li class='ipsMenu_item'><a href='{$event->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unlock' ) )}' title='{lang="unlock_title_event"}'>{lang="unlock"}</a></li>
+								{{endif}}
+								{{if $event->canMove()}}				
+									<li class='ipsMenu_item'><a href='{$event->url()->csrf()->setQueryString( array( 'do' => 'move' ) )}' data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title="{lang="move"}"  title='{lang="event_move_title"}'>{lang="move"}</a></li>
+								{{endif}}
+								{{if $event->canDelete()}}				
+									<li class='ipsMenu_item'><a href='{$event->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'delete' ) )}' data-confirm  title='{lang="calendar_delete_title"}'>{lang="delete"}</a></li>
+								{{endif}}
+								{{if \IPS\Member::loggedIn()->modPermission('can_view_moderation_log')}}
+									<li class='ipsMenu_sep'><hr></li>
+									<li class="ipsMenu_item"><a href='{$event->url()->csrf()->setQueryString( array( 'do' => 'modLog' ) )}' data-ipsDialog data-ipsDialog-title='{lang="moderation_history"}'>{lang="moderation_history"}</a></li>
+								{{endif}}
+							</ul>
+						</li>
+					{{endif}}
+
+					{{if !\IPS\Member::loggedIn()->group['gbw_no_report'] }}
+						<li>
+							<a href='{$event->url('report')}' data-ipsDialog data-ipsDialog-size='medium' data-ipsDialog-title="{lang="report_event"}" data-ipsDialog-remoteSubmit data-ipsDialog-flashMessage="{lang="report_submit_success"}" title="{lang="report_event"}" class='ipsButton ipsButton_link ipsButton_verySmall ipsButton_fullWidth'>{lang="report_event"}</a>
+						</li>
+					{{endif}}
+
+					<li><a href='{$event->url('download')->csrf()}' title='{lang="download_ical_title"}' class='ipsButton ipsButton_link ipsButton_verySmall ipsButton_fullWidth'>{lang="download_ical"}</a></li>
+				</ul>
+
+				<div class='ipsResponsive_showPhone ipsResponsive_block'>
+					{template="follow" app="core" group="global" params="'calendar', 'event', $event->id, $event->followers()->count( TRUE )"}
+				</div>
+			</div>
+		{{if $event->rsvp }}
+				</div>
+			</div>
+		{{endif}}
+
+		
+
+		{{if $event->rsvp || $event->map( 270, 270 )}}
+			<div class='ipsResponsive ipsResponsive_hideDesktop'>
+				
+			</div>
+		{{endif}}
+
+		{{if count( $event->shareLinks() )}}
+			<div class='ipsSpacer_both'>
+				{template="sharelinks" app="core" group="global" params="$event"}
+			</div>
+		{{endif}}
+	</section>
+
+	{{if $commentsAndReviews}}
+		<br>
+		{{if $event->container()->allow_reviews && $event->container()->allow_comments}}
+			<a id="replies"></a>
+			<h2 class='ipsType_sectionTitle ipsType_reset'>{lang="user_feedback"}</h2>
+		{{endif}}
+		{$commentsAndReviews|raw}
+	{{endif}}
+</div>]]></template>
+ <template template_group="widgets" template_name="recentReviews" template_data="$reviews, $orientation='vertical'" template_location="front" template_app="calendar"><![CDATA[<h3 class='ipsType_reset ipsWidget_title'>{lang="block_recentReviews"}</h3>
+<div class='ipsWidget_inner'>
+	{{if $orientation == 'vertical'}}
+		<div class='ipsPad_half'>
+			{{if !empty( $reviews ) }}
+				<ul class='ipsDataList ipsDataList_reducedSpacing'>
+					{{foreach $reviews as $review}}
+						<li class='ipsDataItem'>
+							<div class='ipsDataItem_icon'>
+								{template="userPhoto" app="core" group="global" params="$review->author(), 'tiny'"}
+							</div>
+							<div class='ipsDataItem_main ipsType_break'>
+								<a href="{$review->item()->url()}" title='{lang="view_this_event" sprintf="$review->item()->title"}'>{wordbreak="$review->item()->title"}</a><br>
+								<span class='ipsType_light ipsType_medium'>{lang="byline_nodate" htmlsprintf="$review->author()->link()"}</span><br>
+								{template="rating" group="global" location="front" app="core" params="'small', $review->rating, \IPS\Settings::i()->reviews_rating_out_of"} &nbsp;&nbsp;
+								<span class='ipsType_small ipsType_reset'><time datetime="{$review->mapped('date')}" itemprop="dtreviewed">{datetime="$review->mapped('date')" norelative="true"}</time></span>
+							</div>
+						</li>
+					{{endforeach}}
+				</ul>
+			{{else}}
+				<div class='ipsType_light ipsPad_half ipsType_center'>{lang="no_recent_reviews"}</div>
+			{{endif}}
+		</div>
+	{{else}}
+		{{if !empty( $reviews ) }}
+			<ul class='ipsDataList ipsDataList_reducedSpacing'>
+				{{foreach $reviews as $review}}
+					<li class='ipsDataItem'>
+						<div class='ipsDataItem_icon'>
+							{template="userPhoto" app="core" group="global" params="$review->author(), 'tiny'"}
+						</div>
+						<div class='ipsDataItem_main ipsType_break'>
+							<a href="{$review->item()->url()}" title='{lang="view_this_event" sprintf="$review->item()->title"}'>{wordbreak="$review->item()->title"}</a><br>
+							<span class='ipsType_light ipsType_medium'>{lang="byline_nodate" htmlsprintf="$review->author()->link()"}</span>, <span class='ipsType_small ipsType_reset ipsType_light'><time datetime="{$review->mapped('date')}" itemprop="dtreviewed">{datetime="$review->mapped('date')" norelative="true"}</time></span><br>
+							<div class='ipsType_medium ipsType_richText' data-ipsTruncate data-ipsTruncate-type='remove' data-ipsTruncate-size='2 lines'>
+								{template="rating" group="global" location="front" app="core" params="'small', $review->rating, \IPS\Settings::i()->reviews_rating_out_of"} &nbsp;&nbsp; {$review->truncated()|raw}
+							</div>
+						</div>
+					</li>
+				{{endforeach}}
+			</ul>
+		{{else}}
+			<div class='ipsType_light ipsPad_half ipsType_center'>{lang="no_recent_reviews"}</div>
+		{{endif}}
+	{{endif}}
+</div>]]></template>
+ <template template_group="widgets" template_name="todaysBirthdays" template_data="$members, $orientation='vertical'" template_location="front" template_app="calendar"><![CDATA[<h3 class='ipsType_reset ipsWidget_title'>{lang="block_todaysBirthdays"}</h3>
+<div class='ipsWidget_inner {{if $orientation == 'vertical'}}ipsPad{{else}}ipsPad_half{{endif}}'>
+	{{if $orientation == 'vertical'}}
+		{{if !empty($members) }}
+			<ol class='ipsDataList ipsDataList_reducedSpacing'>
+				{{foreach $members as $member}}
+					<li class='ipsDataItem'>
+						<div class='ipsDataItem_main ipsPhotoPanel ipsPhotoPanel_tiny ipsClearfix'>
+							{template="userPhoto" app="core" group="global" params="$member, 'tiny'"}
+							<div>
+								{$member->link()|raw}
+								{{if $member->bday_year}}<br><span class='ipsType_light'>{lang="member_age" pluralize="$member->age()"}</span>{{endif}}
+							</div>
+						</div>
+					</li>
+				{{endforeach}}
+			</ol>
+		{{else}}
+			<div class='ipsType_light ipsPad_half ipsType_center'>{lang="no_members_birthday_today"}</div>
+		{{endif}}
+	{{else}}
+		{{if !empty($members) }}
+			<ol class='ipsList_inline ipsList_noSpacing'>
+				{{foreach $members as $idx => $member}}
+					<li>
+						{$member->link()|raw} {{if $member->bday_year}} <span class='ipsType_light'>{lang="member_age" pluralize="$member->age()"}</span>{{endif}}{{if $idx != count( $members ) - 1}},{{endif}}
+					</li>
+				{{endforeach}}
+			</ol>
+		{{else}}
+			<div class='ipsType_light ipsPad_half ipsType_center'>{lang="no_members_birthday_today"}</div>
+		{{endif}}
+	{{endif}}
+</div>]]></template>
+ <template template_group="widgets" template_name="upcomingEvents" template_data="$events, $today, $orientation='vertical'" template_location="front" template_app="calendar"><![CDATA[<h3 class='ipsType_reset ipsWidget_title'>{lang="block_upcomingEvents"}</h3>
+<div class='ipsWidget_inner'>
+	{{if $orientation == 'vertical'}}
+		<div class='ipsPad_half'>
+	{{endif}}
+	{{if !empty( $events ) }}
+		<ul class='ipsDataList ipsDataList_reducedSpacing'>
+			{{foreach $events as $event}}
+				<li class='ipsDataItem ipsClearfix'>
+					<div class='ipsDataItem_icon cCalendar_date_overlay'>
+						<time datetime='{$event->nextOccurrence( $today, 'startDate' )->mysqlDatetime()}' class='ipsCalendarDate'>
+							<span class='ipsCalendarDate_month'>{$event->nextOccurrence( $today, 'startDate' )->monthNameShort}</span>
+							<span class='ipsCalendarDate_date'>{$event->nextOccurrence( $today, 'startDate' )->mday}</span>
+						</time>
+					</div>
+					<div class='ipsDataItem_main ipsType_break ipsContained'>
+						{{if $event->container()->allow_comments && $orientation == 'vertical'}}
+							<div class="ipsCommentCount ipsPos_right {{if $event->comments === 0}}ipsFaded{{endif}}" data-ipsTooltip title='{lang="replies_number" pluralize="$event->comments"}'>{expression="$event->comments"}</div>
+						{{endif}}
+						<a href="{$event->url()}" title='{lang="view_this_event" sprintf="$event->title"}'>{$event->title}</a><br>
+						<strong class='ipsType_small'>
+							{{if $event->nextOccurrence( $today, 'startDate' )}}
+								{$event->nextOccurrence( $today, 'startDate' )->calendarDate()}{{if !$event->all_day}} {$event->nextOccurrence( $today, 'startDate' )->localeTime( FALSE )} {{endif}}
+								{{if $event->nextOccurrence( $event->nextOccurrence( $today, 'startDate' ) ?: $today, 'endDate' ) }}
+									{{if $orientation == 'vertical'}}<br>{{endif}}
+									<span class='ipsType_light ipsType_unbold'>{lang="until"}</span>{{if $orientation == 'vertical'}}<br>{{endif}}
+									{$event->nextOccurrence( $event->nextOccurrence( $today, 'startDate' ) ?: $today, 'endDate' )->calendarDate()}{{if !$event->all_day}} {$event->nextOccurrence( $event->nextOccurrence( $today, 'startDate' ) ?: $today, 'endDate' )->localeTime( FALSE )}{{endif}}
+								{{endif}}
+							{{else}}
+								{$event->lastOccurrence( 'startDate' )->calendarDate()}{{if !$event->all_day}} {$event->lastOccurrence( 'startDate' )->localeTime( FALSE )} {{endif}}
+								{{if $event->lastOccurrence( 'endDate' ) }}
+									{{if $orientation == 'vertical'}}<br>{{endif}}
+									<span class='ipsType_light ipsType_unbold'>{lang="until"}</span>{{if $orientation == 'vertical'}}<br>{{endif}}
+									{$event->lastOccurrence( 'endDate' )->calendarDate()}{{if !$event->all_day}} {$event->lastOccurrence( 'endDate' )->localeTime( FALSE )}{{endif}}
+								{{endif}}
+							{{endif}}
+						</strong>
+						<br>
+						{{if $event->container()->allow_comments && $orientation == 'horizontal'}}
+							<span class="{{if $event->comments === 0}}ipsFaded{{endif}}" data-ipsTooltip title='{lang="replies_number" pluralize="$event->comments"}'><i class='fa fa-comment'></i> {expression="$event->comments"}</span>&nbsp;&nbsp;
+						{{endif}}
+						{{if $orientation == 'horizontal'}}
+							<div class='ipsType_medium ipsType_richText' data-ipsTruncate data-ipsTruncate-type='remove' data-ipsTruncate-size='2 lines'>
+								{$event->truncated()|raw}
+							</div>
+						{{endif}}
+					</div>
+				</li>
+			{{endforeach}}
+		</ul>
+	{{else}}
+		<div class='ipsType_light ipsPad_half ipsType_center'>{lang="no_upcoming_events"}</div>
+	{{endif}}
+	{{if $orientation == 'vertical'}}
+		</div>
+	{{endif}}
+</div>]]></template>
+ <css css_location="front" css_app="calendar" css_attributes="" css_path="." css_name="calendar_responsive.css"><![CDATA[/* BOTH */
+@media screen and (max-width: 979px) {
+	/* Submit screen */
+	.cCalendarSubmit_field {
+		width: 100%;
+	}
+
+		.cCalendarSubmit_field input {
+			max-width: 100% !important;
+			width: 100% !important;
+		}
+
+	/* Calendar views */
+	.cCalendar th span,
+	.ipsButton.cCalendar_miniAddEvent {
+		display: none;
+	}
+
+	/* Day view */
+	.cCalendarDay .cCalendarDay_hour > h2 {
+		text-align: left;
+		padding: 10px;
+		font-size: 22px;
+		line-height: 22px;
+	}
+}
+
+/* TABLETS */
+@media screen and (min-width: 768px) and (max-width: 979px) {
+	.cCalendar th:after {
+		content: attr(data-short);
+	}
+}
+
+/* PHONES */
+@media screen and (max-width: 767px) {
+
+	/* Submit screen */
+	#elDateGrid_arrow {
+		padding-top: 0;
+	}
+	
+		#elDateGrid_arrow .fa {
+			font-size: 80px;
+			line-height: 70px;
+		}
+
+			#elDateGrid_arrow .fa:before {
+				content: '\f107';
+			}
+
+	/* Calendar header */
+	#elCalendarsHeader .ipsType_pageTitle {
+		display: block;
+		margin-top: 10px;
+	}
+
+	.cCalendarNav .ipsType_pageTitle {
+		font-size: 20px;
+		margin-top: 0;
+	}
+
+	.cCalendarNav [data-role='calendarNav'] {
+		margin-top: -140px;
+	}
+
+	.cCalendarNav .ipsPager_prev a, 
+	.cCalendarNav .ipsPager_next a {
+		display: inline-block;
+	}
+
+	.cCalendarNav .ipsPager_prev {
+		margin-top: 70px;
+		float: left;
+	}
+	html[dir="rtl"] .cCalendarNav .ipsPager_prev {
+		float: right;
+	}
+
+	.cCalendarNav .ipsPager_next {
+		margin-top: -67px;
+		float: right;
+	}
+	html[dir="rtl"] .cCalendarNav .ipsPager_next {
+		float: left;
+	}
+
+	/* Calendar views */
+	.cCalendar td {
+		height: 40px;
+		border: 0;
+		padding: 0px;
+		border-bottom: 1px solid rgba(0,0,0,0.04);
+	}
+
+	.cCalendar td > div {
+		padding-bottom: 0;
+		min-height: 0;
+	}
+	
+	.cCalendar td.cCalendar_today {
+		background: transparent;
+		border: 0;
+	}
+
+	.cCalendar th:after {
+		content: attr(data-veryShort);
+	}
+
+	.cCalendar_birthdays {
+		display: none;
+	}
+	
+	.cCalendar .cEvents {
+		display: none;
+	}
+
+	.cCalendar .cCalendar_dayNumber {
+		display: block;
+		text-align: center;
+		margin: 1px auto;
+		height: 40px;
+		width: 100%;
+		padding:4px;
+		line-height: 26px;
+		font-size: 12px;
+		border-radius: 15px;
+	}
+
+	.cCalendar .cCalendar_hasEvents .cCalendar_dayNumber {
+		border: 2px solid rgba(0,0,0,0.12);
+		background: rgba(0,0,0,0.04);
+	}
+
+		.cCalendar .cCalendar_hasEvents.cCalendar_today .cCalendar_dayNumber {
+			background: #f8eeeb;
+		}
+
+		.cCalendar td.cCalendar_today .cCalendar_dayNumber {
+			background: #fff7f5;
+			border: 2px solid #cd3816;
+			color: #cd3816;
+		}
+
+	/* WEEK VIEW */
+	.cCalendarWeek_day {
+		margin-bottom: 0 !important;
+	}
+
+	/* EVENT VIEW */
+	#elEventHeader {
+		text-align: center;
+	}
+
+	#elEventHeader .ipsUserPhoto {
+		display: none;
+	}
+
+	#elEventHeader_details {
+		text-align: center;
+	}
+
+	html[dir="ltr"] #elEventHeader_details .ipsPhotoPanel > div {
+		margin-left: 0;
+	}
+	html[dir="rtl"] #elEventHeader_details .ipsPhotoPanel > div {
+		margin-right: 0;
+	}
+
+	#elEventHeader_details time, #elEventHeader_details p.cEvent_to {
+		float: none;
+		display: inline-block;
+		min-width: 100%;
+	}
+
+	#elEventHeader_details time .cEvent_dayNum {
+		font-size: inherit;
+		font-weight: normal;
+		float: none;
+		line-height: inherit;
+		letter-spacing: 0;
+	}
+	html[dir="ltr"] #elEventHeader_details time .cEvent_dayNum {
+		margin-right: 0;
+	}
+	html[dir="rtl"] #elEventHeader_details time .cEvent_dayNum {
+		margin-left: 0;
+	}
+
+	#elEventHeader_details time .cEvent_dayNum,
+	#elEventHeader_details time .cEvent_day,
+	#elEventHeader_details time .cEvent_date {
+		display: inline;
+		font-size: 15px;
+	}
+
+	#elEventHeader_details time .cEvent_day {
+		display: block;
+	}
+
+	#elEventHeader_details time p {
+		display: block;
+		float: none;
+	}
+
+	#elEventHeader_details time p .fa-arrow-circle-right:before{
+		content:"\f0ab";
+	}
+}]]></css>
+ <css css_location="front" css_app="calendar" css_attributes="" css_path="." css_name="calendar.css"><![CDATA[.cCalendar {
+	width: 100%;
+	table-layout: fixed;
+}
+
+.ipsType_sectionTitle + .cCalendar {
+	margin-top: -12px;
+}
+
+.cCalendarIcon {
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	border-radius: 3px;
+	vertical-align: middle;
+}
+html[dir="ltr"] .cCalendarIcon {
+	margin-right: 5px;
+}
+html[dir="rtl"] .cCalendarIcon {
+	margin-left: 5px;
+}
+
+.cCalendarNav .ipsType_pageTitle {
+	font-size: 30px;
+	margin: -20px 0 7px 0;
+}
+
+.cCalendar td {
+	width: 14.285%;
+	min-height: 100px;
+	border: 1px solid rgba(0,0,0,0.04);
+	vertical-align: top;
+	padding: 7px;
+}
+
+	.cCalendar td > div {
+		height: 100%;
+		min-height: 100px;
+		position: relative;
+	}
+
+.cCalendar td.cCalendar_nonDate {
+	background: #dedede;
+}
+
+.cCalendar td.cCalendar_today, .cCalendarWeek div.cCalendar_today {
+	/*border: 3px solid #9f3d3b;*/
+	background: #262e33;
+	color: #fff;
+}
+	.cCalendarWeek div.cCalendar_today h2.ipsType_sectionHead {
+		color: #fff;
+	}
+
+.cCalendar_dayNumber {
+	font-size: 14px;
+	font-weight: bold;
+	display: inline-block;
+}
+
+.ipsButton.cCalendar_miniAddEvent {
+	height: 15px;
+	line-height: 14px;
+	padding: 0 2px;
+	opacity: 0;
+	{prefix="transition" value="0.2s all ease-in-out"}
+}
+
+	.cCalendar td:hover .cCalendar_miniAddEvent {
+		opacity: 0.5;
+	}
+
+	.cCalendar td .cCalendar_miniAddEvent:hover {
+		opacity: 1;
+	}
+
+.cCalendar_birthdays {
+	font-size: 11px;
+	text-transform: uppercase;
+	margin: 0;
+}
+
+	.cCalendar td .cCalendar_birthdays {
+		position: absolute;
+		bottom: 0px;
+		padding: 0;
+	}
+
+.cCalendarWeek > li {
+	margin-bottom: 15px;
+}
+
+	.cCalendarWeek > li:last-child {
+		margin-bottom: 0;
+	}
+
+.cCalendarWeek .cEvents + .cCalendar_birthdays {
+	margin-top: 10px;
+}
+
+/* EVENT STYLES */
+.cEvents_wrapper, .cEvents {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cEvents_event {
+	margin-bottom: 5px;
+}
+
+a.cEvents_event, .cEvents_event a, .cEvents_event.cEvents_empty span {
+	display: block;
+	line-height: 26px;
+	height: 26px;
+	font-size: 13px;
+	margin-bottom: 2px;
+	padding: 0 8px 0 10px;
+	color: #fff;
+	border-radius: 20px;
+	white-space: nowrap;
+	overflow: hidden;
+}
+html[dir="rtl"] a.cEvents_event, 
+html[dir="rtl"] .cEvents_event a,
+html[dir="rtl"] .cEvents_event.cEvents_empty span {
+	padding: 0 10px 0 8px;
+}
+
+	a.cEvents_style_blank, .cEvents_style_blank a, .cCalendarIcon.cEvents_style_blank {
+		background-color: transparent;
+		border: 1px solid rgba(0,0,0,0.1);
+	}
+
+	a.cEvents_event.cEvents_eventSmall, .cEvents_event.cEvents_eventSmall a, .cEvents_event.cEvents_eventSmall.cEvents_empty span {
+		font-size: 12px;
+		padding: 0 8px;
+		line-height: 26px;
+		height: 26px;
+		display: inline-block;
+	}
+
+.cEvents_time {
+	font-size: 10px;
+	text-transform: uppercase;
+	opacity: 0.7;
+	letter-spacing: -1px;
+	color: #ebebeb;
+}
+
+/* Single event special styles */
+.cEvents_single .cEvents_event a {
+	border-radius: 20px;
+}
+
+/* Ranged event special styles */
+.cEvents_ranged .cEvents_event a {
+	border-radius: 0;
+}
+
+html[dir="ltr"] .cEvents_ranged .cEvents_event:not( .cEvents_first ) a {
+	margin-left: -7px;
+	padding-left: 8px;
+}
+html[dir="rtl"] .cEvents_ranged .cEvents_event:not( .cEvents_first ) a {
+	margin-right: -7px;
+	padding-right: 8px;
+}
+
+html[dir="ltr"] .cEvents_ranged .cEvents_event:not( .cEvents_last ) a {
+	margin-right: -8px;
+}
+html[dir="rtl"] .cEvents_ranged .cEvents_event:not( .cEvents_last ) a {
+	margin-left: -8px;
+}
+
+html[dir="ltr"] .cEvents_ranged .cEvents_event.cEvents_first a {
+	border-top-left-radius: 20px;
+	border-bottom-left-radius: 20px;
+}
+html[dir="ltr"] .cEvents_ranged .cEvents_event.cEvents_last a {
+	border-top-right-radius: 20px;
+	border-bottom-right-radius: 20px;
+}
+html[dir="rtl"] .cEvents_ranged .cEvents_event.cEvents_first a {
+	border-top-right-radius: 20px;
+	border-bottom-right-radius: 20px;
+}
+html[dir="rtl"] .cEvents_ranged .cEvents_event.cEvents_last a {
+	border-top-left-radius: 20px;
+	border-bottom-left-radius: 20px;
+}
+
+/* Hide details in all but the first in each row */
+tr td:not( :first-child ):not( .cCalendar_firstDay ) .cEvents_ranged .cEvents_event:not( .cEvents_first ) a,
+tr td:not( :first-child ):not( .cCalendar_firstDay ) .cEvents_ranged .cEvents_event:not( .cEvents_first ) a span {
+	font-size: 0;
+}
+
+	tr td:not( :first-child ):not( .cCalendar_firstDay ) .cEvents_ranged .cEvents_event:not( .cEvents_first ) a img {
+		display: none;
+	}
+
+.cCalendarCarousel .cCalendarBlock {
+	width: 400px;
+	height: 380px;
+	overflow: hidden;
+}
+
+/* EVENT VIEW */
+#elEventHeader .ipsCoverPhoto {
+	height: 150px;
+	padding-top: 90px;
+	background-size: cover;
+}
+
+#elEventHeader_details {
+	background: #222;
+	color: #fff;
+}
+
+	#elEventHeader_details .ipsRating.ipsRating_large {
+		margin-top: 0;
+	}
+
+#elEventHeader_details .cEvents_event {
+	margin-top: 5px;
+}
+
+.cEvent_details {
+	text-shadow: 0px 1px 0px rgba(0,0,0,0.7);
+}
+
+	.cEvent_details time {
+		opacity: 0.7;
+	}
+
+.cEvent_to {
+	font-size: 28px;
+	margin: 6px 15px;
+}
+
+#elAttendeesMob {
+	padding-left: 0;
+	padding-right: 0;
+	padding-top: 0;
+}
+
+
+/* DAY VIEW */
+.cCalendarDay_hour {
+	vertical-align: top;
+}
+
+.cCalendarDay .cCalendarDay_hour > h2 {
+	font-size: 54px;
+	font-weight: 300;
+	text-align: right;
+	margin-top: 10px;
+}
+html[dir="rtl"] .cCalendarDay .cCalendarDay_hour > h2 {
+	text-align: right;
+}
+
+	.cCalendarDay .cCalendarDay_hour > h2 span {
+		font-size: 14px;
+		text-transform: uppercase;
+	}
+
+.cCalendarDay_hour.cCalendarDay_allDay > h2 {
+	font-size: 28px;
+	line-height: 30px;
+	margin-top: 0;
+}
+
+.cCalendarDay > .ipsDataItem {
+	border-bottom: 2px solid rgba(0,0,0,0.2);
+}
+
+.ipsDataItem.cCalendarDay_allDay {
+	border-bottom: 6px solid #000;
+}
+
+.cCalendarDay_eventList > li {
+	margin-bottom: 15px;
+}
+
+/* STREAM VIEW */
+.cCalendarBlock .ipsPageHead_special {
+	height: 80px;
+	padding-top: 48px;
+}
+
+.cCalendarBlock .ipsType_pageTitle {
+	font-size: 20px;
+}
+
+.cCalendarBlock_map {
+	height: 200px;
+	text-align: center;
+	margin: 10px auto;
+
+}
+
+#event_timezone option {
+	width: 400px;
+	white-space: nowrap;
+}
+
+.cCalendar_shortInput {
+	width: auto !important;
+	padding: 2px !important;
+}
+
+/* Submit screen */
+.cCalendarSubmit_field {
+	display: inline-block;
+	position: relative;
+	margin-bottom: 5px;
+}
+
+	html[dir="ltr"] .cCalendarSubmit_field input {
+		padding-left: 35px !important;
+	}
+	html[dir="rtl"] .cCalendarSubmit_field input {
+		padding-right: 35px !important;
+	}
+
+	.cCalendarSubmit_field .fa {
+		position: absolute;
+		color: #9f3d3b;
+		top: 9px;
+		font-size: 20px;
+	}
+	html[dir="ltr"] .cCalendarSubmit_field .fa {
+		left: 10px;
+	}
+	html[dir="rtl"] .cCalendarSubmit_field .fa {
+		right: 10px;
+	}
+
+#elDateGrid_arrow {
+	font-size: 120px;
+	opacity: 0.2;
+	padding-top: 20px;
+	overflow: hidden;
+}
+
+#elTimezone {
+	margin-bottom: 0;
+}]]></css>
+ <css css_location="front" css_app="calendar" css_attributes="" css_path="." css_name="embed.css"><![CDATA[.ipsEmbedded .cCalendarEmbed_calendar {
+	background: #f5f5f5;
+}
+
+.ipsEmbedded .ipsCalendarDate {
+	width: 80px;
+	margin: 10px auto;
+	display: block;
+	border: 1px solid rgba(0,0,0,0.2);
+	background: #fafafa;
+	padding: 8px 0;
+	border-radius: 3px;
+	overflow: hidden;
+}
+	
+	.ipsEmbedded .ipsCalendarDate {
+		background: #fff;
+	}
+	
+	.ipsEmbedded .ipsCalendarDate > span {
+		display: block;
+		text-align: center;
+	}
+
+	.ipsEmbedded .ipsCalendarDate_month {
+		color: #a93848;
+		text-transform: uppercase;
+		font-size: 20px;
+		line-height: 1;
+		font-weight: 500;
+	}
+
+	.ipsEmbedded .ipsCalendarDate_date {
+		font-size: 40px;
+		line-height: 42px;
+		font-weight: 300;
+		color: #333;
+	}]]></css>
+ <css css_location="front" css_app="calendar" css_attributes="" css_path="." css_name="profile.css"><![CDATA[.cCalendarDate {
+	width: 80px;
+	display: block;
+	border: 1px solid rgba(0,0,0,0.2);
+	background: #fff;
+	padding: 8px 0;
+	border-radius: 3px;
+	overflow: hidden;
+}
+	
+	.cCalendarDate {
+		background: #fff;
+	}
+	
+	.cCalendarDate > span {
+		display: block;
+		text-align: center;
+	}
+
+	.cCalendarDate_month {
+		color: #a93848;
+		text-transform: uppercase;
+		font-size: 20px;
+		line-height: 1;
+		font-weight: 500;
+	}
+
+	.cCalendarDate_date {
+		font-size: 36px;
+		line-height: 36px;
+		font-weight: 300;
+		color: #333;
+	}]]></css>
+</theme>

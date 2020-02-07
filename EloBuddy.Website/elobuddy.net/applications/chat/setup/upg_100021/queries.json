@@ -1,0 +1,63 @@
+{
+    "1": {
+        "method": "addIndex",
+        "params": [
+            "chat_log_archive",
+            {
+                "type": "key",
+                "name": "log_time",
+                "columns": [
+                    "log_time"
+                ],
+                "length": [
+                    null
+                ]
+            }
+        ]
+    },
+    "2": {
+        "method": "addColumn",
+        "params": [
+            "core_groups",
+            {
+                "name": "chat_access",
+                "type": "TINYINT",
+                "length": 10,
+                "null": false,
+                "default": 0,
+                "comment": "Can access chat?",
+                "unsigned": true
+            }
+        ]
+    },
+    "3": {
+        "method": "addColumn",
+        "params": [
+            "core_groups",
+            {
+                "name": "chat_moderate",
+                "type": "TINYINT",
+                "length": 10,
+                "null": false,
+                "default": 0,
+                "comment": "Can moderate chat?",
+                "unsigned": true
+            }
+        ]
+    },
+    "4": {
+        "method": "addColumn",
+        "params": [
+            "core_groups",
+            {
+                "name": "chat_private",
+                "type": "TINYINT",
+                "length": 10,
+                "null": false,
+                "default": 0,
+                "comment": "Can send private chats?",
+                "unsigned": true
+            }
+        ]
+    }
+}

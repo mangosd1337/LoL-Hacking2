@@ -1,0 +1,846 @@
+[
+    {
+        "key": "acp_dashboard_blocks",
+        "default": ""
+    },
+    {
+        "key": "acp_notes",
+        "default": ""
+    },
+    {
+        "key": "acp_notes_updated",
+        "default": ""
+    },
+    {
+        "key": "activity_stream_rss",
+        "default": "1"
+    },
+    {
+        "key": "ads_circulation",
+        "default": "random"
+    },
+    {
+        "key": "ads_exist",
+        "default": "0"
+    },
+    {
+        "key": "all_activity_follow_content",
+        "default": "1"
+    },
+    {
+        "key": "all_activity_follow_member",
+        "default": "1"
+    },
+    {
+        "key": "all_activity_like",
+        "default": "1"
+    },
+    {
+        "key": "all_activity_photo",
+        "default": "1"
+    },
+    {
+        "key": "all_activity_register",
+        "default": "1"
+    },
+    {
+        "key": "all_activity_rep_neg",
+        "default": "0"
+    },
+    {
+        "key": "allow_creator_vote",
+        "default": "1"
+    },
+    {
+        "key": "allow_gravatars",
+        "default": "0"
+    },
+    {
+        "key": "allow_reg",
+        "default": "1"
+    },
+    {
+        "key": "allow_remote_images",
+        "default": "1"
+    },
+    {
+        "key": "allow_result_view",
+        "default": "1"
+    },
+    {
+        "key": "api_log_prune",
+        "default": "30"
+    },
+    {
+        "key": "attach_allowed_extensions",
+        "default": ""
+    },
+    {
+        "key": "attach_allowed_types",
+        "default": "all"
+    },
+    {
+        "key": "attachment_image_size",
+        "default": "1000x750"
+    },
+    {
+        "key": "attachment_resample_size",
+        "default": "0x0"
+    },
+    {
+        "key": "auto_polling_enabled",
+        "default": "1"
+    },
+    {
+        "key": "base_url_stored",
+        "default": ""
+    },
+    {
+        "key": "board_name",
+        "default": "IPS Community Suite"
+    },
+    {
+        "key": "bot_antispam_type",
+        "default": "recaptcha"
+    },
+    {
+        "key": "ckeditor_extraPlugins",
+        "default": ""
+    },
+    {
+        "key": "ckeditor_permissions",
+        "default": "{}"
+    },
+    {
+        "key": "ckeditor_toolbars",
+        "default": "{\"desktop\":[{\"name\":\"row1\",\"items\":[\"Bold\",\"Italic\",\"Underline\",\"Strike\",\"-\",\"ipsLink\",\"Ipsquote\",\"ipsCode\",\"ipsEmoticon\",\"-\",\"BulletedList\",\"NumberedList\",\"-\",\"JustifyLeft\",\"JustifyCenter\",\"JustifyRight\",\"-\",\"TextColor\",\"FontSize\",\"-\",\"ipsPreview\"]},\"\\\/\"],\"tablet\":[{\"name\":\"row1\",\"items\":[\"Bold\",\"Italic\",\"Underline\",\"-\",\"ipsLink\",\"Ipsquote\",\"ipsEmoticon\",\"-\",\"BulletedList\",\"NumberedList\",\"-\",\"ipsPreview\"]},\"\\\/\"],\"phone\":[{\"name\":\"row1\",\"items\":[\"Bold\",\"Italic\",\"Underline\",\"-\",\"ipsEmoticon\",\"-\",\"ipsLink\",\"-\",\"ipsPreview\"]},\"\\\/\"]}"
+    },
+    {
+        "key": "connect_slaves",
+        "default": "0"
+    },
+    {
+        "key": "coppa_address",
+        "default": ""
+    },
+    {
+        "key": "coppa_consent_extra",
+        "default": ""
+    },
+    {
+        "key": "coppa_fax",
+        "default": ""
+    },
+    {
+        "key": "copyright_line",
+        "default": ""
+    },
+    {
+        "key": "diagnostics",
+        "default": "1"
+    },
+    {
+        "key": "disable_all_plugins",
+        "default": ""
+    },
+    {
+        "key": "disable_anonymous",
+        "default": "0"
+    },
+    {
+        "key": "edit_log",
+        "default": "1"
+    },
+    {
+        "key": "edit_log_prune",
+        "default": "30"
+    },
+    {
+        "key": "edit_log_public",
+        "default": "0"
+    },
+    {
+        "key": "editor_allowed_classes",
+        "default": ""
+    },
+    {
+        "key": "editor_allowed_datacontrollers",
+        "default": ""
+    },
+    {
+        "key": "editor_allowed_iframe_bases",
+        "default": ""
+    },
+    {
+        "key": "editor_embeds",
+        "default": "1"
+    },
+    {
+        "key": "editor_paragraph_padding",
+        "default": "1"
+    },
+    {
+        "key": "editor_paste_behaviour",
+        "default": "rich"
+    },
+    {
+        "key": "email_color",
+        "default": "#3f6d98"
+    },
+    {
+        "key": "email_in",
+        "default": ""
+    },
+    {
+        "key": "email_logo",
+        "default": ""
+    },
+    {
+        "key": "email_out",
+        "default": ""
+    },
+    {
+        "key": "error_log",
+        "default": "1"
+    },
+    {
+        "key": "error_log_level",
+        "default": "3"
+    },
+    {
+        "key": "error_notify",
+        "default": "0"
+    },
+    {
+        "key": "error_notify_level",
+        "default": "3"
+    },
+    {
+        "key": "fbc_bot_group",
+        "default": "2"
+    },
+    {
+        "key": "flood_control",
+        "default": "0"
+    },
+    {
+        "key": "furl_configuration",
+        "default": ""
+    },
+    {
+        "key": "gl_guidelines",
+        "default": ""
+    },
+    {
+        "key": "gl_link",
+        "default": ""
+    },
+    {
+        "key": "gl_type",
+        "default": "none"
+    },
+    {
+        "key": "googlemaps",
+        "default": "1"
+    },
+    {
+        "key": "googleplacesautocomplete",
+        "default": "1"
+    },
+    {
+        "key": "guest_captcha",
+        "default": "1"
+    },
+    {
+        "key": "htaccess_mod_rewrite",
+        "default": "0"
+    },
+    {
+        "key": "image_jpg_quality",
+        "default": "85"
+    },
+    {
+        "key": "image_png_quality_gd",
+        "default": "9"
+    },
+    {
+        "key": "image_proxy_cache_period",
+        "default": "7"
+    },
+    {
+        "key": "image_suite",
+        "default": "imagemagick"
+    },
+    {
+        "key": "ipb_bruteforce_attempts",
+        "default": "3"
+    },
+    {
+        "key": "ipb_bruteforce_period",
+        "default": "15"
+    },
+    {
+        "key": "ipb_bruteforce_unlock",
+        "default": "1"
+    },
+    {
+        "key": "ipb_copy_number",
+        "default": ""
+    },
+    {
+        "key": "ipb_poll_only",
+        "default": "0"
+    },
+    {
+        "key": "ipb_reg_number",
+        "default": ""
+    },
+    {
+        "key": "ipb_url_blacklist",
+        "default": ""
+    },
+    {
+        "key": "ipb_url_filter_option",
+        "default": "none"
+    },
+    {
+        "key": "ipb_url_whitelist",
+        "default": ""
+    },
+    {
+        "key": "ipbseo_ga_enabled",
+        "default": "1"
+    },
+    {
+        "key": "ips_cp_purchase",
+        "default": "0"
+    },
+    {
+        "key": "ipseo_ga",
+        "default": ""
+    },
+    {
+        "key": "ipsgeoip",
+        "default": "1"
+    },
+    {
+        "key": "keycaptcha_privatekey",
+        "default": ""
+    },
+    {
+        "key": "links_external",
+        "default": "1"
+    },
+    {
+        "key": "logins_over_https",
+        "default": "0"
+    },
+    {
+        "key": "lp_method",
+        "default": "random"
+    },
+    {
+        "key": "mail_method",
+        "default": "php"
+    },
+    {
+        "key": "match_browser",
+        "default": "0"
+    },
+    {
+        "key": "match_ipaddress",
+        "default": "1"
+    },
+    {
+        "key": "max_poll_choices",
+        "default": "20"
+    },
+    {
+        "key": "max_poll_questions",
+        "default": "3"
+    },
+    {
+        "key": "max_title_length",
+        "default": "255"
+    },
+    {
+        "key": "max_user_name_length",
+        "default": "26"
+    },
+    {
+        "key": "max_video_width",
+        "default": "0"
+    },
+    {
+        "key": "max_video_width_css",
+        "default": "none"
+    },
+    {
+        "key": "member_menu_create_key",
+        "default": ""
+    },
+    {
+        "key": "merge_concurrent_posts",
+        "default": "0"
+    },
+    {
+        "key": "min_user_name_length",
+        "default": "3"
+    },
+    {
+        "key": "most_online",
+        "default": "{\"count\":0,\"time\":0}"
+    },
+    {
+        "key": "new_reg_notify",
+        "default": "0"
+    },
+    {
+        "key": "php_mail_extra",
+        "default": ""
+    },
+    {
+        "key": "poll_allow_public",
+        "default": "1"
+    },
+    {
+        "key": "poll_allow_vdelete",
+        "default": "0"
+    },
+    {
+        "key": "pop3_password",
+        "default": ""
+    },
+    {
+        "key": "pop3_port",
+        "default": "995"
+    },
+    {
+        "key": "pop3_server",
+        "default": ""
+    },
+    {
+        "key": "pop3_tls",
+        "default": "1"
+    },
+    {
+        "key": "pop3_user",
+        "default": ""
+    },
+    {
+        "key": "post_titlechange",
+        "default": "500"
+    },
+    {
+        "key": "posts_add_nofollow",
+        "default": "1"
+    },
+    {
+        "key": "posts_add_nofollow_exclude",
+        "default": ""
+    },
+    {
+        "key": "privacy_link",
+        "default": ""
+    },
+    {
+        "key": "privacy_text",
+        "default": ""
+    },
+    {
+        "key": "privacy_type",
+        "default": "none"
+    },
+    {
+        "key": "profile_comment_approval",
+        "default": "0"
+    },
+    {
+        "key": "profile_comments",
+        "default": "1"
+    },
+    {
+        "key": "prune_emailerrorlogs",
+        "default": "3"
+    },
+    {
+        "key": "prune_log_admin",
+        "default": "0"
+    },
+    {
+        "key": "prune_log_adminlogin",
+        "default": "30"
+    },
+    {
+        "key": "prune_log_email_error",
+        "default": "30"
+    },
+    {
+        "key": "prune_log_error",
+        "default": "30"
+    },
+    {
+        "key": "prune_log_moderator",
+        "default": "0"
+    },
+    {
+        "key": "prune_log_spam",
+        "default": "30"
+    },
+    {
+        "key": "prune_log_system",
+        "default": "180"
+    },
+    {
+        "key": "prune_log_tasks",
+        "default": "30"
+    },
+    {
+        "key": "prune_notifications",
+        "default": "3"
+    },
+    {
+        "key": "recaptcha2_private_key",
+        "default": ""
+    },
+    {
+        "key": "recaptcha2_public_key",
+        "default": ""
+    },
+    {
+        "key": "recaptcha_private_key",
+        "default": "6LcpWAMAAAAAAETX5jHd9NlPtIHJA4G-ra3X2RQB"
+    },
+    {
+        "key": "recaptcha_public_key",
+        "default": "6LcpWAMAAAAAAA4klDtDNuDH6LsGgBX5mBoJ3naK"
+    },
+    {
+        "key": "reg_auth_type",
+        "default": "user"
+    },
+    {
+        "key": "reg_rules",
+        "default": "<p>Please take a moment to review these rules.<\/p><p>Please remember that we are not responsible for any messages posted. We do not vouch for or warrant the accuracy, completeness or usefulness of any message, and are not responsible for the contents of any message.<\/p><p>The messages express the views of the author of the message, not necessarily the views of this website. Any user who feels that a posted message is objectionable is encouraged to contact us immediately by email. We have the ability to remove objectionable messages and we will make every effort to do so, within a reasonable time frame, if we determine that removal is necessary.<\/p><p>You agree, through your use of this service, that you will not use this website to post any material which is knowingly false and\/or defamatory, inaccurate, abusive, vulgar, hateful, harassing, obscene, profane, sexually oriented, threatening, invasive of a person's privacy, or otherwise violative of any law.<\/p><p>You agree not to post any copyrighted material unless the copyright is owned by you or by this website.<\/p><p>Our software uses cookies to distinguish you from other users of our website. This helps us to provide you with a personalized experience when you browse this site.<\/p>"
+    },
+    {
+        "key": "remote_image_cache",
+        "default": "7"
+    },
+    {
+        "key": "remote_image_proxy",
+        "default": "0"
+    },
+    {
+        "key": "reputation_can_self_vote",
+        "default": "0"
+    },
+    {
+        "key": "reputation_enabled",
+        "default": "1"
+    },
+    {
+        "key": "reputation_highlight",
+        "default": "50"
+    },
+    {
+        "key": "reputation_point_types",
+        "default": "like"
+    },
+    {
+        "key": "reputation_protected_groups",
+        "default": ""
+    },
+    {
+        "key": "reputation_show_content",
+        "default": "1"
+    },
+    {
+        "key": "reputation_show_profile",
+        "default": "1"
+    },
+    {
+        "key": "reviews_rating_out_of",
+        "default": "5"
+    },
+    {
+        "key": "search_index_timeframe",
+        "default": "0"
+    },
+    {
+        "key": "security_remove_acp_link",
+        "default": "0"
+    },
+    {
+        "key": "seo_r_on",
+        "default": "1"
+    },
+    {
+        "key": "setup_in_progress",
+        "default": "0"
+    },
+    {
+        "key": "signatures_enabled",
+        "default": "0"
+    },
+    {
+        "key": "site_address",
+        "default": ""
+    },
+    {
+        "key": "site_offline_message",
+        "default": ""
+    },
+    {
+        "key": "site_online",
+        "default": "1"
+    },
+    {
+        "key": "sitemap_content_settings",
+        "default": "{}"
+    },
+    {
+        "key": "sitemap_last_ping",
+        "default": "0"
+    },
+    {
+        "key": "sitemap_path",
+        "default": ""
+    },
+    {
+        "key": "sitemap_profiles_count",
+        "default": "-1"
+    },
+    {
+        "key": "sitemap_profiles_priority",
+        "default": "0.6"
+    },
+    {
+        "key": "sitemap_url",
+        "default": ""
+    },
+    {
+        "key": "sixty_second_emails",
+        "default": "1"
+    },
+    {
+        "key": "smtp_host",
+        "default": "localhost"
+    },
+    {
+        "key": "smtp_pass",
+        "default": ""
+    },
+    {
+        "key": "smtp_port",
+        "default": "25"
+    },
+    {
+        "key": "smtp_protocol",
+        "default": "plain"
+    },
+    {
+        "key": "smtp_user",
+        "default": ""
+    },
+    {
+        "key": "spam_service_action_0",
+        "default": "1"
+    },
+    {
+        "key": "spam_service_action_1",
+        "default": "1"
+    },
+    {
+        "key": "spam_service_action_2",
+        "default": "1"
+    },
+    {
+        "key": "spam_service_action_3",
+        "default": "2"
+    },
+    {
+        "key": "spam_service_action_4",
+        "default": "4"
+    },
+    {
+        "key": "spam_service_enabled",
+        "default": "1"
+    },
+    {
+        "key": "spam_service_send_to_ips",
+        "default": "1"
+    },
+    {
+        "key": "sparkpost_api_key",
+        "default": ""
+    },
+    {
+        "key": "sparkpost_click_tracking",
+        "default": "0"
+    },
+    {
+        "key": "sparkpost_use_for",
+        "default": "0"
+    },
+    {
+        "key": "spm_notify",
+        "default": "0"
+    },
+    {
+        "key": "spm_option",
+        "default": "disable,unapprove"
+    },
+    {
+        "key": "spm_post_days",
+        "default": "3"
+    },
+    {
+        "key": "staff_directory_empty",
+        "default": "0"
+    },
+    {
+        "key": "startpoll_cutoff",
+        "default": "24"
+    },
+    {
+        "key": "subs_autoprune",
+        "default": "0"
+    },
+    {
+        "key": "tags_can_prefix",
+        "default": "1"
+    },
+    {
+        "key": "tags_clean",
+        "default": "0"
+    },
+    {
+        "key": "tags_enabled",
+        "default": "1"
+    },
+    {
+        "key": "tags_force_lower",
+        "default": "1"
+    },
+    {
+        "key": "tags_len_max",
+        "default": "0"
+    },
+    {
+        "key": "tags_len_min",
+        "default": "0"
+    },
+    {
+        "key": "tags_max",
+        "default": "0"
+    },
+    {
+        "key": "tags_min",
+        "default": "0"
+    },
+    {
+        "key": "tags_min_req",
+        "default": "0"
+    },
+    {
+        "key": "tags_open_system",
+        "default": "1"
+    },
+    {
+        "key": "tags_predefined",
+        "default": ""
+    },
+    {
+        "key": "task_cron_key",
+        "default": ""
+    },
+    {
+        "key": "task_use_cron",
+        "default": "normal"
+    },
+    {
+        "key": "theme_designers_mode",
+        "default": "0"
+    },
+    {
+        "key": "topic_redirect_prune",
+        "default": "30"
+    },
+    {
+        "key": "twitter_hashtag",
+        "default": ""
+    },
+    {
+        "key": "upgrade_email",
+        "default": ""
+    },
+    {
+        "key": "upgrade_ftp_details",
+        "default": ""
+    },
+    {
+        "key": "upload_settings",
+        "default": ""
+    },
+    {
+        "key": "use_coppa",
+        "default": "0"
+    },
+    {
+        "key": "use_friendly_urls",
+        "default": "1"
+    },
+    {
+        "key": "username_characters",
+        "default": ""
+    },
+    {
+        "key": "validate_day_prune",
+        "default": "30"
+    },
+    {
+        "key": "viglink_api_key",
+        "default": ""
+    },
+    {
+        "key": "viglink_enabled",
+        "default": "0"
+    },
+    {
+        "key": "viglink_groups",
+        "default": ""
+    },
+    {
+        "key": "viglink_norewrite",
+        "default": ""
+    },
+    {
+        "key": "viglink_subid",
+        "default": ""
+    },
+    {
+        "key": "warn_on",
+        "default": "1"
+    },
+    {
+        "key": "warn_protected",
+        "default": ""
+    },
+    {
+        "key": "warn_show_own",
+        "default": "1"
+    },
+    {
+        "key": "warnings_acknowledge",
+        "default": "0"
+    },
+    {
+        "key": "widget_cache_ttl",
+        "default": "300"
+    },
+    {
+        "key": "xforward_matching",
+        "default": "0"
+    }
+]

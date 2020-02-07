@@ -1,0 +1,151 @@
+From 069ba7aa2f9269654b32b6f8fb7a5a9f1e1171ed Mon Sep 17 00:00:00 2001
+From: Javier <jachicao@uc.cl>
+Date: Wed, 17 Feb 2016 16:18:51 -0300
+Subject: [PATCH 25/28] fixed azir's soldiers detection
+
+sometimes the object changes after a dash
+---
+ EloBuddy.SDK/Orbwalker.cs | 49 +++++++++++++++++--------------
+ 1 file changed, 27 insertions(+), 22 deletions(-)
+
+diff --git a/EloBuddy.SDK/Orbwalker.cs b/EloBuddy.SDK/Orbwalker.cs
+index 7e8d6d3..928122d 100644
+--- a/EloBuddy.SDK/Orbwalker.cs
++++ b/EloBuddy.SDK/Orbwalker.cs
+@@ -307,15 +307,15 @@ namespace EloBuddy.SDK
+ 
+         #region Azir Fields and Properties
+ 
+-        internal static List<Obj_AI_Minion> _azirSoldiers;
++        internal static readonly Dictionary<int, Obj_AI_Minion> _azirSoldiers = new Dictionary<int, Obj_AI_Minion>();
+         public static List<Obj_AI_Minion> AzirSoldiers
+         {
+-            get { return _azirSoldiers != null ? new List<Obj_AI_Minion>(_azirSoldiers) : new List<Obj_AI_Minion>(); }
++            get { return _azirSoldiers.Values.ToList(); }
+         }
+-        internal static List<Obj_AI_Minion> _validAzirSoldiers;
++        internal static readonly Dictionary<int, Obj_AI_Minion> _validAzirSoldiers = new Dictionary<int, Obj_AI_Minion>();
+         public static List<Obj_AI_Minion> ValidAzirSoldiers
+         {
+-            get { return _validAzirSoldiers != null ? new List<Obj_AI_Minion>(_validAzirSoldiers) : new List<Obj_AI_Minion>(); }
++            get { return _validAzirSoldiers.Values.ToList(); }
+         }
+         internal static Dictionary<int, bool> AzirSoldierPreDashStatus { get; set; }
+ 
+@@ -345,28 +345,33 @@ namespace EloBuddy.SDK
+             switch (Player.Instance.Hero)
+             {
+                 case Champion.Azir:
+-
+-                    _azirSoldiers = ObjectManager.Get<Obj_AI_Minion>().Where(o => o.IsValid && o.IsAlly && o.Name == "AzirSoldier" &&
+-                                                                                  o.Buffs.Any(b => b.IsValid() && b.Caster.IsMe && b.Count == 1 && b.DisplayName == "azirwspawnsound")).ToList();
+-                    _validAzirSoldiers = _azirSoldiers.Where(o => o.IsInRange(Player.Instance, 950)).ToList();
++                    foreach (var soldier in ObjectManager.Get<Obj_AI_Minion>().Where(o => o.IsValid && o.IsAlly && o.Name == "AzirSoldier" &&
++                                                                                  o.Buffs.Any(b => b.IsValid() && b.Caster.IsMe && b.Count == 1 && b.DisplayName == "azirwspawnsound")))
++                    {
++                        _azirSoldiers[soldier.NetworkId] = soldier;
++                        if (Player.Instance.IsInRange(soldier, 950))
++                        {
++                            _validAzirSoldiers[soldier.NetworkId] = soldier;
++                        }
++                    }
+                     AzirSoldierPreDashStatus = new Dictionary<int, bool>();
+ 
+                     Obj_AI_Base.OnPlayAnimation += delegate(Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
+                     {
+                         var soldier = sender as Obj_AI_Minion;
+-                        if (soldier != null && soldier.IsAlly && soldier.Name == "AzirSoldier" && _azirSoldiers.Contains(soldier))
++                        if (soldier != null && soldier.IsAlly && soldier.Name == "AzirSoldier")
+                         {
+                             switch (args.Animation)
+                             {
+                                 case "Inactive":
+-                                    _validAzirSoldiers.Remove(soldier);
++                                    _validAzirSoldiers.Remove(soldier.NetworkId);
+                                     if (AzirSoldierPreDashStatus.ContainsKey(soldier.NetworkId))
+                                     {
+                                         AzirSoldierPreDashStatus[soldier.NetworkId] = false;
+                                     }
+                                     break;
+                                 case "Reactivate":
+-                                    _validAzirSoldiers.Add(soldier);
++                                    _validAzirSoldiers[soldier.NetworkId] = soldier;
+                                     if (AzirSoldierPreDashStatus.ContainsKey(soldier.NetworkId))
+                                     {
+                                         AzirSoldierPreDashStatus[soldier.NetworkId] = true;
+@@ -375,20 +380,20 @@ namespace EloBuddy.SDK
+                                 case "Run":
+                                     if (!AzirSoldierPreDashStatus.ContainsKey(soldier.NetworkId))
+                                     {
+-                                        AzirSoldierPreDashStatus.Add(soldier.NetworkId, _validAzirSoldiers.Any(o => o.IdEquals(soldier)));
++                                        AzirSoldierPreDashStatus.Add(soldier.NetworkId, _validAzirSoldiers.Any(o => o.Value.IdEquals(soldier)));
+                                     }
+-                                    _validAzirSoldiers.Remove(soldier);
++                                    _validAzirSoldiers.Remove(soldier.NetworkId);
+                                     break;
+                                 case "Run_Exit":
+                                     if (AzirSoldierPreDashStatus.ContainsKey(soldier.NetworkId) && AzirSoldierPreDashStatus[soldier.NetworkId])
+                                     {
+-                                        _validAzirSoldiers.Add(soldier);
++                                        _validAzirSoldiers[soldier.NetworkId] = soldier;
+                                         AzirSoldierPreDashStatus.Remove(soldier.NetworkId);
+                                     }
+                                     break;
+                                 case "Death":
+-                                    _azirSoldiers.Remove(soldier);
+-                                    _validAzirSoldiers.Remove(soldier);
++                                    _azirSoldiers.Remove(soldier.NetworkId);
++                                    _validAzirSoldiers.Remove(soldier.NetworkId);
+                                     AzirSoldierPreDashStatus.Remove(soldier.NetworkId);
+                                     break;
+                             }
+@@ -400,8 +405,8 @@ namespace EloBuddy.SDK
+                         if (soldier != null && soldier.IsAlly && soldier.Name == "AzirSoldier" && args.Buff.Caster.IsMe &&
+                             args.Buff.DisplayName == "azirwspawnsound")
+                         {
+-                            _azirSoldiers.Add(soldier);
+-                            _validAzirSoldiers.Add(soldier);
++                            _azirSoldiers[soldier.NetworkId] = soldier;
++                            _validAzirSoldiers[soldier.NetworkId] = soldier;
+                         }
+                     };
+                     break;
+@@ -806,7 +811,7 @@ namespace EloBuddy.SDK
+ 
+         internal static void _OnPostAttack(Obj_AI_Base sender)
+         {
+-            if (sender.IsMelee)
++            if (IsMelee)
+             {
+                 // Set to a more precise last auto attack time
+                 LastAutoAttack = Core.GameTickCount - (int)(sender.AttackCastDelay * 1000) - InternalPing;
+@@ -1087,7 +1092,7 @@ namespace EloBuddy.SDK
+         internal static IEnumerable<Obj_AI_Minion> AzirSoldiersInRange(this AttackableUnit target)
+         {
+             // TODO: Respect increased length of soldier basic attack
+-            return _validAzirSoldiers.Where(o => o.IsInRange(target, AzirSoldierAutoAttackRange + target.BoundingRadius - 20));
++            return _validAzirSoldiers.Values.Where(o => o.IsInRange(target, AzirSoldierAutoAttackRange + target.BoundingRadius - 20));
+         }
+ 
+         #endregion
+@@ -1268,7 +1273,7 @@ namespace EloBuddy.SDK
+                     LastHitProjectileTime =
+                         time + extraTime +
+                         Math.Max(0, (int) (1.5f * 1000 * (Player.Instance.Distance(minion) - Player.Instance.GetAutoAttackRange(minion)) / Player.Instance.MoveSpeed)),
+-                    LaneClearProjectileTime = time + (int) (1.25f * minion.GetAttackDelay())
++                    LaneClearProjectileTime = time + (int) (1.4f * minion.GetAttackDelay())
+                 };
+                 CurrentMinionValues[minion.NetworkId] = values;
+             }
+@@ -1475,7 +1480,7 @@ namespace EloBuddy.SDK
+             // Azir soldier range
+             if (Player.Instance.Hero == Champion.Azir && DrawAzirRange)
+             {
+-                foreach (var soldier in _validAzirSoldiers)
++                foreach (var soldier in _validAzirSoldiers.Values)
+                 {
+                     Circle.Draw(Color.LightGreen, AzirSoldierAutoAttackRange + 45, soldier);
+                 }
+-- 
+1.9.4.msysgit.2
+

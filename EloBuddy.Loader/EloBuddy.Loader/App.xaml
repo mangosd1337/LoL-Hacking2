@@ -1,0 +1,16 @@
+﻿<Application x:Class="EloBuddy.Loader.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="Views/LoginWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <Style x:Key="HyperlinkLaunch" TargetType="{x:Type Hyperlink}">
+                <EventSetter Event="RequestNavigate" Handler="HyperlinkLaunch_RequestNavigate" />
+            </Style>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="resources/CommonResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+
+    </Application.Resources>
+</Application>

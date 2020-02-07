@@ -1,0 +1,218 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D01EDE4F-8AF4-4E89-9B48-4AEBBB57FBBD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>EloBuddy.SDK</RootNamespace>
+    <AssemblyName>EloBuddy.SDK</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>3535e172</NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>5</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>EloBuddy.SDK.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EloBuddy, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7339047cb10f6e86, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\EloBuddy.dll</HintPath>
+    </Reference>
+    <Reference Include="EloBuddy.Sandbox, Version=1.0.5934.34859, Culture=neutral, PublicKeyToken=d671ef5d8e7e69a5, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\EloBuddy.Sandbox.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D9, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\SharpDX.Direct3D9.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AddonManager.cs" />
+    <Compile Include="Auth.cs" />
+    <Compile Include="Bootstrap.cs" />
+    <Compile Include="Constants\AutoAttacks.cs" />
+    <Compile Include="Constants\ObjectNames.cs" />
+    <Compile Include="DamageLibrary.cs" />
+    <Compile Include="DefaultSettings.cs" />
+    <Compile Include="Enumerations\DangerLevel.cs" />
+    <Compile Include="Enumerations\HitChance.cs" />
+    <Compile Include="Enumerations\LogLevel.cs" />
+    <Compile Include="Enumerations\SkillShotType.cs" />
+    <Compile Include="Enumerations\TargetSelectorMode.cs" />
+    <Compile Include="Enumerations\TeleportStatus.cs" />
+    <Compile Include="Enumerations\TeleportType.cs" />
+    <Compile Include="Events\Dash.cs" />
+    <Compile Include="Events\Loading.cs" />
+    <Compile Include="Events\Gapcloser.cs" />
+    <Compile Include="Events\Interrupter.cs" />
+    <Compile Include="Events\Teleport.cs" />
+    <Compile Include="Geometry.cs" />
+    <Compile Include="Item.cs" />
+    <Compile Include="Menu\AddonContainer.cs" />
+    <Compile Include="Menu\Button.cs" />
+    <Compile Include="Menu\ContainerView.cs" />
+    <Compile Include="Menu\Control.cs" />
+    <Compile Include="Menu\ControlContainer.cs" />
+    <Compile Include="Menu\ControlList.cs" />
+    <Compile Include="Menu\DynamicControl.cs" />
+    <Compile Include="Menu\EmptyControl.cs" />
+    <Compile Include="Menu\ISerializeable.cs" />
+    <Compile Include="Menu\MainMenu.cs" />
+    <Compile Include="Menu\Menu.cs" />
+    <Compile Include="Menu\Theme.cs" />
+    <Compile Include="Menu\ThemeManager.cs" />
+    <Compile Include="Menu\Values\CheckBox.cs" />
+    <Compile Include="Menu\Values\ComboBox.cs" />
+    <Compile Include="Menu\Values\GroupLabel.cs" />
+    <Compile Include="Menu\Values\IValue.cs" />
+    <Compile Include="Menu\Values\KeyBind.cs" />
+    <Compile Include="Menu\Values\Label.cs" />
+    <Compile Include="Menu\Values\Separator.cs" />
+    <Compile Include="Menu\Values\Slider.cs" />
+    <Compile Include="Menu\Values\ValueBase.cs" />
+    <Compile Include="Menu\Values\ValueDeserializationException.cs" />
+    <Compile Include="Messages.cs" />
+    <Compile Include="Core.cs" />
+    <Compile Include="Damage.cs" />
+    <Compile Include="EntityManager.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Notifications\INotification.cs" />
+    <Compile Include="Notifications\Notifications.cs" />
+    <Compile Include="Notifications\NotificationBase.cs" />
+    <Compile Include="Notifications\NotificationTexture.cs" />
+    <Compile Include="Notifications\SimpleNotification.cs" />
+    <Compile Include="Orbwalker.cs" />
+    <Compile Include="Prediction.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Rendering\Circle.cs" />
+    <Compile Include="Rendering\Line.cs" />
+    <Compile Include="Rendering\Sprite.cs" />
+    <Compile Include="Rendering\Text.cs" />
+    <Compile Include="Rendering\TextureLoader.cs" />
+    <Compile Include="Spell.cs" />
+    <Compile Include="Spells\CollisionType.cs" />
+    <Compile Include="Spells\SpellType.cs" />
+    <Compile Include="Spells\SpellDatabase.cs" />
+    <Compile Include="Spells\SpellInfo.cs" />
+    <Compile Include="Spells\SummonerSpells.cs" />
+    <Compile Include="StreamingMode.cs" />
+    <Compile Include="TargetSelector.cs" />
+    <Compile Include="ThirdParty\ClipperLib.cs" />
+    <Compile Include="ThirdParty\Glide\Ease.cs" />
+    <Compile Include="ThirdParty\Glide\GlideInfo.cs" />
+    <Compile Include="ThirdParty\Glide\Lerper.cs" />
+    <Compile Include="ThirdParty\Glide\Tween.cs" />
+    <Compile Include="ThirdParty\Glide\Tweener.cs" />
+    <Compile Include="Utils\Logger.cs" />
+    <Compile Include="Utils\TimeMeasure.cs" />
+    <Compile Include="Utils\Utilities.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources1.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="EloBuddy.SDK.snk" />
+    <None Include="Resources\DamageLibrary\DamageLibrary.json" />
+    <None Include="Resources\Gapcloser\Gapclosers.json" />
+    <None Include="Resources\Fonts\Gill Sans MT Light.ttf" />
+    <None Include="Resources\Fonts\Gill Sans MT Pro Book.otf" />
+    <None Include="Resources\Fonts\Gill Sans MT Pro Medium.otf" />
+    <None Include="Resources\Item\ItemData.json" />
+    <None Include="Resources\SpellDatabase\SpellDatabase.json" />
+    <None Include="Resources\TargetSelector\Priorities.json" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Resources\Notification\SimpleNotification.png" />
+    <None Include="Resources\Menu\config.json" />
+    <Content Include="Resources\Menu\theme.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />
+  <Import Project="..\packages\SharpDX.Toolkit.2.6.3\build\SharpDX.Toolkit.targets" Condition="Exists('..\packages\SharpDX.Toolkit.2.6.3\build\SharpDX.Toolkit.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

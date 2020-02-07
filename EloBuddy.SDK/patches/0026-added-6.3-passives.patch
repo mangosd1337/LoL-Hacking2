@@ -1,0 +1,246 @@
+From d47085063b222e667cff26bb96c70aaec5ee18a9 Mon Sep 17 00:00:00 2001
+From: Javier <jachicao@uc.cl>
+Date: Fri, 19 Feb 2016 22:59:05 -0300
+Subject: [PATCH 26/28] added 6.3 passives
+
+---
+ EloBuddy.SDK/Damage.cs | 82 +++++++++++++---------------------
+ 1 file changed, 30 insertions(+), 52 deletions(-)
+
+diff --git a/EloBuddy.SDK/Damage.cs b/EloBuddy.SDK/Damage.cs
+index d04cb04..6568690 100644
+--- a/EloBuddy.SDK/Damage.cs
++++ b/EloBuddy.SDK/Damage.cs
+@@ -3,7 +3,6 @@ using System.Collections.Generic;
+ using System.Data;
+ using System.Linq;
+ using System.Reflection;
+-using System.Security.Cryptography.X509Certificates;
+ using EloBuddy.SDK.Menu.Values;
+ 
+ namespace EloBuddy.SDK.AddonDevelopers
+@@ -121,22 +120,22 @@ namespace EloBuddy.SDK.AddonDevelopers
+                 var statikk = 0f;
+                 var kircheis = 0f;
+                 var rapid = 0f;
+-                //Statikk Shiv: UNIQUE – SHIV LIGHTNING: Your next basic attack (on-hit) sparks lightning to up to 4 nearby units, dealing 30 - 100 (based on level) bonus magic damage, increased to 52.5 - 175 (based on level) against minions.
++                //Statikk Shiv: UNIQUE – SHIV LIGHTNING: Your next basic attack (on-hit) sparks lightning to up to 4 nearby units, dealing 50 - 120 (based on level) bonus magic damage, increased to 110 -  (based on level) against minions.
+                 if (fromHero.HasItem(ItemId.Statikk_Shiv))
+                 {
+-                    statikk += (targetIsMinion ? 2.2f : 1f) * new[] { 30, 30, 30, 30, 30, 36, 41, 47, 52, 57, 63, 68, 74, 49, 84, 90, 95, 100 }[fromHero.Level - 1];
++                    statikk += (targetIsMinion ? 2.2f : 1f) * new[] { 50, 50, 50, 50, 50, 56, 61, 67, 72, 77, 83, 88, 94, 99, 104, 110, 115, 120 }[fromHero.Level - 1];
+                 }
+ 
+                 //Kircheis Shard: ENERGIZED STRIKE: Your next basic attack deals +30 bonus on-hit magic damage.
+-                if (fromHero.HasItem(2015))
++                if (fromHero.HasItem(ItemId.Kircheis_Shard))
+                 {
+-                    kircheis += 30f;
++                    kircheis += 40f;
+                 }
+ 
+-                //Rapid Firecannon: UNIQUE – ENERGIZED STRIKE: Moving and attacking generates Energize stacks, up to 100. When fully Energized, your next basic attack gains FIRECANNON and deals 50 - 200 (based on level) bonus on-hit magic damage.
+-                if (fromHero.HasItem(3094))
++                //Rapid Firecannon: UNIQUE – ENERGIZED STRIKE: Moving and attacking generates Energize stacks, up to 100. When fully Energized, your next basic attack gains FIRECANNON and deals 50 - 160 (based on level) bonus on-hit magic damage.
++                if (fromHero.HasItem(ItemId.Rapid_Firecannon))
+                 {
+-                    rapid += new[] { 50, 50, 50, 50, 50, 62, 74, 85, 97, 108, 120, 131, 143, 154, 166, 177, 189, 200 }[fromHero.Level - 1];
++                    rapid += new[] { 50, 50, 50, 50, 50, 58, 66, 75, 83, 92, 100, 109, 117, 126, 134, 143, 151, 160 }[fromHero.Level - 1];
+                 }
+                 precalculated.RawMagical = new[] { statikk, kircheis, rapid }.Max();
+             }
+@@ -442,11 +441,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+                     //TODO
+                     break;
+                 case Champion.Shen:
+-                    if (fromHero.HasBuff("shenwayoftheninjaaura"))
+-                    {
+-                        precalculated.RawMagical += 4f + 4f * fromHero.Level +
+-                                                    0.1f * (fromHero.MaxHealth - (570.8f + (85f * fromHero.Level)));
+-                    }
++                    //TODO
+                     break;
+                 case Champion.Shyvana:
+                     if (fromHero.HasBuff("ShyvanaDoubleAttack"))
+@@ -1171,28 +1166,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+                 }
+ 
+                 #endregion
+-
+-                #region Dragon's Buff
+-
+-                if (targetMinion != null)
+-                {
+-                    var buffCount = fromHero.GetBuffCount("s5test_dragonslayerbuff");
+-                    if (buffCount >= 4)
+-                    {
+-                        percentPassive *= 1.15f * (buffCount == 5 ? 2f : 1f);
+-                    }
+-                }
+-                else if (target.IsStructure())
+-                {
+-                    var buffCount = fromHero.GetBuffCount("s5test_dragonslayerbuff");
+-                    if (buffCount >= 2)
+-                    {
+-                        percentPassive *= 1.15f * (buffCount == 5 ? 2f : 1f);
+-                    }
+-                }
+                 //Doom's Eve: +10% increased damage TODO
+-
+-                #endregion
+             }
+ 
+             if (targetHero != null)
+@@ -1309,11 +1283,6 @@ namespace EloBuddy.SDK.AddonDevelopers
+                         }
+                         break;
+                     case Champion.Shen:
+-                        if (targetHero.HasBuff("shenshadowdashpassive") && from.HasBuffOfType(BuffType.Taunt) &&
+-                            damageType == DamageType.Physical)
+-                        {
+-                            percentReceived *= 0.5f;
+-                        }
+                         break;
+                     case Champion.Urgot:
+                         if (targetHero.HasBuff("urgotswapdef"))
+@@ -1580,8 +1549,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+ 
+             public string SetVaribles(string expresion, Obj_AI_Base source, Obj_AI_Base target, IVariable[] customVariables)
+             {
+-
+-                expresion = Variables.Aggregate(expresion, (current, variable) => current.Replace("{" + variable.Key + "}", variable.GetValue(source, target).ToString("F") ));
++                expresion = Variables.Aggregate(expresion, (current, variable) => current.Replace("{" + variable.Key + "}", variable.GetValue(source, target).ToString("F")));
+                 if (customVariables != null)
+                     expresion = customVariables.Aggregate(expresion, (current, variable) => current.Replace("{" + variable.Key + "}", variable.GetValue(source, target).ToString("F")));
+                 return expresion;
+@@ -1735,6 +1703,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+             {
+                 DamageSources.Add(damageSource);
+             }
++
+             public void AddExpresion(DamageSourceExpression damageSource)
+             {
+                 DamageSourceExpresions.Add(damageSource);
+@@ -1744,6 +1713,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+             {
+                 DamageSources.RemoveAll(o => o == damageSource);
+             }
++
+             public void RemoveExpresion(DamageSourceExpression damageSource)
+             {
+                 DamageSourceExpresions.RemoveAll(o => o == damageSource);
+@@ -1759,7 +1729,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+                 if (Condition != null && !Condition(target))
+                 {
+                     return 0;
+-                    }
++                }
+                 var baseDamage = DamageSources.Sum(o => o.GetDamage(source, target));
+                 return DamageSourceExpresions.Count == 0 ? baseDamage : DamageSourceExpresions.Sum(x => x.GetDamage(source, target, baseDamage));
+             }
+@@ -1799,7 +1769,8 @@ namespace EloBuddy.SDK.AddonDevelopers
+                 var value = ExpressionCalculator.SetVaribles(condition, source, target, null);
+                 var statements = value.Split(' ');
+ 
+-                if (statements.Length != 3) return true;
++                if (statements.Length != 3)
++                    return true;
+                 switch (statements[1])
+                 {
+                     case ">":
+@@ -1812,7 +1783,6 @@ namespace EloBuddy.SDK.AddonDevelopers
+                         return float.Parse(statements[0]) >= float.Parse(statements[2]);
+                     case "<=":
+                         return float.Parse(statements[0]) <= float.Parse(statements[2]);
+-
+                 }
+                 return true;
+             }
+@@ -1820,9 +1790,10 @@ namespace EloBuddy.SDK.AddonDevelopers
+             public override float GetDamage(Obj_AI_Base source, Obj_AI_Base target, float baseDamage)
+             {
+                 var spell = source.Spellbook.GetSpell(Slot);
+-                if (spell.Level == 0)  return 0;
++                if (spell.Level == 0)
++                    return 0;
+                 var cond = CheckCondition(Condition, source, target);
+-                
++
+                 return cond
+                     ? source.CalculateDamageOnUnit(target, DamageType, ExpressionCalculator.Calculate(Expression, source, target, GetCustomVaribales(baseDamage)))
+                     : baseDamage;
+@@ -1840,39 +1811,46 @@ namespace EloBuddy.SDK.AddonDevelopers
+         #endregion
+ 
+         #region Expression Variables
++
+         internal class ExpresionBasicVarible : IVariable
+         {
+             public string Key { get; set; }
+             public Func<Obj_AI_Base, Obj_AI_Base, float> Value { get; set; }
++
+             public ExpresionBasicVarible(string key, Func<Obj_AI_Base, Obj_AI_Base, float> value)
+             {
+                 Key = key;
+                 Value = value;
+             }
++
+             public float GetValue(Obj_AI_Base source, Obj_AI_Base target)
+             {
+                 return Value.Invoke(source, target);
+             }
+         }
++
+         internal class ExpresionLevelVarible : IVariable
+         {
+             public string Key { get; set; }
+             public SpellSlot Slot { get; set; }
+             public float[] Damages { get; set; }
+-            public ExpresionLevelVarible(string key, SpellSlot slot, float [] damages)
++
++            public ExpresionLevelVarible(string key, SpellSlot slot, float[] damages)
+             {
+                 Key = key;
+                 Slot = slot;
+                 Damages = damages;
+             }
++
+             public float GetValue(Obj_AI_Base source, Obj_AI_Base target)
+             {
+-                var spellLevel = source.Spellbook.GetSpell(Slot).Level -1;
+-                if(spellLevel  > 0 && spellLevel < 5)
++                var spellLevel = source.Spellbook.GetSpell(Slot).Level - 1;
++                if (spellLevel > 0 && spellLevel < 5)
+                     return Damages[spellLevel];
+                 return 0f;
+             }
+         }
++
+         internal class ExpresionStaticVarible : IVariable
+         {
+             public string Key { get; set; }
+@@ -1964,10 +1942,10 @@ namespace EloBuddy.SDK.AddonDevelopers
+                 else
+                 {
+                     Property = ObjectType.GetProperty(name);
+-                    if(Property != null) return;
++                    if (Property != null)
++                        return;
+                 }
+                 throw new ArgumentException((IsMethod ? "Method" : "Property") + " (" + name + ") not found!");
+-
+             }
+ 
+             public float GetValue(Obj_AI_Base source, Obj_AI_Base target)
+@@ -2012,7 +1990,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+             string Key { get; }
+             float GetValue(Obj_AI_Base source, Obj_AI_Base target);
+         }
++
+         #endregion
+     }
+ }
+-
+-- 
+1.9.4.msysgit.2
+

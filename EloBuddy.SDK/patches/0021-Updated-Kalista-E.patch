@@ -1,0 +1,224 @@
+From 3a095a8bb7ef7274247e525fa0365657710873b7 Mon Sep 17 00:00:00 2001
+From: Lachlan van der Velden <lvelden1@gmail.com>
+Date: Tue, 9 Feb 2016 18:39:18 +1100
+Subject: [PATCH 21/28] Updated Kalista E
+
+---
+ .../Resources/DamageLibrary/DamageLibrary.json     | 117 +++++++++++++++++++--
+ 1 file changed, 108 insertions(+), 9 deletions(-)
+
+diff --git a/EloBuddy.SDK/Resources/DamageLibrary/DamageLibrary.json b/EloBuddy.SDK/Resources/DamageLibrary/DamageLibrary.json
+index 6dc7719..3d8dafb 100644
+--- a/EloBuddy.SDK/Resources/DamageLibrary/DamageLibrary.json
++++ b/EloBuddy.SDK/Resources/DamageLibrary/DamageLibrary.json
+@@ -90,6 +90,7 @@
+               "ScalingType": "AbilityPoints"
+             }
+           ]
++
+         }
+       },
+       {
+@@ -105,6 +106,7 @@
+               "ScalingType": "AbilityPoints"
+             }
+           ]
++
+         }
+       }
+     ],
+@@ -276,7 +278,7 @@
+           "DamageType": "Physical",
+           "Damages": [ 60, 75, 90 ],
+           "BonusDamages": [
+-            
++
+           ]
+         }
+       }
+@@ -307,7 +309,23 @@
+           "DamageType": "Magical",
+           "Damages": [ 8, 12, 16, 20, 24 ],
+           "BonusDamages": [
+-            
++
++          ],
++          "ExpresionDamages": [
++            {
++              "StaticVaribles": [
++                {
++                  "ScalingTarget": "Target",
++                  "ScalingType": "MaxHealth",
++                  "Key": "Target.MaxHealth"
++                }
++              ],
++              "TypeVaribles": [ ],
++              "LevelVaribles": [ ],
++              "DamageType": "Magical",
++              "DamagePercentages": [ 0.01, 0.015, 0.02, 0.025, 0.03 ],
++              "Expression": "{Target.MaxHealth} + ({Target.MaxHealth} * 0.0001)"
++            }
+           ]
+         }
+       }
+@@ -363,6 +381,21 @@
+             }
+           ]
+         }
++      },
++      {
++        "Stage": "Detonation",
++        "SpellData": {
++          "DamageType": "Magical",
++          "Damages": [ 60, 90, 120, 150, 180 ],
++          "BonusDamages": [
++            {
++              "DamageType": "Magical",
++              "DamagePercentages": [ 0.5, 0.5, 0.5, 0.5, 0.5 ],
++              "ScalingTarget": "Source",
++              "ScalingType": "AbilityPoints"
++            }
++          ]
++        }
+       }
+     ],
+     "E": [
+@@ -1315,7 +1348,7 @@
+           "DamageType": "Magical",
+           "Damages": [ 40, 75, 110, 145, 180 ],
+           "BonusDamages": [
+-            
++
+           ]
+         }
+       },
+@@ -1325,7 +1358,7 @@
+           "DamageType": "Magical",
+           "Damages": [ 60, 100, 140, 180, 220 ],
+           "BonusDamages": [
+-            
++
+           ]
+         }
+       }
+@@ -1615,7 +1648,7 @@
+           "DamageType": "Magical",
+           "Damages": [ 20, 30, 40, 50, 60 ],
+           "BonusDamages": [
+-            
++
+           ]
+         }
+       }
+@@ -2195,7 +2228,7 @@
+           "DamageType": "True",
+           "Damages": [ 15, 30, 45, 60, 75 ],
+           "BonusDamages": [
+-            
++
+           ]
+         }
+       }
+@@ -2599,6 +2632,72 @@
+           ]
+         }
+       }
++    ],
++    "E": [
++      {
++        "Stage": "Detonation",
++        "SpellData": {
++          "DamageType": "Physical",
++          "Damages": [ 0, 0, 0, 0, 0 ],
++          "BonusDamages": [ ],
++          "ExpresionDamages": [
++            {
++              "StaticVaribles": [
++                {
++                  "ScalingTarget": "Source",
++                  "ScalingType": "AttackPoints",
++                  "Key": "Source.AttackPoints"
++                }
++              ],
++              "LevelVaribles": [
++                {
++                  "Key": "Rend.Damage",
++                  "Damages": [ 20, 30, 40, 50, 60 ],
++                  "Slot": "E"
++                },
++                {
++                  "Key": "Spear.Damage",
++                  "Damages": [ 10, 14, 19, 25, 32 ],
++                  "Slot": "E"
++                },
++                {
++                  "Key": "Spear.DamageMultiplier",
++                  "Damages": [ 0.2, 0.225, 0.25, 0.275, 0.3 ],
++                  "Slot": "E"
++                },
++                {
++                  "Key": "Rend.DamageMultiplier",
++                  "Damages": [ 0.6, 0.6, 0.6, 0.6, 0.6 ],
++                  "Slot": "E"
++                }
++              ],
++              "TypeVaribles": [
++                {
++                  "Name": "GetBuffCount",
++                  "Parameters": [ "KalistaExpungeMarker" ],
++                  "DamageType": "Physical",
++                  "Target": "Target",
++                  "Key": "Source.EStacks"
++
++                }
++              ],
++              "DamageType": "Physical",
++              "DamagePercentages": [ 10, 14, 19, 25, 32 ],
++              "Condition":  "{Source.EStacks} > 0",
++              "Expression": "{Rend.Damage} + ({Source.EStacks} - 1) * {Spear.Damage} + {Source.AttackPoints} * ({Rend.DamageMultiplier} + ({Source.EStacks} - 1) * {Spear.DamageMultiplier})"
++            }
++          ]
++        }
++      },
++      {
++        "Stage": "Default",
++        "SpellData": {
++          "DamageType": "Physical",
++          "Damages": [ 0, 0, 0, 0, 0 ],
++          "BonusDamages": [ ],
++          "ExpresionDamages": [ ]
++        }
++      }
+     ]
+   },
+   "Karma": {
+@@ -4462,7 +4561,7 @@
+           "DamageType": "True",
+           "Damages": [ 400, 550, 700, 850, 1000 ],
+           "BonusDamages": [
+-            
++
+           ]
+         }
+       }
+@@ -5631,7 +5730,7 @@
+           "DamageType": "Physical",
+           "Damages": [ 25, 35, 45, 55, 65 ],
+           "BonusDamages": [
+-            
++
+           ]
+         }
+       }
+@@ -7305,7 +7404,7 @@
+           "DamageType": "Magical",
+           "Damages": [ 40, 55, 70, 85, 100 ],
+           "BonusDamages": [
+-            
++
+           ]
+         }
+       }
+-- 
+1.9.4.msysgit.2
+

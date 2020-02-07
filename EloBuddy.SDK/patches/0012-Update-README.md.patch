@@ -1,0 +1,25 @@
+From e7d8979be340007509617c7c77cfb09aba949504 Mon Sep 17 00:00:00 2001
+From: Hellsing <matrix11@gmx.net>
+Date: Sat, 6 Feb 2016 14:20:45 +0100
+Subject: [PATCH 12/13] Update README.md
+
+---
+ README.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/README.md b/README.md
+index ed8a128..faf8468 100644
+--- a/README.md
++++ b/README.md
+@@ -3,7 +3,7 @@ This is a special repository where you can see some parts of the SDK. Please fol
+ 
+ ## TODO list
+ - [x] Get things going
+-- [ ] Add Jhin support to the Orbwalker
++- [x] Add Jhin support to the Orbwalker
+ - [ ] Fix Azir soldier tower attacking
+ - [ ] Rework and improve the DamageLibrary
+ - [ ] Improve Orbwalker logic
+-- 
+1.9.4.msysgit.2
+

@@ -1,0 +1,6 @@
+<project outputDir="N:\Dropbox\EloBuddy_Deploy\Deploy" baseDir="N:\Dropbox\EloBuddy_Deploy\Release" xmlns="http://confuser.codeplex.com">
+  <rule pattern="true" inherit="false">
+    <protection id="rename" />
+  </rule>
+  <module path="..\Release\EloBuddy.dll" snKey="C:\Users\kappa\Desktop\EloBuddy.Core\Resources\EloBuddy.snk" />
+</project>

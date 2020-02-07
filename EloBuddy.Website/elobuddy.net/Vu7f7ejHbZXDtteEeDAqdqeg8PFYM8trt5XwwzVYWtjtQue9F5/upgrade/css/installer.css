@@ -1,0 +1,65 @@
+.ipsApp.ipsApp_installer {
+	padding-top: 3%;
+}
+
+#elInstaller_wrap {
+	width: 95%;
+	margin: 0 auto;
+	min-height: 450px;
+}
+
+#ipsLayout_header header {
+	background: #1f282d;
+}
+
+.ipsApp.ipsApp_installer #elLogo img {
+		display: none;
+	} 
+
+	.ipsApp.ipsApp_installer #elLogo {
+		display: inline-block;
+		width: 26px;
+		height: 25px;
+		vertical-align: middle;
+		margin: -3px 5px 0 0;
+		background-image: url( ../img/logo@2x.png );
+		background-repeat: no-repeat;
+		background-size: 26px 25px;
+	}
+
+.ipsApp.ipsApp_installer #ipsLayout_header #elSiteTitle {
+	font-size: 22px;
+}
+
+.ipsApp.ipsApp_installer #ipsLayout_header header {
+	line-height: 58px;
+	height: 58px;
+	padding: 0 15px;
+}
+
+#elInstaller_body {
+	background: #fff;
+}
+
+#elInstaller_steps {
+	font-size: 15px;
+	line-height: 3;
+	margin-left: 15px;
+}
+
+.elInstaller_stepDone {
+	color: #bababa;
+}
+
+#elInstaller_welcome {
+	font-size: 30px;
+	font-weight: 300;
+}
+
+.ipsVersions dt {
+	float: left;
+	width: 120px;
+}
+	.ipsVersions.disabled dt, .ipsVersions.disabled dd {
+		color: #b9b9b9;
+	}

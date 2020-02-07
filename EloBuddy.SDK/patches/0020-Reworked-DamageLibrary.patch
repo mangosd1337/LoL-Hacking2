@@ -1,0 +1,602 @@
+From 73749001ebb0c0bb162c2d84263931b4573e8a69 Mon Sep 17 00:00:00 2001
+From: Lachlan van der Velden <lvelden1@gmail.com>
+Date: Tue, 9 Feb 2016 18:38:56 +1100
+Subject: [PATCH 20/28] Reworked DamageLibrary
+
+---
+ EloBuddy.SDK/Damage.cs        | 338 ++++++++++++++++++++++++--
+ EloBuddy.SDK/DamageLibrary.cs |  95 +++++++-
+ 2 files changed, 406 insertions(+), 27 deletions(-)
+
+diff --git a/EloBuddy.SDK/Damage.cs b/EloBuddy.SDK/Damage.cs
+index 2ac8633..d04cb04 100644
+--- a/EloBuddy.SDK/Damage.cs
++++ b/EloBuddy.SDK/Damage.cs
+@@ -1,6 +1,9 @@
+ ﻿using System;
+ using System.Collections.Generic;
++using System.Data;
+ using System.Linq;
++using System.Reflection;
++using System.Security.Cryptography.X509Certificates;
+ using EloBuddy.SDK.Menu.Values;
+ 
+ namespace EloBuddy.SDK.AddonDevelopers
+@@ -1457,7 +1460,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+             return Math.Max(percentReceived * percentPassive * percentMod * (rawDamage + flatPassive) + flatReceived + otherDamageModifier, 0f);
+         }
+ 
+-        #region Hellsing Created Still Good Code I Hope...
++        #region Calculators
+ 
+         public static Calculator CreateCalculator(Obj_AI_Base sourceUnit)
+         {
+@@ -1550,6 +1553,70 @@ namespace EloBuddy.SDK.AddonDevelopers
+             }
+         }
+ 
++        public class ExpressionCalculator
++        {
++            private DataTable DataTable { get; set; }
++            public List<IVariable> Variables { get; set; }
++
++            public ExpressionCalculator()
++            {
++                DataTable = new DataTable();
++                Variables = new List<IVariable>();
++            }
++
++            public float Calculate(string expresion, Obj_AI_Base source, Obj_AI_Base target, IVariable[] customVariables = null)
++            {
++                expresion = SetVaribles(expresion, source, target, customVariables);
++                try
++                {
++                    return float.Parse(DataTable.Compute(expresion, null).ToString());
++                }
++                catch (Exception ex)
++                {
++                    Console.WriteLine(ex);
++                    return 0f;
++                }
++            }
++
++            public string SetVaribles(string expresion, Obj_AI_Base source, Obj_AI_Base target, IVariable[] customVariables)
++            {
++
++                expresion = Variables.Aggregate(expresion, (current, variable) => current.Replace("{" + variable.Key + "}", variable.GetValue(source, target).ToString("F") ));
++                if (customVariables != null)
++                    expresion = customVariables.Aggregate(expresion, (current, variable) => current.Replace("{" + variable.Key + "}", variable.GetValue(source, target).ToString("F")));
++                return expresion;
++            }
++        }
++
++        #endregion
++
++        #region Enums
++
++        public enum ScalingType
++        {
++            AbilityPoints,
++            AttackPoints,
++            BonusAbilityPoints,
++            BonusAttackPoints,
++            Armor,
++            MagicResist,
++            CurrentHealth,
++            CurrentMana,
++            MaxHealth,
++            MaxMana,
++            MissingHealth
++        }
++
++        public enum ScalingTarget
++        {
++            Source,
++            Target
++        }
++
++        #endregion
++
++        #region Damage Sources
++
+         public abstract class DamageSourceBase
+         {
+             public abstract float GetDamage(Obj_AI_Base source, Obj_AI_Base target);
+@@ -1653,6 +1720,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+         public class DamageSourceBoundle : DamageSourceBase
+         {
+             public List<DamageSourceBase> DamageSources { get; protected set; }
++            public List<DamageSourceExpression> DamageSourceExpresions { get; protected set; }
+ 
+             public Func<Obj_AI_Base, bool> Condition { get; set; }
+ 
+@@ -1660,17 +1728,26 @@ namespace EloBuddy.SDK.AddonDevelopers
+             {
+                 // Initialize properties
+                 DamageSources = new List<DamageSourceBase>();
++                DamageSourceExpresions = new List<DamageSourceExpression>();
+             }
+ 
+             public void Add(DamageSourceBase damageSource)
+             {
+                 DamageSources.Add(damageSource);
+             }
++            public void AddExpresion(DamageSourceExpression damageSource)
++            {
++                DamageSourceExpresions.Add(damageSource);
++            }
+ 
+             public void Remove(DamageSourceBase damageSource)
+             {
+                 DamageSources.RemoveAll(o => o == damageSource);
+             }
++            public void RemoveExpresion(DamageSourceExpression damageSource)
++            {
++                DamageSourceExpresions.RemoveAll(o => o == damageSource);
++            }
+ 
+             public float GetDamage(Obj_AI_Base target)
+             {
+@@ -1682,33 +1759,260 @@ namespace EloBuddy.SDK.AddonDevelopers
+                 if (Condition != null && !Condition(target))
+                 {
+                     return 0;
++                    }
++                var baseDamage = DamageSources.Sum(o => o.GetDamage(source, target));
++                return DamageSourceExpresions.Count == 0 ? baseDamage : DamageSourceExpresions.Sum(x => x.GetDamage(source, target, baseDamage));
++            }
++        }
++
++        public abstract class DamageSourceExpression
++        {
++            public abstract float GetDamage(Obj_AI_Base source, Obj_AI_Base target, float baseDamage);
++        }
++
++        internal class ExpresionDamageSource : DamageSourceExpression
++        {
++            public ExpressionCalculator ExpressionCalculator { get; set; }
++            public string Expression { get; set; }
++            public string Condition { get; set; }
++            public float RequriedValue { get; set; }
++            public SpellSlot Slot { get; set; }
++            public DamageType DamageType { get; set; }
++            public float[] DamagePercentages { get; set; }
++            public IEnumerable<IVariable> Variables
++            {
++                set { ExpressionCalculator.Variables = value.ToList(); }
++            }
++
++            public ExpresionDamageSource(string expression, SpellSlot slot, DamageType damageType)
++            {
++                ExpressionCalculator = new ExpressionCalculator();
++                Expression = expression;
++                Slot = slot;
++                DamageType = damageType;
++            }
++
++            public bool CheckCondition(string condition, Obj_AI_Base source, Obj_AI_Base target)
++            {
++                if (string.IsNullOrEmpty(condition))
++                    return true;
++                var value = ExpressionCalculator.SetVaribles(condition, source, target, null);
++                var statements = value.Split(' ');
++
++                if (statements.Length != 3) return true;
++                switch (statements[1])
++                {
++                    case ">":
++                        return float.Parse(statements[0]) > float.Parse(statements[2]);
++                    case "<":
++                        return float.Parse(statements[0]) < float.Parse(statements[2]);
++                    case "==":
++                        return Math.Abs(float.Parse(statements[0]) - float.Parse(statements[2])) < float.Epsilon;
++                    case ">=":
++                        return float.Parse(statements[0]) >= float.Parse(statements[2]);
++                    case "<=":
++                        return float.Parse(statements[0]) <= float.Parse(statements[2]);
++
+                 }
++                return true;
++            }
+ 
+-                return DamageSources.Sum(o => o.GetDamage(source, target));
++            public override float GetDamage(Obj_AI_Base source, Obj_AI_Base target, float baseDamage)
++            {
++                var spell = source.Spellbook.GetSpell(Slot);
++                if (spell.Level == 0)  return 0;
++                var cond = CheckCondition(Condition, source, target);
++                
++                return cond
++                    ? source.CalculateDamageOnUnit(target, DamageType, ExpressionCalculator.Calculate(Expression, source, target, GetCustomVaribales(baseDamage)))
++                    : baseDamage;
++            }
++
++            private static IVariable[] GetCustomVaribales(float baseDamage)
++            {
++                return new IVariable[]
++                {
++                    new ExpresionBasicVarible("BaseDamage", (source, target) => baseDamage),
++                };
+             }
+         }
+ 
+-        public enum ScalingType
++        #endregion
++
++        #region Expression Variables
++        internal class ExpresionBasicVarible : IVariable
+         {
+-            AbilityPoints,
+-            AttackPoints,
+-            BonusAbilityPoints,
+-            BonusAttackPoints,
+-            Armor,
+-            MagicResist,
+-            CurrentHealth,
+-            CurrentMana,
+-            MaxHealth,
+-            MaxMana,
+-            MissingHealth
++            public string Key { get; set; }
++            public Func<Obj_AI_Base, Obj_AI_Base, float> Value { get; set; }
++            public ExpresionBasicVarible(string key, Func<Obj_AI_Base, Obj_AI_Base, float> value)
++            {
++                Key = key;
++                Value = value;
++            }
++            public float GetValue(Obj_AI_Base source, Obj_AI_Base target)
++            {
++                return Value.Invoke(source, target);
++            }
++        }
++        internal class ExpresionLevelVarible : IVariable
++        {
++            public string Key { get; set; }
++            public SpellSlot Slot { get; set; }
++            public float[] Damages { get; set; }
++            public ExpresionLevelVarible(string key, SpellSlot slot, float [] damages)
++            {
++                Key = key;
++                Slot = slot;
++                Damages = damages;
++            }
++            public float GetValue(Obj_AI_Base source, Obj_AI_Base target)
++            {
++                var spellLevel = source.Spellbook.GetSpell(Slot).Level -1;
++                if(spellLevel  > 0 && spellLevel < 5)
++                    return Damages[spellLevel];
++                return 0f;
++            }
+         }
++        internal class ExpresionStaticVarible : IVariable
++        {
++            public string Key { get; set; }
++            public ScalingType Type { get; set; }
++            public ScalingTarget Target { get; set; }
+ 
+-        public enum ScalingTarget
++            public ExpresionStaticVarible(string key, ScalingTarget target, ScalingType type)
++            {
++                Key = key;
++                Target = target;
++                Type = type;
++            }
++
++            public float GetValue(Obj_AI_Base source, Obj_AI_Base target)
++            {
++                var objBase = Target == ScalingTarget.Source ? source : target;
++                var bonusDamage = 0f;
++                switch (Type)
++                {
++                    case ScalingType.AbilityPoints:
++                        bonusDamage = objBase.FlatMagicDamageMod;
++                        break;
++                    case ScalingType.Armor:
++                        bonusDamage = objBase.Armor + objBase.FlatArmorMod;
++                        break;
++                    case ScalingType.AttackPoints:
++                        bonusDamage = objBase.TotalAttackDamage;
++                        break;
++                    case ScalingType.BonusAbilityPoints:
++                        bonusDamage = objBase.FlatMagicDamageMod;
++                        break;
++                    case ScalingType.BonusAttackPoints:
++                        bonusDamage = objBase.FlatPhysicalDamageMod;
++                        break;
++                    case ScalingType.CurrentHealth:
++                        bonusDamage = objBase.Health;
++                        break;
++                    case ScalingType.CurrentMana:
++                        bonusDamage = objBase.Mana;
++                        break;
++                    case ScalingType.MagicResist:
++                        bonusDamage = objBase.SpellBlock;
++                        break;
++                    case ScalingType.MaxHealth:
++                        bonusDamage = objBase.MaxHealth;
++                        break;
++                    case ScalingType.MaxMana:
++                        bonusDamage = objBase.MaxMana;
++                        break;
++                }
++                return bonusDamage;
++            }
++        }
++
++        internal class ExpresionTypeVarible : IVariable
+         {
+-            Source,
+-            Target
++            public string Key { get; set; }
++            public ScalingTarget Target { get; set; }
++            public DamageType Type { get; set; }
++            public string Name { get; set; }
++            public string[] Parameters { get; set; }
++            public bool IsMethod
++            {
++                get { return Parameters.Length != 0; }
++            }
++            private Type ObjectType { get; set; }
++            private MethodInfo Method { get; set; }
++            private ParameterInfo[] MethodParameters { get; set; }
++            private PropertyInfo Property { get; set; }
++
++            public ExpresionTypeVarible(string key, DamageType type, ScalingTarget target, string name, params string[] param)
++            {
++                Key = key;
++                Type = type;
++                Target = target;
++                Name = name;
++                Parameters = param;
++
++                ObjectType = typeof (Obj_AI_Base);
++                if (IsMethod)
++                {
++                    Method = ObjectType.GetMethod(name);
++                    if (Method != null)
++                    {
++                        MethodParameters = Method.GetParameters();
++                        return;
++                    }
++                }
++                else
++                {
++                    Property = ObjectType.GetProperty(name);
++                    if(Property != null) return;
++                }
++                throw new ArgumentException((IsMethod ? "Method" : "Property") + " (" + name + ") not found!");
++
++            }
++
++            public float GetValue(Obj_AI_Base source, Obj_AI_Base target)
++            {
++                var objBase = Target == ScalingTarget.Source ? source : target;
++                if (IsMethod && Method != null)
++                {
++                    var convertedParams = new object[MethodParameters.Length];
++                    for (int i = 0; i < MethodParameters.Length; i++)
++                    {
++                        if (i > Parameters.Length - 1 && MethodParameters[i].HasDefaultValue)
++                            convertedParams[i] = MethodParameters[i].DefaultValue;
++                        else if (!MethodParameters[i].HasDefaultValue && Parameters.Length < i)
++                            throw new ArgumentException("Not Enough Arguments For Method Expected: " + MethodParameters.Length + ",  Collected: " + Parameters.Length);
++                        else
++                        {
++                            if (MethodParameters[i].ParameterType == typeof (float))
++                                convertedParams[i] = float.Parse(Parameters[i]);
++                            else if (MethodParameters[i].ParameterType == typeof (int))
++                                convertedParams[i] = int.Parse(Parameters[i]);
++                            else if (MethodParameters[i].ParameterType == typeof (string))
++                                convertedParams[i] = Parameters[i];
++                        }
++                    }
++                    var value = Method.Invoke(objBase, convertedParams);
++                    if (Method.ReturnType == typeof (float))
++                        return (float) value;
++                    if (Method.ReturnType == typeof (int))
++                        return (int) value;
++                }
++                else
++                {
++                    return (float) Property.GetValue(objBase);
++                }
++
++                return 0f;
++            }
+         }
+ 
++        public interface IVariable
++        {
++            string Key { get; }
++            float GetValue(Obj_AI_Base source, Obj_AI_Base target);
++        }
+         #endregion
+     }
+ }
++
+diff --git a/EloBuddy.SDK/DamageLibrary.cs b/EloBuddy.SDK/DamageLibrary.cs
+index b089547..c2eb59a 100644
+--- a/EloBuddy.SDK/DamageLibrary.cs
++++ b/EloBuddy.SDK/DamageLibrary.cs
+@@ -28,6 +28,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+             public DamageType DamageType { get; set; }
+             public float[] Damages { get; set; }
+             public SpellBonus[] BonusDamages { get; set; }
++            public ExpresionDamage[] ExpresionDamages { get; set; }
+ 
+             public Damage.DamageSourceBase ToDamageSourceBase(SpellSlot slot)
+             {
+@@ -49,6 +50,23 @@ namespace EloBuddy.SDK.AddonDevelopers
+                         ScalingType = bonus.ScalingType
+                     });
+                 }
++                if (ExpresionDamages != null)
++
++                    foreach (var expresionBonusDamage in ExpresionDamages)
++                    {
++                        boundle.AddExpresion(new Damage.ExpresionDamageSource(expresionBonusDamage.Expression, slot, expresionBonusDamage.DamageType)
++                        {
++                            DamageType = expresionBonusDamage.DamageType,
++                            DamagePercentages = expresionBonusDamage.DamagePercentages,
++                            Variables = 
++                                expresionBonusDamage.StaticVaribles.Select(x => new Damage.ExpresionStaticVarible(x.Key, x.ScalingTarget, x.ScalingType))
++                                    .Cast<Damage.IVariable>()
++                                    .Concat(expresionBonusDamage.TypeVaribles.Select(x => new Damage.ExpresionTypeVarible(x.Key, x.DamageType, x.Target, x.Name, x.Parameters)))
++                                    .Concat(expresionBonusDamage.LevelVaribles.Select(x => new Damage.ExpresionLevelVarible(x.Key, x.Slot, x.Damages))),
++                            Expression = expresionBonusDamage.Expression,
++                            Condition =  expresionBonusDamage.Condition
++                        });
++                    }
+ 
+                 return boundle;
+             }
+@@ -64,6 +82,45 @@ namespace EloBuddy.SDK.AddonDevelopers
+             public Damage.ScalingType ScalingType { get; set; }
+         }
+ 
++        internal class ExpresionDamage
++        {
++            [JsonConverter(typeof(StringEnumConverter))]
++            public DamageType DamageType { get; set; }
++            public float[] DamagePercentages { get; set; }
++            public string Expression { get; set; }
++            public string Condition { get; set; }
++            public StaticDamageVarible[] StaticVaribles { get; set; }
++            public LevelDamageVarible[] LevelVaribles { get; set; }
++            public TypeDamageVarible[] TypeVaribles { get; set; }
++
++        }
++        internal class TypeDamageVarible
++        {
++            public string Name { get; set; }
++            public string[] Parameters { get; set; }
++            [JsonConverter(typeof(StringEnumConverter))]
++            public DamageType DamageType { get; set; }
++            [JsonConverter(typeof(StringEnumConverter))]
++            public Damage.ScalingTarget Target { get; set; }
++            public string Key { get; set; }
++        }
++        internal class StaticDamageVarible
++        {
++            [JsonConverter(typeof(StringEnumConverter))]
++            public Damage.ScalingTarget ScalingTarget { get; set; }
++            [JsonConverter(typeof(StringEnumConverter))]
++            public Damage.ScalingType ScalingType { get; set; }
++            public string Key { get; set; }
++        }
++        internal class LevelDamageVarible
++        {
++            public string Key { get; set; }
++            [JsonConverter(typeof(StringEnumConverter))]
++            public SpellSlot Slot { get; set; }
++            public float[] Damages { get; set; }
++        }
++
++
+         #endregion
+ 
+         #region Database Objects
+@@ -151,6 +208,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+         }
+         #endregion
+ 
++        #region Initialization
+         internal static DamageDatabase Database { get; set; }
+         
+         static DamageLibraryManager()
+@@ -163,16 +221,17 @@ namespace EloBuddy.SDK.AddonDevelopers
+             // Load damages from DamageLibary.json
+             var champData = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<SpellSlot, List<StageSpell>>>>(DefaultSettings.DamageLibrary);
+             //Collecting Data from every champion inside the current game...
+-            foreach (var champ in EntityManager.Heroes.AllHeroes)
++            var heroes = EntityManager.Heroes.AllHeroes.Select(x => x.Hero);
++            foreach (var champ in heroes)
+             {
+                 //Selected champ, get his spell data name...
+-                var csdName = GetSpellDataChampName(champ.Hero);
++                var csdName = GetSpellDataChampName(champ);
+                 if (csdName != null && champData.ContainsKey(csdName))
+                 {
+                     //champ exists in DamageDatabase, see if we have already added him to the generated database
+                     ChampionDamageDatabase champDamageDatabase;
+ 
+-                    if (Database.TryMakeNewChampion(champ.Hero, out champDamageDatabase))
++                    if (Database.TryMakeNewChampion(champ, out champDamageDatabase))
+                     {
+                         
+                         foreach (var entry in champData[csdName])
+@@ -190,13 +249,16 @@ namespace EloBuddy.SDK.AddonDevelopers
+                         }
+                     }
+                 }
+-                else if (!Database.ContainsKey(champ.Hero))
++                else if (!Database.ContainsKey(champ))
+                 {
+                     Logger.Log(LogLevel.Warn, "'{0}' was not found in the DamageLibrary!", csdName);
+-                    Database.Add(champ.Hero, new ChampionDamageDatabase());
++                    Database.Add(champ, new ChampionDamageDatabase());
+                 }
+             }
+         }
++        #endregion
++
++        #region Contains / Try Logic
+ 
+         internal static bool ContainsChampion(Champion champion)
+         {
+@@ -223,19 +285,22 @@ namespace EloBuddy.SDK.AddonDevelopers
+         {
+             database = null;
+             if (!ContainsSlot(champion, slot)) return false;
+-
+             database = Database[champion][slot];
+             return true;
+         }
+         internal static bool TryGetStage(Champion champion, SpellSlot slot, DamageLibrary.SpellStages stage, out Damage.DamageSourceBase damageSourceBase)
+         {
+             damageSourceBase = null;
+-            if (!ContainsStage(champion, slot, stage)) return false;
++            if (!ContainsStage(champion, slot, stage))
++            {
++                return false;
++            }
+ 
+             damageSourceBase = Database[champion][slot][stage];
+             return true;
+         }
+-       
++
++        #endregion
+         internal static string GetSpellDataChampName(Champion champion)
+         {
+             switch (champion)
+@@ -401,14 +466,24 @@ namespace EloBuddy.SDK.AddonDevelopers
+         }
+         public static DamageLibraryManager.ChampionDamageDatabase GetChampionDamageDatabase(this AIHeroClient source)
+         {
++            return GetChampionDamageDatabase(source.Hero);
++        }
++        public static DamageLibraryManager.ChampionDamageDatabase GetChampionDamageDatabase(Champion source)
++        {
+             DamageLibraryManager.ChampionDamageDatabase db;
+-            return DamageLibraryManager.TryGetChampion(source.Hero, out db) ? db : new DamageLibraryManager.ChampionDamageDatabase();
++            return DamageLibraryManager.TryGetChampion(source, out db) ? db : new DamageLibraryManager.ChampionDamageDatabase();
+         }
++        
+         public static DamageLibraryManager.SpellDamageDatabase GetSpellDamageDatabase(this AIHeroClient source, SpellSlot slot)
+         {
++            return GetSpellDamageDatabase(source.Hero, slot);
++        }
++        public static DamageLibraryManager.SpellDamageDatabase GetSpellDamageDatabase(Champion source, SpellSlot slot)
++        {
+             DamageLibraryManager.SpellDamageDatabase db;
+-            return DamageLibraryManager.TryGetSlot(source.Hero, slot, out db) ? db : new DamageLibraryManager.SpellDamageDatabase();
++            return DamageLibraryManager.TryGetSlot(source, slot, out db) ? db : new DamageLibraryManager.SpellDamageDatabase();
+         }
++
+         public static float GetSpellDamage(this AIHeroClient source, Obj_AI_Base target, SpellSlot slot, SpellStages stage = SpellStages.Default)
+         {
+             Damage.DamageSourceBase damageSpell;
+-- 
+1.9.4.msysgit.2
+

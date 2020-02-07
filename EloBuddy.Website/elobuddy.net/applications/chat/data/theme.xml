@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<theme name="Default" author_name="Invision Power Services, Inc" author_url="http://www.invisionpower.com">
+ <template template_group="global" template_name="tabCount" template_data="$count" template_location="front" template_app="chat"><![CDATA[{{if $count}}
+<script type='text/javascript'>
+  $('.elNavigation_app_chat_Chat').append( $('<span/>').addClass('ipsNotificationCount').text('{$count}') );
+</script>
+{{endif}}]]></template>
+ <template template_group="global" template_name="tabNewWindow" template_data="" template_location="front" template_app="chat"><![CDATA[<script type='text/javascript'>
+  $('.elNavigation_app_chat_Chat').click( function( e ){
+  	e.preventDefault();
+
+	var joinWith = '?';
+	
+	if ( $( e.currentTarget ).attr('href').indexOf('?') != -1 )
+	{
+		joinWith = '&';
+	}
+
+  	window.open( $( e.currentTarget ).attr('href') + joinWith + '_popup=1', '_blank', "height=480,width=1200,location=0,menubar=0,toolbar=0" );
+  	return false;
+  });
+</script>]]></template>
+ <template template_group="settings" template_name="chatOnline" template_data="$value" template_location="admin" template_app="chat"><![CDATA[<div>
+	<input type='time' class='ipsField_short' placeholder='{lang="chat_timeplaceholder"}' value="{$value[0]}" name="ipschat_online[0]">
+	{lang="to"}
+	<input type='time' class='ipsField_short' placeholder='{lang="chat_timeplaceholder"}' value="{$value[1]}" name="ipschat_online[1]">
+</div>]]></template>
+ <template template_group="view" template_name="acceptRules" template_data="$form" template_location="front" template_app="chat"><![CDATA[
+<div class='ipsAreaBackground_light ipsPad'>
+	<h1 class='ipsType_pageTitle'>{lang="chatroom_rules"}</h1>
+	<div class='ipsType_normal ipsType_richText ipsContained ipsType_break ipsSpacer_both'>
+		{lang="ipschat_rules"}
+	</div>
+	{$form|raw}
+</div>]]></template>
+ <template template_group="view" template_name="chat" template_data="$chatters" template_location="front" template_app="chat"><![CDATA[
+{{if !\IPS\Settings::i()->ipchat_new_window}}
+	<div class="ipsPageHeader ipsClearfix ipsSpacer_bottom">
+		<h1 class="ipsType_pageTitle">{lang="chat_title"}</h1>
+		<p id='chatDebug'></p>
+	</div>
+{{endif}}
+
+<div data-controller='chat.front.chatcompat.main'>
+	<div id='elChatWrapper'>
+		<div class="ipsTabs ipsClearfix" id='elChatTabs'>
+			<ul class='ipsPos_right ipsList_inline ipsList_noSpacing ipsResponsive_hidePhone'>
+				<li>
+					<a href='#' class='ipsPos_right ipsButton ipsButton_verySmall ipsButton_overlaid' data-action='toggleSound' data-ipsTooltip title='{lang="chat_toggle_sound"}'><i class='fa fa-volume-up'></i></a>
+				</li>
+				<li>
+					{{$leave = \IPS\Request::i()->_popup ? '&_popup=' . \IPS\Request::i()->_popup : '';}}
+					<a href='{url="app=chat&module=chat&controller=view&do=leave{$leave}" seoTemplate="chat" csrf="true"}' class='ipsPos_right ipsButton ipsButton_verySmall ipsButton_overlaid' data-action='leaveChat'>{lang="chat_leave_room"}</a>
+				</li>
+			</ul>
+			<a href="#elChatTabs" data-action="expandTabs"><i class="fa fa-caret-down"></i></a>
+			<ul role="tablist" class="ipsList_reset" id='elChatTabBar'>
+			</ul>
+		</div>
+		<section id='elChatTabsContent'>
+			
+		</section>
+	</div>
+	<div id='elChatIFrame'></div>
+	<ul id='elInitialUserList' class='ipsHide'>
+		{{foreach $chatters as $chatter}}
+			{template="userRow" group="view" app="chat" params="$chatter"}
+		{{endforeach}}
+	</ul>
+	<div class='ipsAreaBackground_light ipsPad ipsResponsive_showPhone ipsResponsive_block ipsSpacer_top ipsType_center'>
+		<ul class='ipsList_inline ipsList_noSpacing'>
+			<li>
+				<a href='#' class='ipsPos_right ipsButton ipsButton_verySmall ipsButton_light' data-action='toggleSound' data-ipsTooltip title='{lang="chat_toggle_sound"}'><i class='fa fa-volume-up'></i></a>
+			</li>
+			<li>
+				{{$leave = \IPS\Request::i()->_popup ? '&_popup=' . \IPS\Request::i()->_popup : '';}}
+				<a href='{url="app=chat&module=chat&controller=view&do=leave{$leave}" seoTemplate="chat" csrf="true"}' class='ipsPos_right ipsButton ipsButton_verySmall ipsButton_light' data-action='leaveChat'>{lang="chat_leave_room"}</a>
+			</li>
+		</ul>
+	</div>
+</div>]]></template>
+ <template template_group="view" template_name="chatvars" template_data="$options, $forumIdMap, $groups, $badwords, $ignored, $emoticons" template_location="front" template_app="chat"><![CDATA[
+<script type='text/javascript'>
+	// System vars
+	ips.setSetting( 'roomID', {$options['roomId']} );
+	ips.setSetting( 'userID', {$options['userId']} );
+	ips.setSetting( 'forumUserID', {expression="intval( \IPS\Member::loggedIn()->member_id )"} );
+	ips.setSetting( 'username', '{{if \IPS\Member::loggedIn()->member_id}}{expression="\IPS\Member::loggedIn()->name"}{{else}}{expression="\IPS\Member::loggedIn()->language()->get('guest')"}_{$options['userId']}{{endif}}' );
+	ips.setSetting( 'accessKey', '{$options['accessKey']}' );
+	ips.setSetting( 'serverHost', '{$options['serverHost']}' );
+	ips.setSetting( 'serverPath', '{$options['serverPath']}' );
+	ips.setSetting( 'ourURL', "{expression="urlencode(\IPS\Settings::i()->base_url)"}" );
+
+	ips.setSetting( 'chatEmoticons', 
+		{expression="json_encode( $emoticons )" raw="true"}
+	);
+
+	ips.setSetting( 'ignoredChats',
+		{expression="json_encode( $ignored )" raw="true"}
+	);
+
+	ips.setSetting( 'forumIDMap', 
+		{expression="json_encode( $forumIdMap )" raw="true"}
+	);
+	
+	ips.setSetting( 'groups', 
+		{expression="json_encode( $groups )" raw="true"}
+	);
+
+	ips.setSetting( 'badwords', 
+		{expression="json_encode( $badwords )" raw="true"}
+	);
+
+	// Sounds in MP3 format
+	ips.setSetting( 'sounds', {
+		'enter': 'enter',
+		'leave': 'leave',
+		'message': 'message'
+	});
+
+	// Settings
+	ips.setSetting( 'condenseTime', true );
+	ips.setSetting( 'maxMessages', 100 );
+	ips.setSetting( 'moderator', {{if \IPS\Member::loggedIn()->group['chat_moderate']}}true{{else}}false{{endif}} );
+	ips.setSetting( 'private', {{if \IPS\Member::loggedIn()->group['chat_private']}}true{{else}}false{{endif}} );
+	ips.setSetting( 'hideEnterExit', '{expression="(bool) \IPS\Settings::i()->ipchat_hide_usermessage"}' );
+	ips.setSetting( 'noBuffer', {{if \IPS\Settings::i()->ipchat_no_buffer}}false{{else}}true{{endif}} );
+	ips.setSetting( 'inactiveKick', parseInt( {expression="\IPS\Settings::i()->ipchat_inactive_minutes"} * 60 ) );
+	ips.setSetting( 'user24hour', {{if \IPS\Settings::i()->ipchat_24hour == '24'}}true{{else}}false{{endif}} );
+	ips.setSetting( 'soundEnabled', ips.utils.db.get( 'chat', 'sounds' ) );
+</script>]]></template>
+ <template template_group="view" template_name="userInfo" template_data="$member" template_location="front" template_app="chat"><![CDATA[{{$group = \IPS\Member\Group::load( $member->member_group_id );}}
+
+<div class='ipsType_center ipsSpacer_top'>
+	<h3 class='ipsType_sectionHead ipsSpacer_bottom'>
+		{$group->formatName( $member->name )|raw}
+	</h3>
+	<br>
+
+	{template="userPhoto" group="global" app="core" params="$member, 'medium'"}
+</div>]]></template>
+ <template template_group="view" template_name="userRow" template_data="$data" template_location="front" template_app="chat"><![CDATA[
+<li id='elChatUserRow_{$data['user_id']}'>
+	{{if $data['forumUserID'] or \IPS\Member::loggedIn()->member_id !== $data['forumUserID']}}
+		<a href='#' class='ipsPhotoPanel ipsPhotoPanel_tiny ipsFaded_withHover cChatUserRow ipsType_blendLinks ipsPad_half' id='elChatUser_{$data['user_id']}' data-userID='{$data['user_id']}' data-forumUserID='{$data['forumUserID']}' data-username="{$data['username']}" data-ipsMenu data-ipsMenu-activeClass='cChatUserRow_hover' data-ipsMenu-appendTo='#elChatUserRow_{$data['user_id']}' >
+			<img src='{$data['photo']}' alt='' class='ipsUserPhoto ipsUserPhoto_tiny'>
+			<div class='cChatUsername'>
+				{$data['formattedUsername']|raw} <i class='fa fa-caret-down ipsFaded ipsFaded_more'></i>
+			</div>
+		</a>
+		<ul id='elChatUser_{$data['user_id']}_menu' class='ipsHide ipsMenu ipsMenu_auto cChatUserMenu' data-userID='{$data['user_id']}' data-forumUserID='{$data['forumUserID']}'>
+			{{if \IPS\Member::loggedIn()->member_id !== $data['forumUserID']}}
+				<li class='ipsMenu_item' data-ipsMenuValue='private'>
+					<a href='#'>{lang="ipchat_private_chat"}</a>
+				</li>
+				<li class='ipsMenu_sep' data-role='privateSep'><hr></li>
+				<li class='ipsMenu_item' data-ipsMenuValue='ignore'>
+					<a href='#'>{lang="ipchat_ignore_chats"}</a>
+				</li>
+				<li class='ipsMenu_item' data-ipsMenuValue='unignore'>
+					<a href='#'>{lang="ipchat_unignore_chats"}</a>
+				</li>
+				{{if \IPS\Member::loggedIn()->group['chat_moderate']}} <!-- if moderator... -->
+					<li class='ipsMenu_sep' data-role='modSep'><hr></li>
+					<li class='ipsMenu_item' data-ipsMenuValue='kick'>
+						<a href='#'>{lang="ipchat_kick"}</a>
+					</li>
+					<li class='ipsMenu_item' data-ipsMenuValue='ban'>
+						<a href='#'>{lang="ipchat_ban"}</a>
+					</li>
+				{{endif}}
+				{{if $data['forumUserID']}}
+					<li class='ipsMenu_sep'><hr></li>
+				{{endif}}
+			{{endif}}
+			{{if $data['forumUserID']}}
+				<li class='ipsMenu_item'>
+					<a href='{$data['profileUrl']}' target='_blank'>{lang="ipchat_profile"}</a>
+				</li>
+			{{endif}}
+		</ul>
+	{{else}}
+		<span class='ipsPhotoPanel ipsPhotoPanel_tiny ipsFaded_withHover cChatUserRow ipsType_blendLinks ipsPad_half' id='elChatUser_{$data['user_id']}' data-userID='{$data['user_id']}' data-forumUserID='{$data['forumUserID']}' data-username="{$data['username']}">
+			<img src='{$data['photo']}' alt='' class='ipsUserPhoto ipsUserPhoto_tiny'>
+			<div class='cChatUsername'>
+				{$data['formattedUsername']|raw}
+			</div>
+		</span>
+	{{endif}}
+</li>]]></template>
+ <template template_group="widgets" template_name="chatwhoschatting" template_data="$chatters, $orientation='vertical'" template_location="front" template_app="chat"><![CDATA[<h3 class='ipsType_reset ipsWidget_title'>
+	{lang="block_chatwhoschatting"}
+</h3>
+<div class='ipsWidget_inner {{if $orientation == 'vertical'}}ipsPad{{else}}ipsPad_half{{endif}}'>
+	{{if count( $chatters )}}
+		<ul class='ipsList_inline ipsList_csv ipsList_noSpacing'>
+			{{foreach $chatters as $row}}
+				<li>{template="userLinkFromData" group="global" app="core" params="$row['forumUserID'], $row['username'], $row['seo_name'], $row['groupID']"}</li>
+			{{endforeach}}
+		</ul>
+	{{else}}
+		<p class='ipsType_reset ipsType_medium ipsType_light'>{lang="chatters_list_empty"}</p>
+	{{endif}}
+</div>]]></template>
+ <css css_location="front" css_app="chat" css_attributes="" css_path="." css_name="chat_responsive.css"><![CDATA[/* PHONES */
+@media screen and (max-width: 767px) {
+	
+	.cChatContainer {
+		height: 315px;
+	}
+
+	#elChatTabBar {
+		margin-right: 0;
+	}
+
+		#elChatTabsContent > .ipsTabs_panel {
+			height: auto;
+		}
+
+		#elChatTabBar .ipsTabs_item [data-action="closeTab"] {
+			margin-left: 10px;
+		}
+
+	.cEmoticonsButton, .cSendButton {
+		margin-bottom: 0 !important;
+	}
+
+	.cEmoticonsButton {
+		width: 25% !important;
+		float: left;
+	}
+
+	.cSendButton {
+		width: 71% !important;
+		float: left;
+		margin-left: 4% !important;
+	}
+
+	/* Row stuff */
+	.cChatRow {
+		display: block;
+	}
+
+	.cChatRow_date {
+		display: none !important;
+	}
+
+	.cChatRow_responsiveDate {
+		float: right;
+		font-size: 11px;
+	}
+
+	.cChatRow_notice {
+		text-align: center;
+	}
+
+	.cChatRow .cChatRow_user {
+		text-align: left;
+		background: #f5f5f5;
+		width: 100%;
+		border-bottom: 0;
+		min-width: 0;
+		max-width: 100%;
+		font-size: 13px;
+		padding: 7px 10px;
+	}
+
+	.cChatRow_own .cChatRow_user {
+		background: #d0dbe7;
+	}
+
+	.cChatRow .cChatRow_user:empty {
+		display: none;
+	}
+
+	.cChatRow .cChatRow_user, .cChatRow .cChatRow_content, .cChatRow .cChatRow_date {
+		display: block;
+	}
+}]]></css>
+ <css css_location="front" css_app="chat" css_attributes="" css_path="." css_name="chat.css"><![CDATA[#elChatTabs {
+	background: #262e33;
+}
+
+	/*#elChatTabs .ipsTabs_item {
+		font-weight: normal;
+	}*/
+
+#elChatWrapper {
+	border: 1px solid rgba(0,0,0,0.1);
+}
+
+#elChatTabsContent > .ipsTabs_panel {
+	height: 430px;
+}
+
+#elChatTabBar {
+	margin-right: 190px;
+}
+
+	#elChatTabBar > li > a:not( .ipsTabs_activeItem ) {
+		background: rgba(225,225,225,0.3);
+	}
+
+@media screen and (min-width: 767px) {
+	#elChatTabBar > li > a:not( .ipsTabs_activeItem ) {
+		color: rgba(255,255,255,0.5);
+	}
+}
+
+#elUserList {
+	max-height: 395px;
+	overflow: auto;
+}
+
+.cChatCompose {
+
+}
+
+.ipsApp .cMessageTextarea {
+	width: 100%;
+	height: 44px;
+	resize: none;
+}
+
+.cChatTab {
+	position: relative;
+	height: 430px;
+	border-right: 1px solid rgba(0,0,0,0.1);
+}
+
+.cChatCompose {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+	
+	.cChatCompose .ipsColumn_veryNarrow {
+		width: 58px;
+	}
+
+		.cChatCompose .ipsColumn_veryNarrow .ipsButton {
+			font-size: 18px;
+		}
+
+.cChatUserRow {
+	display: block;
+}
+
+	.cChatUserRow:hover, .cChatUserRow_hover {
+		background: #fafafa;
+	}
+
+.cChatUsername {
+	font-size: 14px;
+	line-height: 28px;
+}
+	
+	#elUserList .ipsUserPhoto_tiny img, 
+	#elUserList img.ipsUserPhoto_tiny,
+	#elUserList .ipsUserPhoto_tiny:after {
+		width: 28px;
+		height: 28px;
+	}
+
+.cChatUserInfo {
+	min-height: 150px;
+}
+
+#elChatTabs [data-action='toggleSound'] {
+	font-size: 15px;
+}
+
+/* Message styles */
+.cChatContainer {
+	width: 100%;
+	height: 355px;
+	overflow: auto;
+}
+
+.cChatRow {
+	font-size: 14px;
+	overflow: auto;
+	display: table-row;
+	width: 100%;
+}
+
+.cChatRow .cChatRow_user,
+.cChatRow .cChatRow_content,
+.cChatRow .cChatRow_date {
+	display: table-cell;
+	padding: 10px;
+	border-bottom: 1px solid #efefef;
+	vertical-align: top;
+}
+
+.cChatRow .cChatRow_user {
+	text-align: right;
+	color: #898989;
+	min-width: 130px;
+	max-width: 150px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.cChatRow_date {
+	padding: 0 10px;
+	font-size: 12px;
+	color: #939393;
+	min-width: 75px; /* Wide enough for AM/PM */
+	width: 75px;
+}
+/*.cChatRow.cChatRow_date {
+	font-size: 12px;
+	font-weight: bold;
+	color: #222;
+}
+
+	.cChatRow.cChatRow_date .cChatRow_user,
+	.cChatRow.cChatRow_date .cChatRow_content {
+		padding: 5px 10px 0;
+		border-bottom: 0px;
+	}*/
+
+.cChatRow.cChatRow_notice {
+	color: #939393;
+}
+
+.cChatRow.cChatRow_me {
+	color: #898989;
+}
+
+.cChatRow .cChatRow_content {
+	width: 100%;
+}
+
+.cChatRow_system {
+	background: #f9e4e1;
+}
+
+.cChatRow_own {
+	background: #e1eaf5;
+}
+
+	.cChatRow_own .cChatRow_user,
+	.cChatRow_own .cChatRow_content,
+	.cChatRow_own .cChatRow_date {
+		border-color: #cdd8e6;
+	}
+
+
+.cChatParsedImage img {
+	max-width: 100px;
+	max-height: 100px;
+}
+
+.cChatParsedImage a {
+	display: inline-block;
+}
+
+	.cChatParsedImage a:last-child {
+		vertical-align: top;
+	}
+
+.cChatParsedImage .ipsButton {
+	line-height: 14px;
+	padding: 0 5px;
+}]]></css>
+</theme>

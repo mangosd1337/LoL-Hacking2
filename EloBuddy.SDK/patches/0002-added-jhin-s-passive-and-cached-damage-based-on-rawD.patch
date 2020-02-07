@@ -1,0 +1,229 @@
+From 68d0a2e6fbe1ece5128ff1cf5433682609b044d2 Mon Sep 17 00:00:00 2001
+From: Javier <jachicao@uc.cl>
+Date: Fri, 5 Feb 2016 13:39:52 -0300
+Subject: [PATCH 2/8] added jhin's passive and cached damage based on rawDamage
+ and target's maxhealth.
+
+---
+ EloBuddy.SDK/Damage.cs | 100 +++++++++++++++++++++++++++------
+ 1 file changed, 83 insertions(+), 17 deletions(-)
+
+diff --git a/EloBuddy.SDK/Damage.cs b/EloBuddy.SDK/Damage.cs
+index ed7f378..17f37dd 100644
+--- a/EloBuddy.SDK/Damage.cs
++++ b/EloBuddy.SDK/Damage.cs
+@@ -2,7 +2,6 @@
+ using System.Linq;
+ using EloBuddy.SDK.Constants;
+ using EloBuddy.SDK.Menu.Values;
+-using SharpDX;
+ 
+ namespace EloBuddy.SDK
+ {
+@@ -19,9 +18,15 @@ namespace EloBuddy.SDK
+ 
+     public static class Damage
+     {
++        private static readonly Dictionary<float, Tuple<float, float>> CachedPhysicalAutoAttackDamage = new Dictionary<float, Tuple<float, float>>();
++        private static readonly Dictionary<float, Tuple<float, float>> CachedMagicalAutoAttackDamage = new Dictionary<float, Tuple<float, float>>();
+         static Damage()
+         {
+-
++            Game.OnTick += delegate
++            {
++                CachedPhysicalAutoAttackDamage.Clear();
++                CachedMagicalAutoAttackDamage.Clear();
++            };
+         }
+ 
+         internal static bool IsSiegeMinion(this Obj_AI_Base minion)
+@@ -348,7 +353,7 @@ namespace EloBuddy.SDK
+                         }
+                         else
+                         {
+-                            precalculated.RawTotal += (0.3f + 0.1f * (int) Math.Truncate((fromHero.Level - 1f) / 6f)) *
++                            precalculated.RawTotal += (0.3f + 0.1f * (int)Math.Truncate((fromHero.Level - 1f) / 6f)) *
+                                                       fromHero.TotalAttackDamage;
+                         }
+                     }
+@@ -428,7 +433,7 @@ namespace EloBuddy.SDK
+                 case Champion.Riven:
+                     if (fromHero.GetBuffCount("rivenpassiveaaboost") > 0)
+                     {
+-                        precalculated.RawPhysical += (20f + 5f * (int) Math.Truncate((fromHero.Level + 2f) / 3f)) *
++                        precalculated.RawPhysical += (20f + 5f * (int)Math.Truncate((fromHero.Level + 2f) / 3f)) *
+                                                      fromHero.TotalAttackDamage / 100f;
+                     }
+                     break;
+@@ -626,6 +631,7 @@ namespace EloBuddy.SDK
+             var rawPhysicalDamage = precalculated.RawPhysical;
+             var rawMagicalDamage = precalculated.RawMagical;
+             var rawTotal = precalculated.RawTotal;
++            var guaranteedCriticalStrike = false;
+             //Special minions like wards, kalista's w, etc..
+             if (targetIsMinion && target.MaxHealth <= 6)
+             {
+@@ -751,6 +757,13 @@ namespace EloBuddy.SDK
+                         rawPhysicalDamage += Math.Min(400f, 0.1f * target.Health);
+                     }
+                     break;
++                case Champion.Jhin:
++                    if (fromHero.HasBuff("jhinpassiveattackbuff"))
++                    {
++                        rawPhysicalDamage += (target.MaxHealth - target.Health) * ((int)Math.Truncate(fromHero.Level / 6f) * 5f + 10f) / 100f;
++                        guaranteedCriticalStrike = true;
++                    }
++                    break;
+                 case Champion.Katarina:
+                     if (target.HasBuff("katarinaqmark"))
+                     {
+@@ -787,7 +800,7 @@ namespace EloBuddy.SDK
+                 case Champion.Lux:
+                     if (target.HasBuff("LuxIlluminatingFraulein"))
+                     {
+-                        rawMagicalDamage += 10f + 8 * fromHero.Level + 0.2f * fromHero.FlatMagicDamageMod;
++                        rawMagicalDamage += 10f + 8f * fromHero.Level + 0.2f * fromHero.FlatMagicDamageMod;
+                     }
+                     break;
+                 case Champion.Orianna:
+@@ -795,8 +808,8 @@ namespace EloBuddy.SDK
+                              Orbwalker.LastTarget != null && Orbwalker.LastTarget.NetworkId == target.NetworkId)
+                         ? fromHero.GetBuffCount("orianapowerdaggerdisplay")
+                         : 0;
+-                    rawMagicalDamage += (8f * (int) Math.Truncate(((fromHero.Level + 2) / 3f)) + 2f +
+-                                         count * (1.6f * (int) Math.Truncate(((fromHero.Level + 2) / 3f)) + 0.4f) +
++                    rawMagicalDamage += (8f * (int)Math.Truncate(((fromHero.Level + 2) / 3f)) + 2f +
++                                         count * (1.6f * (int)Math.Truncate(((fromHero.Level + 2) / 3f)) + 0.4f) +
+                                          ((15f + 3f * count) / 100f) * fromHero.FlatMagicDamageMod);
+                     break;
+                 case Champion.Quinn:
+@@ -825,7 +838,7 @@ namespace EloBuddy.SDK
+                     if (target.HealthPercent <= 50 && !target.HasBuff("zedpassivecd"))
+                     {
+                         rawMagicalDamage += target.MaxHealth *
+-                                            ((int) Math.Truncate((fromHero.Level - 1f) / 6f) * 2f + 6f) / 100f;
++                                            ((int)Math.Truncate((fromHero.Level - 1f) / 6f) * 2f + 6f) / 100f;
+                     }
+                     break;
+             }
+@@ -898,15 +911,59 @@ namespace EloBuddy.SDK
+             }
+             if (rawPhysicalDamage > 0f)
+             {
+-                calculatedPhysicalDamage += fromHero.CalculateDamageOnUnit(target, DamageType.Physical, rawPhysicalDamage, false, precalculated.AutoAttackDamageType == DamageType.Physical);
++                if (fromHero.IsMe)
++                {
++                    if (!CachedPhysicalAutoAttackDamage.ContainsKey(target.MaxHealth))
++                    {
++                        CachedPhysicalAutoAttackDamage.Add(target.MaxHealth, new Tuple<float, float>(rawPhysicalDamage, fromHero.CalculateDamageOnUnit(target, DamageType.Physical, rawPhysicalDamage, false,
++                            precalculated.AutoAttackDamageType == DamageType.Physical)));
++                        calculatedPhysicalDamage += CachedPhysicalAutoAttackDamage[target.MaxHealth].Item2;
++                    }
++                    else
++                    {
++                        if (Math.Abs(CachedPhysicalAutoAttackDamage[target.MaxHealth].Item1 - rawPhysicalDamage) < float.Epsilon)
++                        {
++                            calculatedPhysicalDamage += CachedPhysicalAutoAttackDamage[target.MaxHealth].Item2;
++                        }
++                        else
++                        {
++                            calculatedPhysicalDamage += fromHero.CalculateDamageOnUnit(target, DamageType.Physical, rawPhysicalDamage, false, precalculated.AutoAttackDamageType == DamageType.Physical);
++                        }
++                    }
++                }
++                else
++                {
++                    calculatedPhysicalDamage += fromHero.CalculateDamageOnUnit(target, DamageType.Physical, rawPhysicalDamage, false, precalculated.AutoAttackDamageType == DamageType.Physical);
++                }
+             }
+             if (rawMagicalDamage > 0f)
+             {
+-                calculatedMagicalDamage += fromHero.CalculateDamageOnUnit(target, DamageType.Magical, rawMagicalDamage, false, precalculated.AutoAttackDamageType == DamageType.Magical);
++                if (fromHero.IsMe)
++                {
++                    if (!CachedMagicalAutoAttackDamage.ContainsKey(target.MaxHealth))
++                    {
++                        CachedMagicalAutoAttackDamage.Add(target.MaxHealth, new Tuple<float, float>(rawMagicalDamage, fromHero.CalculateDamageOnUnit(target, DamageType.Magical, rawMagicalDamage, false, precalculated.AutoAttackDamageType == DamageType.Magical)));
++                        calculatedMagicalDamage += CachedMagicalAutoAttackDamage[target.MaxHealth].Item2;
++                    }
++                    else
++                    {
++                        if (Math.Abs(CachedMagicalAutoAttackDamage[target.MaxHealth].Item1 - rawMagicalDamage) < float.Epsilon)
++                        {
++                            calculatedMagicalDamage += CachedMagicalAutoAttackDamage[target.MaxHealth].Item2;
++                        }
++                        else
++                        {
++                            calculatedMagicalDamage += fromHero.CalculateDamageOnUnit(target, DamageType.Magical, rawMagicalDamage, false, precalculated.AutoAttackDamageType == DamageType.Magical);
++                        }
++                    }
++                }
++                else
++                {
++                    calculatedMagicalDamage += fromHero.CalculateDamageOnUnit(target, DamageType.Magical, rawMagicalDamage, false, precalculated.AutoAttackDamageType == DamageType.Magical);
++                }
+             }
+-            //TODO: Improve this
+             var percentMod = 1f;
+-            if (Math.Abs(fromHero.FlatCritChanceMod - 1f) < float.Epsilon)
++            if (Math.Abs(fromHero.FlatCritChanceMod - 1f) < float.Epsilon || guaranteedCriticalStrike)
+             {
+                 percentMod *= fromHero.GetCriticalStrikePercentMod();
+             }
+@@ -915,7 +972,16 @@ namespace EloBuddy.SDK
+ 
+         internal static float GetCriticalStrikePercentMod(this AIHeroClient fromHero)
+         {
+-            return (fromHero.Hero == Champion.Yasuo ? 1.8f : 2f) + (fromHero.HasItem(ItemId.Infinity_Edge) ? 0.5f : 0f);
++            var percentMod = (fromHero.HasItem(ItemId.Infinity_Edge) ? 0.5f : 0f) + 2f;
++            if (fromHero.Hero == Champion.Yasuo)
++            {
++                percentMod *= 0.9f;
++            }
++            else if (fromHero.Hero == Champion.Jhin)
++            {
++                percentMod *= 0.75f;
++            }
++            return percentMod;
+         }
+ 
+         public static float GetAutoAttackDamage(this Obj_AI_Base from, Obj_AI_Base target, bool respectPassives = false)
+@@ -1064,7 +1130,7 @@ namespace EloBuddy.SDK
+                 }
+                 if (fromHero.HasAssassin() && !EntityManager.Heroes.AllHeroes.Any(h => h.IsValidTarget() && fromHero.Team == h.Team && !h.Equals(fromHero) && h.IsInRange(fromHero, 800)))
+                 {
+-                    percentPassive *= 1.015f;
++                    percentPassive *= 1.02f;
+                 }
+                 // Bounty Hunter
+                 // You gain a permanent 1 % damage increase for each unique enemy champion you kill
+@@ -1101,7 +1167,7 @@ namespace EloBuddy.SDK
+                     if (target.HasBuff("sonapassivedebuff"))
+                     {
+                         var caster = target.GetBuff("sonapassivedebuff").Caster as AIHeroClient;
+-                        percentPassive *= (1f - (0.2f + (caster != null ? 0.02f * (int) (caster.FlatMagicDamageMod / 100f) : 0f)));
++                        percentPassive *= (1f - (0.2f + (caster != null ? 0.02f * (int)(caster.FlatMagicDamageMod / 100f) : 0f)));
+                     }
+ 
+                     // Urgot's Zaun-Touched Bolt Augmenter.png Zaun-Touched Bolt Augmenter makes his autoattacks and Acid Hunter.png Acid Hunter reduce all damage that his target deals by 15% for 2.5 seconds.
+@@ -1386,7 +1452,7 @@ namespace EloBuddy.SDK
+                     case Champion.Fizz:
+                         if (isAutoAttackOrTargetted)
+                         {
+-                            flatReceived -= 2f * (int) ((targetHero.Level + 2f) / 3f) + 2f;
++                            flatReceived -= 2f * (int)((targetHero.Level + 2f) / 3f) + 2f;
+                         }
+                         break;
+                     case Champion.Blitzcrank:
+@@ -1433,7 +1499,7 @@ namespace EloBuddy.SDK
+             var otherDamageModifier = 0f;
+             //Doran's Shield blocks 8 damage from champion basic attacks and single target spells. The damage reduction is calculated before armor/magic resist and percentage damage reduction benefits are taken into account.
+             if (isAutoAttackOrTargetted && damageType == DamageType.Physical && target.Type == GameObjectType.AIHeroClient &&
+-                ((AIHeroClient) target).HasItem(ItemId.Dorans_Shield))
++                ((AIHeroClient)target).HasItem(ItemId.Dorans_Shield))
+             {
+                 otherDamageModifier -= 8 * percentPassive * percentMod;
+             }
+-- 
+1.9.4.msysgit.2
+

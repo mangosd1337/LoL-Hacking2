@@ -1,0 +1,827 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectManager.cpp">
+      <Filter>Source Files\Objects\GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Spellbook.cpp">
+      <Filter>Source Files\Objects\Spellbook</Filter>
+    </ClCompile>
+    <ClCompile Include="HeroInventory.cpp">
+      <Filter>Source Files\Objects\HeroInventory</Filter>
+    </ClCompile>
+    <ClCompile Include="Core.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_AI_Base.cpp">
+      <Filter>Source Files\Objects\GameObjects\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientFacade.cpp">
+      <Filter>Source Files\Game\ClientFacade</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory.cpp">
+      <Filter>Source Files\Game\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SpellDataInst.cpp">
+      <Filter>Source Files\Objects\Spellbook</Filter>
+    </ClCompile>
+    <ClCompile Include="SpellData.cpp">
+      <Filter>Source Files\Objects\Spellbook</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuGUI.cpp">
+      <Filter>Source Files\Game\pwHud\MenuGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="NavMesh.cpp">
+      <Filter>Source Files\Game\NavMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files\Objects\GameObjects\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Console.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Bootstrapper.cpp">
+      <Filter>Source Files\Bootstrap</Filter>
+    </ClCompile>
+    <ClCompile Include="Drawing.cpp">
+      <Filter>Source Files\RiotX3D</Filter>
+    </ClCompile>
+    <ClCompile Include="InventorySlot.cpp">
+      <Filter>Source Files\Objects\HeroInventory</Filter>
+    </ClCompile>
+    <ClCompile Include="BuffInstance.cpp">
+      <Filter>Source Files\Objects\BuffInstance</Filter>
+    </ClCompile>
+    <ClCompile Include="BuffManager.cpp">
+      <Filter>Source Files\Objects\BuffInstance</Filter>
+    </ClCompile>
+    <ClCompile Include="EventHandler.cpp">
+      <Filter>Source Files\Core\EventHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector3f.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="HeroStatsCollection.cpp">
+      <Filter>Source Files\Objects\HeroStats</Filter>
+    </ClCompile>
+    <ClCompile Include="r3dRenderer.cpp">
+      <Filter>Source Files\r3dRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="pwHud.cpp">
+      <Filter>Source Files\Game\pwHud\pwHud</Filter>
+    </ClCompile>
+    <ClCompile Include="pwConsole.cpp">
+      <Filter>Source Files\Game\pwHud\pwHud</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Source Files\Core\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientNode.cpp">
+      <Filter>Source Files\ENet</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor_Common.cpp">
+      <Filter>Source Files\Objects\Actor_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="TacticalMap.cpp">
+      <Filter>Source Files\r3dRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="MissionInfo.cpp">
+      <Filter>Source Files\Game\MissionInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="RiotClock.cpp">
+      <Filter>Source Files\Game\RiotClock</Filter>
+    </ClCompile>
+    <ClCompile Include="AttackableUnit.cpp">
+      <Filter>Source Files\Objects\GameObjects\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="RiotAsset.cpp">
+      <Filter>Source Files\Game\RiotAsset</Filter>
+    </ClCompile>
+    <ClCompile Include="r3dCamera.cpp">
+      <Filter>Source Files\r3dCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="BuffHost.cpp">
+      <Filter>Source Files\Objects\BuffInstance</Filter>
+    </ClCompile>
+    <ClCompile Include="NavigationPath.cpp">
+      <Filter>Source Files\Objects\Actor_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Hacks.cpp">
+      <Filter>Source Files\Hacks</Filter>
+    </ClCompile>
+    <ClCompile Include="HudGameObjectChat.cpp">
+      <Filter>Source Files\Game\HudGameObjectChat</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildInfo.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="SpellCaster_Client.cpp">
+      <Filter>Source Files\Objects\Spellbook</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaEzCb.cpp">
+      <Filter>Source Files\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="API.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Injector.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ScoreboardView.cpp">
+      <Filter>Source Files\Game\ScoreboardView</Filter>
+    </ClCompile>
+    <ClCompile Include="CRepl32Info.cpp">
+      <Filter>Source Files\Game\CRepl32Info</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioManager.cpp">
+      <Filter>Source Files\AudioManager</Filter>
+    </ClCompile>
+    <ClCompile Include="HudVote.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="FoundryItemShop.cpp">
+      <Filter>Source Files\Game\FoundryItemShop</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterDataStack.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Detour.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="AIHeroClient.cpp">
+      <Filter>Source Files\Objects\GameObjects\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="RiotX3D.cpp">
+      <Filter>Source Files\RiotX3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Patchables.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="RiotRadsIO.cpp">
+      <Filter>Source Files\RiotRadsIO</Filter>
+    </ClCompile>
+    <ClCompile Include="r3dRenderLayer.cpp">
+      <Filter>Source Files\r3dRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Obj_BarracksDampener.cpp">
+      <Filter>Source Files\Objects\GameObjects\Objects\Obj_Building</Filter>
+    </ClCompile>
+    <ClCompile Include="CharDataInfo.cpp">
+      <Filter>Source Files\Objects\GameObjects\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="CharData.cpp">
+      <Filter>Source Files\Objects\GameObjects\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="RiotString.cpp">
+      <Filter>Source Files\RiotString</Filter>
+    </ClCompile>
+    <ClCompile Include="TeemoClient.cpp">
+      <Filter>Source Files\TeemoClient</Filter>
+    </ClCompile>
+    <ClCompile Include="NetClient.cpp">
+      <Filter>Source Files\ENet</Filter>
+    </ClCompile>
+    <ClCompile Include="Crypto.cpp">
+      <Filter>Source Files\Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="Humanizer.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="LoLClient.cpp">
+      <Filter>Source Files\LoLClient</Filter>
+    </ClCompile>
+    <ClCompile Include="Lua.cpp">
+      <Filter>Source Files\Lua</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ObjectManager.h">
+      <Filter>Header Files\Objects\GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Core.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="AttackableUnit.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit</Filter>
+    </ClInclude>
+    <ClInclude Include="Units.h">
+      <Filter>Header Files\Objects\GameObjects\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_AI_Minion.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_AI_Turret.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_SpellMissile.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\Obj_SpellMissile</Filter>
+    </ClInclude>
+    <ClInclude Include="Spellbook.h">
+      <Filter>Header Files\Objects\Spellbook</Filter>
+    </ClInclude>
+    <ClInclude Include="SpellDataInst.h">
+      <Filter>Header Files\Objects\Spellbook</Filter>
+    </ClInclude>
+    <ClInclude Include="SpellData.h">
+      <Filter>Header Files\Objects\Spellbook</Filter>
+    </ClInclude>
+    <ClInclude Include="HeroInventory.h">
+      <Filter>Header Files\Objects\HeroInventory</Filter>
+    </ClInclude>
+    <ClInclude Include="Macros.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticEnums.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_AI_Base.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Detour.hpp">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="BuffManager.h">
+      <Filter>Header Files\Objects\BuffInstance</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_SpellCircleMissile.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\Obj_SpellMissile</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_SpellLineMissile.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\Obj_SpellMissile</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_Building.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_Building</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_Barracks.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_Building</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_AnimatedBuilding.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_Building\AnimatedBuilding</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_HQ.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_Building\AnimatedBuilding</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_Lake.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_Building</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_LampBulb.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_Shop.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_Building</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_SpawnPoint.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_Building</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_Turret.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_Building\AnimatedBuilding</Filter>
+    </ClInclude>
+    <ClInclude Include="AvatarPimpl.h">
+      <Filter>Header Files\Objects\Avatar</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory.h">
+      <Filter>Header Files\Game\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_SpellChainMissile.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\Obj_SpellMissile</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuGUI.h">
+      <Filter>Header Files\Game\pwHud\MenuGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="NavMesh.h">
+      <Filter>Header Files\Game\NavMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Console.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Bootstrapper.h">
+      <Filter>Header Files\Bootstrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientFacade.h">
+      <Filter>Header Files\Game\ClientFacade</Filter>
+    </ClInclude>
+    <ClInclude Include="BuffInstance.h">
+      <Filter>Header Files\Objects\BuffInstance</Filter>
+    </ClInclude>
+    <ClInclude Include="Drawing.h">
+      <Filter>Header Files\RiotX3D</Filter>
+    </ClInclude>
+    <ClInclude Include="InventorySlot.h">
+      <Filter>Header Files\Objects\HeroInventory</Filter>
+    </ClInclude>
+    <ClInclude Include="EventHandler.h">
+      <Filter>Header Files\Core\EventHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemNode.h">
+      <Filter>Header Files\Objects\HeroInventory</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3f.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="HeroStatsCollection.h">
+      <Filter>Header Files\Objects\HeroStats</Filter>
+    </ClInclude>
+    <ClInclude Include="r3dRenderer.h">
+      <Filter>Header Files\r3dRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="pwConsole.h">
+      <Filter>Header Files\Game\pwHud\pwHud</Filter>
+    </ClInclude>
+    <ClInclude Include="pwHud.h">
+      <Filter>Header Files\Game\pwHud\pwHud</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_BarracksDampener.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_Building\AnimatedBuilding</Filter>
+    </ClInclude>
+    <ClInclude Include="Obj_AI_Marker.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientNode.h">
+      <Filter>Header Files\ENet</Filter>
+    </ClInclude>
+    <ClInclude Include="SpellCastInfo.h">
+      <Filter>Header Files\Objects\Spellbook</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor_Common.h">
+      <Filter>Header Files\Objects\Actor_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="TacticalMap.h">
+      <Filter>Header Files\r3dRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="MissionInfo.h">
+      <Filter>Header Files\Game\MissionInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="RiotClock.h">
+      <Filter>Header Files\Game\RiotClock</Filter>
+    </ClInclude>
+    <ClInclude Include="NavigationPath.h">
+      <Filter>Header Files\Objects\Actor_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="RiotAsset.h">
+      <Filter>Header Files\Game\RiotAsset</Filter>
+    </ClInclude>
+    <ClInclude Include="r3dCamera.h">
+      <Filter>Header Files\r3dCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="BuffHost.h">
+      <Filter>Header Files\Objects\BuffInstance</Filter>
+    </ClInclude>
+    <ClInclude Include="MissileClient.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="RiotString.h">
+      <Filter>Header Files\RiotString</Filter>
+    </ClInclude>
+    <ClInclude Include="Experience.h">
+      <Filter>Header Files\Objects\Experience</Filter>
+    </ClInclude>
+    <ClInclude Include="Hacks.h">
+      <Filter>Header Files\Hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="HudGameObjectChat.h">
+      <Filter>Header Files\Game\HudGameObjectChat</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildInfo.h">
+      <Filter>Header Files\Game\BuildInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="SpellCaster_Client.h">
+      <Filter>Header Files\Objects\Spellbook</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaEzCb.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Injector.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Offsets.h">
+      <Filter>Header Files\Patchables</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoreboardView.h">
+      <Filter>Header Files\Game\ScoreboardView</Filter>
+    </ClInclude>
+    <ClInclude Include="CRepl32Info.h">
+      <Filter>Header Files\Game\CRepl32Info</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioManager.h">
+      <Filter>Header Files\AudioManager</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketLayer.h">
+      <Filter>Header Files\PacketLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="HudVote.h">
+      <Filter>Header Files\Game\HudVote</Filter>
+    </ClInclude>
+    <ClInclude Include="FoundryItemShop.h">
+      <Filter>Header Files\Game\FoundryItemShop</Filter>
+    </ClInclude>
+    <ClInclude Include="r3dTexture.h">
+      <Filter>Header Files\r3dTexture</Filter>
+    </ClInclude>
+    <ClInclude Include="r3dRenderLayer.h">
+      <Filter>Header Files\r3dTexture</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterDataStack.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="AIHeroClient.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_AI_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="RiotX3D.h">
+      <Filter>Header Files\RiotX3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Patchables.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="OffsetsEU.h">
+      <Filter>Header Files\Patchables\EU</Filter>
+    </ClInclude>
+    <ClInclude Include="OffsetsCN.h">
+      <Filter>Header Files\Patchables\CN</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectsEU.h">
+      <Filter>Header Files\Patchables\EU</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectsCN.h">
+      <Filter>Header Files\Patchables\CN</Filter>
+    </ClInclude>
+    <ClInclude Include="OffsetsGARENA.h">
+      <Filter>Header Files\Patchables\Garena</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectsGARENA.h">
+      <Filter>Header Files\Patchables\Garena</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectVTable.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="RiotRadsIO.h">
+      <Filter>Header Files\RiotRadsIO</Filter>
+    </ClInclude>
+    <ClInclude Include="CharDataInfo.h">
+      <Filter>Header Files\Objects\GameObjects\Objects\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="TeemoClient.h">
+      <Filter>Header Files\TeemoClient</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterIntermediate.h">
+      <Filter>Header Files\Patchables\EU</Filter>
+    </ClInclude>
+    <ClInclude Include="NetClient.h">
+      <Filter>Header Files\ENet</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketTypedefs.h">
+      <Filter>Header Files\ENet</Filter>
+    </ClInclude>
+    <ClInclude Include="NetClient_Virtual.h">
+      <Filter>Header Files\ENet</Filter>
+    </ClInclude>
+    <ClInclude Include="Crypto.h">
+      <Filter>Header Files\Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="OffsetsPBE.h">
+      <Filter>Header Files\Patchables\PBE</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectsPBE.h">
+      <Filter>Header Files\Patchables\PBE</Filter>
+    </ClInclude>
+    <ClInclude Include="CharIntermediatePBE.h">
+      <Filter>Header Files\Patchables\PBE</Filter>
+    </ClInclude>
+    <ClInclude Include="Humanizer.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="resource1.h" />
+    <ClInclude Include="LoLClient.h">
+      <Filter>Header Files\LoLClient</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{9d424773-69c3-4d44-a386-b621c3fd0fe6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{b8ecd2be-6fd3-4568-ba5a-d9f02a98f75d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game">
+      <UniqueIdentifier>{b7327cc1-2b08-4d07-9dfe-fb982b37f0a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game">
+      <UniqueIdentifier>{a36b2423-e9cf-490d-82c6-c2b82ac4abac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Bootstrap">
+      <UniqueIdentifier>{8fb3d951-4b5c-47c0-9643-65be3ae665d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Bootstrapper">
+      <UniqueIdentifier>{41dd2a49-2ae3-4b5e-a4d7-bf042a6eeb2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\ClientFacade">
+      <UniqueIdentifier>{f1a21e3e-87fc-4431-94b6-8bf0543f9caf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\pwHud">
+      <UniqueIdentifier>{1fa89374-c1d5-43c1-b875-91e0b7a34810}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\ClientFacade">
+      <UniqueIdentifier>{678b06e7-5dc1-40ca-a011-d678ae7e1e81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\pwHud">
+      <UniqueIdentifier>{5d811d33-987c-4d00-8705-1bf5f07c98e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects">
+      <UniqueIdentifier>{b31de396-e6e8-4c49-8945-ac87258d8aa1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\HeroInventory">
+      <UniqueIdentifier>{f5e55fe0-90d1-4535-af31-d76f9cf3d837}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\GameObjects">
+      <UniqueIdentifier>{8f13343d-39e2-41b2-9814-b8d82321e7eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\GameObjects\Objects">
+      <UniqueIdentifier>{147cbeb7-0c0f-4229-9284-298bb6132a0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\NavMesh">
+      <UniqueIdentifier>{567af926-9049-4269-851b-3388ab9a289d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\pwHud\MenuGUI">
+      <UniqueIdentifier>{7c675cc4-e730-455f-9a05-57c794744af3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\pwHud\MenuGUI">
+      <UniqueIdentifier>{06bc3f0e-852d-4d27-8115-0a2d1a8700dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects">
+      <UniqueIdentifier>{19fcea7c-fa63-4193-9acf-4b9b9cfc5c04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\HeroInventory">
+      <UniqueIdentifier>{2682d030-012e-4d67-ae48-4059fb795c81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\Spellbook">
+      <UniqueIdentifier>{0deb8491-d1c8-433f-a5e2-67b3871c87de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\BuffInstance">
+      <UniqueIdentifier>{b344559a-c58b-431d-aaa8-20cd18b4ee35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\NavMesh">
+      <UniqueIdentifier>{8928b101-7c6e-4520-b7bd-45c867e91cc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\Spellbook">
+      <UniqueIdentifier>{8489ec64-a648-4ce6-b9a7-2d7dcc583db2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Memory">
+      <UniqueIdentifier>{592e04f6-e645-405e-bf14-c30168107c7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Memory">
+      <UniqueIdentifier>{c4ac43fc-9615-4531-a1ec-cade4f653943}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\BuffInstance">
+      <UniqueIdentifier>{243c36dd-df2a-478b-b96f-5a6a6f5ce82e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\GameObjects">
+      <UniqueIdentifier>{87d2182b-4250-4b06-b676-185b07e7e0c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\GameObjects\Objects">
+      <UniqueIdentifier>{70eee1c8-58c4-411b-964c-dbe1a7567c80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\GameObjects\Objects\GameObject">
+      <UniqueIdentifier>{e530d8c5-c58f-40ee-9d53-8652263e3e36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\GameObjects\Objects\GameObject\Obj_SpellMissile">
+      <UniqueIdentifier>{d0d62876-59c6-4623-add1-9cec586d4881}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit">
+      <UniqueIdentifier>{cf8a63a7-63ca-4aeb-9f4a-514c828a7583}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_AI_Base">
+      <UniqueIdentifier>{20e52b56-ae04-45f8-9ac0-d2e1bafddf45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_Building">
+      <UniqueIdentifier>{83985dfa-a027-455a-a291-1d796fef4433}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\GameObjects\Objects\GameObject\AttackableUnit\Obj_Building\AnimatedBuilding">
+      <UniqueIdentifier>{f2782223-d801-465e-a0fb-ef923846ed02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\HeroStats">
+      <UniqueIdentifier>{595bb782-5840-403e-a191-98548502bba9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\HeroStats">
+      <UniqueIdentifier>{8fdea53c-33cd-4485-a9eb-9fd79871d119}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\r3dRenderer">
+      <UniqueIdentifier>{6431bc7d-ba29-4c9c-b28a-9128408c4ee4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\r3dRenderer">
+      <UniqueIdentifier>{4f708f77-e095-41d9-a440-63332b01a498}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\pwHud\pwHud">
+      <UniqueIdentifier>{17adf4f0-654a-48d2-bc22-5baaba0bcc2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\pwHud\HudManager">
+      <UniqueIdentifier>{71ced450-c353-46d3-b25d-0f5d586a8c82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\pwHud\pwHud">
+      <UniqueIdentifier>{6c53c49b-1123-4dac-863b-481235ffca54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Misc">
+      <UniqueIdentifier>{bf5785d7-0235-43e2-b155-0665dca5b123}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ENet">
+      <UniqueIdentifier>{e24c3648-3376-4a21-b74a-8b6645dc07cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ENet">
+      <UniqueIdentifier>{237d48d3-81f6-42ea-8943-af298b77a4bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\Actor_Common">
+      <UniqueIdentifier>{de0a32ce-92da-42a4-ab7d-0ec7f36bddf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\Actor_Common">
+      <UniqueIdentifier>{4b752f05-89d0-415f-9e85-049a6f439429}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\MissionInfo">
+      <UniqueIdentifier>{08299365-08f6-4e16-885f-d47cd690425c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\MissionInfo">
+      <UniqueIdentifier>{8f36f9d7-93f3-41b1-8706-7c95761f9a9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\RiotClock">
+      <UniqueIdentifier>{fa4131f9-897d-4c6e-b574-f67111c519b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\RiotClock">
+      <UniqueIdentifier>{722d0e8a-e198-41a6-b181-e5b3b730bcdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\RiotAsset">
+      <UniqueIdentifier>{829d9814-70f8-4911-be31-feb118d3374c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\RiotAsset">
+      <UniqueIdentifier>{b6a0953f-3af7-429a-bb1d-71677fbf32cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\r3dCamera">
+      <UniqueIdentifier>{392b81ed-07fe-4d21-a90b-84f705e87d64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\r3dCamera">
+      <UniqueIdentifier>{17379a59-f2b4-4615-ac9f-3ba1c63f5e62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\RiotString">
+      <UniqueIdentifier>{d08ca785-a75a-4cff-a96e-10bfb7213d01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\Experience">
+      <UniqueIdentifier>{6a64aca4-4575-4587-b2e9-a0c10e1d9ce5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{5c187a55-c581-4a8a-a779-4a20446d9405}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\EventHandler">
+      <UniqueIdentifier>{63967da8-f68e-4307-8dbc-0ea498e96551}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{4a3f4aa2-50da-4071-a235-44e164741c4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\EventHandler">
+      <UniqueIdentifier>{cb3d6af4-75ec-4bac-b34b-50906d041932}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\Avatar">
+      <UniqueIdentifier>{4b73bcee-e971-4986-848e-d89ab2858b7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Hacks">
+      <UniqueIdentifier>{2e73692a-0006-4732-a1e9-8055429c8d30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Hacks">
+      <UniqueIdentifier>{6b57fe93-9253-41ec-9741-7bc9ee13bd40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\HudGameObjectChat">
+      <UniqueIdentifier>{4ef3fdf7-1489-4323-8df9-757483a4a39b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\HudGameObjectChat">
+      <UniqueIdentifier>{b4d614c2-cfbf-4026-b32b-6b049e26dbeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\BuildInfo">
+      <UniqueIdentifier>{369ca408-9ef5-4e01-b353-a3bdda2e8356}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects\GameObjects\Objects\Structs">
+      <UniqueIdentifier>{9f3fdab3-5392-4e32-88a5-e663c445d78b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Patchables">
+      <UniqueIdentifier>{76782e1a-b3c8-4bac-b088-508187c8a6af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\ScoreboardView">
+      <UniqueIdentifier>{66f3b59f-ef41-4dcd-9351-aaad9e6f34fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\ScoreboardView">
+      <UniqueIdentifier>{6c504025-c318-4483-8f26-61ee5ae704a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\CRepl32Info">
+      <UniqueIdentifier>{944b0f89-254d-4902-8003-ee45412231a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\CRepl32Info">
+      <UniqueIdentifier>{78695978-085a-4308-85d2-be97bc2afd6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AudioManager">
+      <UniqueIdentifier>{515ae11e-102a-4771-b29c-7f9231e2aa5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AudioManager">
+      <UniqueIdentifier>{2967f4d0-8492-4b94-8b25-04e17b34750d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\PacketLayer">
+      <UniqueIdentifier>{bb513376-00e5-412d-ac60-f9189f50d6ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\HudVote">
+      <UniqueIdentifier>{17536dbe-2898-424a-9f7d-7b332be347bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\FoundryItemShop">
+      <UniqueIdentifier>{ac4096f9-4bf0-4872-a1ea-25d5e4a6c046}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\FoundryItemShop">
+      <UniqueIdentifier>{ecbdebe7-4e68-4eb1-941a-f88cc050d897}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\r3dTexture">
+      <UniqueIdentifier>{37b9492f-ba77-4a99-88ee-c13743fce9a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\RiotX3D">
+      <UniqueIdentifier>{abdd4ea9-f858-49ac-82a4-89c08ecbcb25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\RiotX3D">
+      <UniqueIdentifier>{cf80b361-6c11-4249-a025-e28ff8e88b80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Patchables\EU">
+      <UniqueIdentifier>{2c294353-fb08-47a3-829b-18f139b5fe47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Patchables\CN">
+      <UniqueIdentifier>{07ead209-5ecc-42b9-9495-cb05d3722410}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Patchables\Garena">
+      <UniqueIdentifier>{ce9e45aa-b816-4943-8840-eb47c9c290dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\RiotRadsIO">
+      <UniqueIdentifier>{594d4461-779b-439a-af21-6add007f0510}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\RiotRadsIO">
+      <UniqueIdentifier>{90d52ee1-e3fc-4732-b350-102568683c8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\GameObjects\Objects\Obj_Building">
+      <UniqueIdentifier>{f6354311-1946-4281-8c0c-773d51e6bc45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Misc">
+      <UniqueIdentifier>{a3a18477-ed29-4d1e-ba84-a1425fa289de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\RiotString">
+      <UniqueIdentifier>{7c91b45d-eaf7-430e-9503-8c890199b2a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\TeemoClient">
+      <UniqueIdentifier>{9ed80506-fc7b-4c13-be13-4c7354e87183}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TeemoClient">
+      <UniqueIdentifier>{93f16160-9475-4bc1-b2f2-7b636f79f4a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Crypto">
+      <UniqueIdentifier>{3dd637bc-6f73-4d82-82be-cddecbb3bfdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Crypto">
+      <UniqueIdentifier>{0a30fb66-7613-4b5d-973f-ce6468277ba2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Patchables\PBE">
+      <UniqueIdentifier>{ed4c0cc5-a783-4fc2-8d12-35a64a5048f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\LoLClient">
+      <UniqueIdentifier>{13e73560-dbe5-4fe1-92c8-fda3cdd8abbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LoLClient">
+      <UniqueIdentifier>{8a484aa0-49c5-4045-88cf-8a67c4c1deb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Lua">
+      <UniqueIdentifier>{67f5063d-7c53-45db-82cf-8dad7e132426}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Lua">
+      <UniqueIdentifier>{4d7ca89e-b1a2-4664-81c3-babefea55457}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NavMeshCell.h">
+      <Filter>Header Files\Game\NavMesh</Filter>
+    </None>
+    <None Include="..\..\..\dragontail-5.24.2\5.24.2\data\en_GB\champion.json" />
+    <None Include="..\..\..\dragontail-5.24.2\5.24.2\data\en_GB\championFull.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="EloBuddy.Core.rc" />
+  </ItemGroup>
+</Project>

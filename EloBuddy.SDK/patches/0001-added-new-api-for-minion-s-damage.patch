@@ -1,0 +1,158 @@
+From 7ed8082665c20fc6a19c0a94ea266b29b7b00218 Mon Sep 17 00:00:00 2001
+From: Javier <jachicao@uc.cl>
+Date: Fri, 5 Feb 2016 12:13:13 -0300
+Subject: [PATCH 1/8] added new api for minion's damage.
+
+---
+ EloBuddy.SDK/Damage.cs | 109 ++-------------------------------
+ 1 file changed, 4 insertions(+), 105 deletions(-)
+
+diff --git a/EloBuddy.SDK/Damage.cs b/EloBuddy.SDK/Damage.cs
+index 05ee145..ed7f378 100644
+--- a/EloBuddy.SDK/Damage.cs
++++ b/EloBuddy.SDK/Damage.cs
+@@ -21,8 +21,7 @@ namespace EloBuddy.SDK
+     {
+         static Damage()
+         {
+-            Obj_AI_Base.OnLevelUp += OnLevelUp;
+-            OnLevelUp(Player.Instance, null);
++
+         }
+ 
+         internal static bool IsSiegeMinion(this Obj_AI_Base minion)
+@@ -59,91 +58,6 @@ namespace EloBuddy.SDK
+ 
+         #endregion
+ 
+-        #region Minion pushing 5.24
+-
+-        internal enum Lane
+-        {
+-            Top,
+-            Middle,
+-            Bottom
+-        }
+-
+-        internal static float AllyTeamAverage;
+-        internal static float EnemyTeamAverage;
+-
+-        private static readonly Vector2 BottomCenterPoint = new Vector2(12674, 2398);
+-        private static readonly Vector2 TopCenterPoint = new Vector2(2156, 12520);
+-        private static readonly Vector2 OrderBasePoint = new Vector2(414, 414);
+-        private static readonly Vector2 ChaosBasePoint = new Vector2(14294, 14376);
+-
+-        private static void OnLevelUp(Obj_AI_Base sender, Obj_AI_BaseLevelUpEventArgs args)
+-        {
+-            if (sender.Type != GameObjectType.AIHeroClient)
+-            {
+-                return;
+-            }
+-
+-            var allyAverage = EntityManager.Heroes.Allies.Count > 0 ? EntityManager.Heroes.Allies.Average(h => h.Level) : 0;
+-            var enemyAverage = EntityManager.Heroes.Enemies.Count > 0 ? EntityManager.Heroes.Enemies.Average(h => h.Level) : 0;
+-
+-            AllyTeamAverage = (float) Math.Max(0, allyAverage - enemyAverage);
+-            EnemyTeamAverage = (float) Math.Max(0, enemyAverage - allyAverage);
+-        }
+-
+-        internal static float TeamLevelAdvantage(this Obj_AI_Base minion)
+-        {
+-            if (minion.Type != GameObjectType.obj_AI_Minion)
+-                return 0;
+-            var allyAverage = EntityManager.Heroes.Allies.Count > 0 ? EntityManager.Heroes.Allies.Average(h => h.Level) : 0;
+-            var enemyAverage = EntityManager.Heroes.Enemies.Count > 0 ? EntityManager.Heroes.Enemies.Average(h => h.Level) : 0;
+-            if (minion.IsAlly)
+-            {
+-                if (allyAverage - enemyAverage <= 0)
+-                {
+-                    return 0;
+-                }
+-                return (float) (allyAverage - enemyAverage);
+-            }
+-            if (minion.IsEnemy)
+-            {
+-                if (enemyAverage - allyAverage <= 0)
+-                {
+-                    return 0;
+-                }
+-                return (float) (enemyAverage - allyAverage);
+-            }
+-            return 0f;
+-        }
+-
+-        internal static Lane GetLane(this Obj_AI_Base target)
+-        {
+-            var position = target.Position.To2D();
+-            var basePoint = position.Distance(OrderBasePoint, true) < position.Distance(ChaosBasePoint, true) ? OrderBasePoint : ChaosBasePoint;
+-            var bot = position.Distance(basePoint, BottomCenterPoint, true);
+-            var top = position.Distance(basePoint, TopCenterPoint, true);
+-            var mid = position.Distance(OrderBasePoint, ChaosBasePoint, true);
+-            if (top < mid && top < bot)
+-            {
+-                return Lane.Top;
+-            }
+-            if (bot < mid && bot < top)
+-            {
+-                return Lane.Bottom;
+-            }
+-            return Lane.Middle;
+-        }
+-
+-        internal static int TurretsTaken(this Obj_AI_Base from)
+-        {
+-            var lane = from.GetLane();
+-            return 3 -
+-                   (@from.IsAlly
+-                       ? EntityManager.Turrets.Enemies.Count(t => t.IsValid && !t.IsDead && t.Health > 0 && t.IsTargetable && t.IsLaneTurret() && lane == t.GetLane())
+-                       : EntityManager.Turrets.Allies.Count(t => t.IsValid && !t.IsDead && t.Health > 0 && t.IsTargetable && t.IsLaneTurret() && lane == t.GetLane()));
+-        }
+-
+-        #endregion
+-
+         #region AutoAttackDamage
+ 
+         internal static PrecalculatedAutoAttackDamage GetStaticAutoAttackDamage(this AIHeroClient fromHero, bool targetIsMinion)
+@@ -1132,16 +1046,10 @@ namespace EloBuddy.SDK
+ 
+             #region Minion Pushing 5.24
+ 
+-            if (fromMinion != null && targetMinion != null && Game.MapId == GameMapId.SummonersRift && Game.Time >= 240)
++            if (fromMinion != null && targetMinion != null && Game.MapId == GameMapId.SummonersRift)
+             {
+-                var teamLevel = from.TeamLevelAdvantage(); //from.IsAlly ? AllyTeamAverage : EnemyTeamAverage;
+-                var turretsTaken = from.TurretsTaken();
+                 //While your team has a level advantage, your minions deal bonus damage to enemy minions equal to 5% + 5% per turret advantage in their lane, all multiplied by your team's level advantage.
+-                //Bonus damage = (5% + (5% x Turret advantage)) x Team level advantage
+-                if (teamLevel > 0)
+-                {
+-                    percentPassive *= (100f + (5f + 5f * turretsTaken) * Math.Min(teamLevel, 3f)) / 100f;
+-                }
++                percentPassive *= 1f + fromMinion.PercentDamageToBarracksMinionMod;
+             }
+ 
+             #endregion
+@@ -1511,19 +1419,10 @@ namespace EloBuddy.SDK
+                 }
+                 else if (fromMinion != null && Game.MapId == GameMapId.SummonersRift && Game.Time >= 240)
+                 {
+-                    #region Minion Pushing 5.24
+-
+-                    var targetLevel = target.TeamLevelAdvantage(); //target.IsAlly ? AllyTeamAverage : EnemyTeamAverage; TEMP FIX
+-                    var turretsTaken = target.TurretsTaken();
+                     //MINION DEFENSE BONUS
+                     //While your team has a level advantage, your minions take reduced damage from enemy minions equal to 1 + 1 per turret advantage in that lane, with the turret advantage bonus multiplied by the team's level advantage.
+                     //Damage reduction = 1 + (Level advantage * Turret advantage)
+-                    if (targetLevel > 0)
+-                    {
+-                        flatReceived -= 1 + (Math.Min(targetLevel, 3f) * turretsTaken);
+-                    }
+-
+-                    #endregion
++                    flatReceived -= targetMinion.FlatDamageReductionFromBarracksMinionMod;
+                 }
+             }
+ 
+-- 
+1.9.4.msysgit.2
+

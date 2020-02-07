@@ -1,0 +1,30 @@
+<ips:template parameters="$requirements" />
+{{$canProceed = TRUE;}}
+<section>
+	{{foreach $requirements['requirements'] as $k => $_requirements}}
+		<h2 class="ipsType_sectionHead">{lang="requirements" sprintf="$k"}</h2>
+		<ul class="ipsPad ipsType_large ipsList_checks">
+			{{foreach $_requirements as $item}}
+				{{if !$item['success']}}{{$canProceed = FALSE;}}{{endif}}
+				<li class="{{if $item['success']}}success{{else}}fail{{endif}}">{$item['message']}</li>
+			{{endforeach}}
+		</ul>
+	{{endforeach}}
+	{{if isset( $requirements['advice'] ) and count( $requirements['advice'] )}}
+		<h2 class="ipsType_sectionHead">{lang="recommendations"}</h2>
+		<br><br>
+		<p class="ipsType_normal">{lang="recom_info"}</p>
+		<ul class="ipsPad ipsType_large ipsList_checks">
+			{{foreach $requirements['advice'] as $key => $item}}
+				<li class="{{if $key === 'php'}}ipsMessage ipsMessage_warning{{else}}advisory{{endif}}">{$item}</li>
+			{{endforeach}}
+		</ul>
+	{{endif}}
+</section>
+<div class='ipsPad_double ipsType_center'>
+	{{if $canProceed}}
+		<a href='{url="controller=license"}' class='ipsButton ipsButton_large ipsButton_primary'>{lang="continue"}</a>
+	{{else}}
+		<a href='' class='ipsButton ipsButton_large ipsButton_primary ipsButton_disabled'>{lang="proceed_anyways"}</a>
+	{{endif}}
+</div>

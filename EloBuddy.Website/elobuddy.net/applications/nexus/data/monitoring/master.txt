@@ -1,0 +1,20 @@
+<?php
+
+$check = urldecode( $_GET['check'] );
+if ( substr( $check, 0, 7 ) != 'http://' and substr( $check, 0, 8 ) != 'https://' )
+{
+	exit;
+}
+
+$response = @file_get_contents( $check );
+
+if ( $response === FALSE )
+{
+	echo "FAIL";
+}
+else
+{
+	echo $response;
+}
+
+file_put_contents( "./monitor.txt", time() . "\n" . $_GET['notify'] );

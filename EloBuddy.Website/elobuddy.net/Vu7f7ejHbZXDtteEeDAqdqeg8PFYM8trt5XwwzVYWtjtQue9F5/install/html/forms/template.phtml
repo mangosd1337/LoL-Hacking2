@@ -1,0 +1,30 @@
+<ips:template parameters="$id, $action, $tabs, $activeTab, $error, $errorTabs, $hiddenValues, $actionButtons, $uploadField, $sidebar, $tabClasses, $class" />
+<form action="{$action}" method="post" {{if $uploadField}}enctype="multipart/form-data"{{endif}}>
+	<input type="hidden" name="{$id}_submitted" value="1">
+	{{foreach $hiddenValues as $k => $v}}
+		{{if is_array( $v )}}
+			{{foreach $v as $_k => $_v}}
+				<input type="hidden" name="{$k}[{$_k}]" value="{$_v}">
+			{{endforeach}}
+		{{else}}
+			<input type="hidden" name="{$k}" value="{$v}">
+		{{endif}}
+	{{endforeach}}
+	{{if $uploadField}}
+		<input type="hidden" name="MAX_FILE_SIZE" value="{$uploadField}">
+		<input type="hidden" name="plupload" value="{expression="md5( uniqid() )"}">
+	{{endif}}
+	{{if $error}}
+		<div class="ipsMessage ipsMessage_error">
+			{$error}
+		</div>
+	{{endif}}
+	<ul class='ipsForm {{if \IPS\Dispatcher::i()->step == 1}}ipsForm_vertical{{else}}{$class}{{endif}}'>
+		{expression="array_pop( $tabs )" raw="true"}
+		<li class='ipsFieldRow'>
+			<div class='ipsFieldRow_content'>
+				{expression="implode( '', $actionButtons)" raw="true"}
+			</div>
+		</li>
+	</ul>
+</form>

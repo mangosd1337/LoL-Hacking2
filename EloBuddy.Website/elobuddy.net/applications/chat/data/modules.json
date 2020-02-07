@@ -1,0 +1,14 @@
+{
+    "admin": {
+        "chat": {
+            "default_controller": "",
+            "protected": false
+        }
+    },
+    "front": {
+        "chat": {
+            "default_controller": "view",
+            "protected": 0
+        }
+    }
+}

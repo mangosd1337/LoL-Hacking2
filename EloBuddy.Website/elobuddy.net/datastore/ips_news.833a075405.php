@@ -1,0 +1,5 @@
+<?php
+
+return <<<'VALUE'
+"{\"content\":[{\"title\":\"Theme Tip: Styling specific elements on specific pages\",\"link\":\"https:\\\/\\\/invisionpower.com\\\/news\\\/theme-tip-styling-specific-elements-on-specific-pages-r966\\\/\",\"date\":\"Mon, 02 May 2016 13:07:19 +0000\"},{\"title\":\"Theme Tip: Using custom template bits\",\"link\":\"https:\\\/\\\/invisionpower.com\\\/news\\\/theme-tip-using-custom-template-bits-r965\\\/\",\"date\":\"Mon, 25 Apr 2016 13:02:14 +0000\"},{\"title\":\"Theme Tip: Advanced uses for Pages database fields\",\"link\":\"https:\\\/\\\/invisionpower.com\\\/news\\\/theme-tip-advanced-uses-for-pages-database-fields-r964\\\/\",\"date\":\"Mon, 18 Apr 2016 13:06:17 +0000\"},{\"title\":\"Support for PHP 5.4 ending soon\",\"link\":\"https:\\\/\\\/invisionpower.com\\\/news\\\/support-for-php-54-ending-soon-r963\\\/\",\"date\":\"Tue, 12 Apr 2016 13:05:37 +0000\"},{\"title\":\"Theme Tip: Using Pages blocks anywhere\",\"link\":\"https:\\\/\\\/invisionpower.com\\\/news\\\/theme-tip-using-pages-blocks-anywhere-r962\\\/\",\"date\":\"Mon, 11 Apr 2016 13:02:41 +0000\"}],\"time\":1462742795}"
+VALUE;

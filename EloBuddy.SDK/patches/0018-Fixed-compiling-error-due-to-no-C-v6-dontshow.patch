@@ -1,0 +1,228 @@
+From bc3d3d54f7573e817964b7043effc73ae3b043df Mon Sep 17 00:00:00 2001
+From: Lachlan van der Velden <lvelden1@gmail.com>
+Date: Mon, 8 Feb 2016 20:50:32 +1100
+Subject: [PATCH 18/28] Fixed compiling error due to no C#v6 :'( #dontshow
+
+---
+ EloBuddy.SDK/DamageLibrary.cs | 122 +++++++++++++-------------
+ EloBuddy.SDK/Orbwalker.cs     |   4 +-
+ 2 files changed, 63 insertions(+), 63 deletions(-)
+
+diff --git a/EloBuddy.SDK/DamageLibrary.cs b/EloBuddy.SDK/DamageLibrary.cs
+index f256243..79de6ee 100644
+--- a/EloBuddy.SDK/DamageLibrary.cs
++++ b/EloBuddy.SDK/DamageLibrary.cs
+@@ -6,8 +6,6 @@ using EloBuddy.SDK.Enumerations;
+ using EloBuddy.SDK.Utils;
+ using Newtonsoft.Json;
+ using Newtonsoft.Json.Converters;
+-using static EloBuddy.SDK.AddonDevelopers.DamageLibrary;
+-using static EloBuddy.SDK.AddonDevelopers.DamageLibraryManager;
+ 
+ namespace EloBuddy.SDK.AddonDevelopers
+ {
+@@ -17,7 +15,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+         internal class StageSpell
+         {
+             [JsonConverter(typeof (StringEnumConverter))]
+-            public SpellStages Stage { get; set; }
++            public DamageLibrary.SpellStages Stage { get; set; }
+             public ChampionSpell SpellData { get; set; }
+ 
+         }
+@@ -104,13 +102,13 @@ namespace EloBuddy.SDK.AddonDevelopers
+             public SpellDamageDatabase NewSpell(SpellSlot key)
+             {
+                 SpellDamageDatabase db;
+-                Add(key, db = new SpellDamageDatabase(this));
++                Add(key, db = new SpellDamageDatabase());
+                 return db;
+             }
+ 
+         }
+ 
+-        public class SpellDamageDatabase : Dictionary<SpellStages, Damage.DamageSourceBase>
++        public class SpellDamageDatabase : Dictionary<DamageLibrary.SpellStages, Damage.DamageSourceBase>
+         {
+             internal void AddStageSpell(StageSpell spell, SpellSlot slot)
+             {
+@@ -175,7 +173,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+         {
+             return ContainsChampion(champion) && Database[champion].ContainsKey(slot);
+         }
+-        internal static bool ContainsStage(Champion champion, SpellSlot slot, SpellStages stage)
++        internal static bool ContainsStage(Champion champion, SpellSlot slot, DamageLibrary.SpellStages stage)
+         {
+             return ContainsSlot(champion, slot) && Database[champion][slot].ContainsKey(stage);
+         }
+@@ -196,7 +194,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+             database = Database[champion][slot];
+             return true;
+         }
+-        internal static bool TryGetStage(Champion champion, SpellSlot slot, SpellStages stage, out Damage.DamageSourceBase damageSourceBase)
++        internal static bool TryGetStage(Champion champion, SpellSlot slot, DamageLibrary.SpellStages stage, out Damage.DamageSourceBase damageSourceBase)
+         {
+             damageSourceBase = null;
+             if (!ContainsStage(champion, slot, stage)) return false;
+@@ -204,8 +202,58 @@ namespace EloBuddy.SDK.AddonDevelopers
+             damageSourceBase = Database[champion][slot][stage];
+             return true;
+         }
++       
++        internal static string GetSpellDataChampName(EloBuddy.Champion champion)
++        {
++            switch (champion)
++            {
++                // Spacing
++                case EloBuddy.Champion.DrMundo:
++                    return "Dr Mundo";
++                case EloBuddy.Champion.JarvanIV:
++                    return "Jarvan IV";
++                case EloBuddy.Champion.LeeSin:
++                    return "Lee Sin";
++                case EloBuddy.Champion.MasterYi:
++                    return "Master Yi";
++                case EloBuddy.Champion.MissFortune:
++                    return "Miss Fortune";
++                case EloBuddy.Champion.TahmKench:
++                    return "Tahm Kench";
++                case EloBuddy.Champion.TwistedFate:
++                    return "Twisted Fate";
++                case EloBuddy.Champion.XinZhao:
++                    return "Xin Zhao";
++
++                // Special characters
++                case EloBuddy.Champion.Chogath:
++                    return "Cho'Gath";
++                case EloBuddy.Champion.Khazix:
++                    return "Kha'Zix";
++                case EloBuddy.Champion.KogMaw:
++                    return "Kog'Maw";
++                case EloBuddy.Champion.RekSai:
++                    return "Rek'Sai";
++                case EloBuddy.Champion.Velkoz:
++                    return "Vel'Koz";
+ 
+-        internal static void ReplaceSpell<T>(AIHeroClient hero, SpellSlot slot, SpellStages stage) where T : DamageSourceReplacement
++                // Capitalization
++                case EloBuddy.Champion.FiddleSticks:
++                    return "Fiddlesticks";
++                case EloBuddy.Champion.Leblanc:
++                    return "LeBlanc";
++
++                // Totally different naming, rito pls
++                case EloBuddy.Champion.MonkeyKing:
++                    return "Wukong";
++
++                // Same name
++                default:
++                    return champion.ToString();
++            }
++        }
++
++        internal static void ReplaceSpell<T>(AIHeroClient hero, SpellSlot slot, DamageLibrary.SpellStages stage) where T : DamageSourceReplacement
+         {
+             Database[hero.Hero][slot][stage] =
+                 (T)Activator.CreateInstance(typeof(T), BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { slot, Database[hero.Hero][slot][stage] }, null);
+@@ -324,15 +372,15 @@ namespace EloBuddy.SDK.AddonDevelopers
+         /// <param name="source"></param>
+         /// <param name="slot"></param>
+         /// <returns></returns>
+-        public static SpellDamageDatabase GetSpellDamageDatabase(this AIHeroClient source, SpellSlot slot)
++        public static DamageLibraryManager.SpellDamageDatabase GetSpellDamageDatabase(this AIHeroClient source, SpellSlot slot)
+         {
+-            SpellDamageDatabase db;
+-            return TryGetSlot(source.Hero, slot, out db) ? db : new SpellDamageDatabase();
++            DamageLibraryManager.SpellDamageDatabase db;
++            return DamageLibraryManager.TryGetSlot(source.Hero, slot, out db) ? db : new DamageLibraryManager.SpellDamageDatabase();
+         }
+         public static float GetSpellDamage(this AIHeroClient source, Obj_AI_Base target, SpellSlot slot, SpellStages stage = SpellStages.Default)
+         {
+             Damage.DamageSourceBase damageSpell;
+-            return TryGetStage(source.Hero, slot, stage, out damageSpell) ? damageSpell.GetDamage(source, target) : 0;
++            return DamageLibraryManager.TryGetStage(source.Hero, slot, stage, out damageSpell) ? damageSpell.GetDamage(source, target) : 0;
+         }
+ 
+         public enum SummonerSpells
+@@ -397,55 +445,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+             return 0;
+         }
+ 
+-        internal static string GetSpellDataChampName(EloBuddy.Champion champion)
+-        {
+-            switch (champion)
+-            {
+-                // Spacing
+-                case EloBuddy.Champion.DrMundo:
+-                    return "Dr Mundo";
+-                case EloBuddy.Champion.JarvanIV:
+-                    return "Jarvan IV";
+-                case EloBuddy.Champion.LeeSin:
+-                    return "Lee Sin";
+-                case EloBuddy.Champion.MasterYi:
+-                    return "Master Yi";
+-                case EloBuddy.Champion.MissFortune:
+-                    return "Miss Fortune";
+-                case EloBuddy.Champion.TahmKench:
+-                    return "Tahm Kench";
+-                case EloBuddy.Champion.TwistedFate:
+-                    return "Twisted Fate";
+-                case EloBuddy.Champion.XinZhao:
+-                    return "Xin Zhao";
+-
+-                // Special characters
+-                case EloBuddy.Champion.Chogath:
+-                    return "Cho'Gath";
+-                case EloBuddy.Champion.Khazix:
+-                    return "Kha'Zix";
+-                case EloBuddy.Champion.KogMaw:
+-                    return "Kog'Maw";
+-                case EloBuddy.Champion.RekSai:
+-                    return "Rek'Sai";
+-                case EloBuddy.Champion.Velkoz:
+-                    return "Vel'Koz";
+-
+-                // Capitalization
+-                case EloBuddy.Champion.FiddleSticks:
+-                    return "Fiddlesticks";
+-                case EloBuddy.Champion.Leblanc:
+-                    return "LeBlanc";
+-
+-                // Totally different naming, rito pls
+-                case EloBuddy.Champion.MonkeyKing:
+-                    return "Wukong";
+-
+-                // Same name
+-                default:
+-                    return champion.ToString();
+-            }
+-        }
++        
+ 
+         internal static readonly List<string> SpecialCases = new List<string>
+         {
+diff --git a/EloBuddy.SDK/Orbwalker.cs b/EloBuddy.SDK/Orbwalker.cs
+index e0c3387..06b5386 100644
+--- a/EloBuddy.SDK/Orbwalker.cs
++++ b/EloBuddy.SDK/Orbwalker.cs
+@@ -603,7 +603,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+         }
+ 
+         /// <summary>
+-        /// Resets the auto attack internally. This will not make it actually reset it ingame!
++        /// Resets the auto attack internally. This will not make it actually reset it in game!
+         /// </summary>
+         public static void ResetAutoAttack()
+         {
+@@ -629,7 +629,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+             // Check if an active mode is set
+             if (ActiveModesFlags != ActiveModes.None || DrawLastHitMarker)
+             {
+-                // Recalculate lasthi`ttable minions
++                // Recalculate lasthittable minions
+                 _onlyLastHit = !ActiveModesFlags.HasFlag(ActiveModes.LaneClear) && !ActiveModesFlags.HasFlag(ActiveModes.JungleClear);
+                 RecalculateLasthittableMinions();
+ 
+-- 
+1.9.4.msysgit.2
+

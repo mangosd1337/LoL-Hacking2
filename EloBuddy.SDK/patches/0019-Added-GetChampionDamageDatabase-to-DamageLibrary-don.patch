@@ -1,0 +1,159 @@
+From 9c50ff6ae1ab63e13739791b9425315ad33983a4 Mon Sep 17 00:00:00 2001
+From: Lachlan van der Velden <lvelden1@gmail.com>
+Date: Mon, 8 Feb 2016 21:46:20 +1100
+Subject: [PATCH 19/28] Added GetChampionDamageDatabase() to DamageLibrary
+ #dontshow
+
+---
+ EloBuddy.SDK/DamageLibrary.cs | 82 +++++++++++++++++++--------
+ 1 file changed, 57 insertions(+), 25 deletions(-)
+
+diff --git a/EloBuddy.SDK/DamageLibrary.cs b/EloBuddy.SDK/DamageLibrary.cs
+index 79de6ee..b089547 100644
+--- a/EloBuddy.SDK/DamageLibrary.cs
++++ b/EloBuddy.SDK/DamageLibrary.cs
+@@ -1,6 +1,9 @@
+ ﻿using System;
++using System.CodeDom;
++using System.Collections;
+ using System.Collections.Generic;
+ using System.Linq;
++using System.Linq.Expressions;
+ using System.Reflection;
+ using EloBuddy.SDK.Enumerations;
+ using EloBuddy.SDK.Utils;
+@@ -87,7 +90,37 @@ namespace EloBuddy.SDK.AddonDevelopers
+             }
+         }
+ 
+-        internal class ChampionDamageDatabase : Dictionary<SpellSlot, SpellDamageDatabase>
++        public class LockedDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
++        {
++            private readonly Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
++
++            public TValue this[TKey key]
++            {
++                get { return _dictionary[key]; }
++                internal set { _dictionary[key] = value; }
++            }
++
++            public bool ContainsKey(TKey key)
++            {
++                return _dictionary.ContainsKey(key);
++            }
++
++            internal TValue Add(TKey key, TValue value)
++            {
++                _dictionary.Add(key, value);
++                return value;
++            }
++            public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
++            {
++                return _dictionary.GetEnumerator();
++            }
++
++            IEnumerator IEnumerable.GetEnumerator()
++            {
++                return GetEnumerator();
++            }
++        }
++        public class ChampionDamageDatabase : LockedDictionary<SpellSlot, SpellDamageDatabase>
+         {
+             /// <summary>
+             /// Returns a new <see cref="SpellDamageDatabase"/> if the specified <see cref="SpellSlot"/> is not already in the database.
+@@ -108,7 +141,7 @@ namespace EloBuddy.SDK.AddonDevelopers
+ 
+         }
+ 
+-        public class SpellDamageDatabase : Dictionary<DamageLibrary.SpellStages, Damage.DamageSourceBase>
++        public class SpellDamageDatabase : LockedDictionary<DamageLibrary.SpellStages, Damage.DamageSourceBase>
+         {
+             internal void AddStageSpell(StageSpell spell, SpellSlot slot)
+             {
+@@ -203,48 +236,48 @@ namespace EloBuddy.SDK.AddonDevelopers
+             return true;
+         }
+        
+-        internal static string GetSpellDataChampName(EloBuddy.Champion champion)
++        internal static string GetSpellDataChampName(Champion champion)
+         {
+             switch (champion)
+             {
+                 // Spacing
+-                case EloBuddy.Champion.DrMundo:
++                case Champion.DrMundo:
+                     return "Dr Mundo";
+-                case EloBuddy.Champion.JarvanIV:
++                case Champion.JarvanIV:
+                     return "Jarvan IV";
+-                case EloBuddy.Champion.LeeSin:
++                case Champion.LeeSin:
+                     return "Lee Sin";
+-                case EloBuddy.Champion.MasterYi:
++                case Champion.MasterYi:
+                     return "Master Yi";
+-                case EloBuddy.Champion.MissFortune:
++                case Champion.MissFortune:
+                     return "Miss Fortune";
+-                case EloBuddy.Champion.TahmKench:
++                case Champion.TahmKench:
+                     return "Tahm Kench";
+-                case EloBuddy.Champion.TwistedFate:
++                case Champion.TwistedFate:
+                     return "Twisted Fate";
+-                case EloBuddy.Champion.XinZhao:
++                case Champion.XinZhao:
+                     return "Xin Zhao";
+ 
+                 // Special characters
+-                case EloBuddy.Champion.Chogath:
++                case Champion.Chogath:
+                     return "Cho'Gath";
+-                case EloBuddy.Champion.Khazix:
++                case Champion.Khazix:
+                     return "Kha'Zix";
+-                case EloBuddy.Champion.KogMaw:
++                case Champion.KogMaw:
+                     return "Kog'Maw";
+-                case EloBuddy.Champion.RekSai:
++                case Champion.RekSai:
+                     return "Rek'Sai";
+-                case EloBuddy.Champion.Velkoz:
++                case Champion.Velkoz:
+                     return "Vel'Koz";
+ 
+                 // Capitalization
+-                case EloBuddy.Champion.FiddleSticks:
++                case Champion.FiddleSticks:
+                     return "Fiddlesticks";
+-                case EloBuddy.Champion.Leblanc:
++                case Champion.Leblanc:
+                     return "LeBlanc";
+ 
+                 // Totally different naming, rito pls
+-                case EloBuddy.Champion.MonkeyKing:
++                case Champion.MonkeyKing:
+                     return "Wukong";
+ 
+                 // Same name
+@@ -366,12 +399,11 @@ namespace EloBuddy.SDK.AddonDevelopers
+         {
+             DamageLibraryManager.Initialize();
+         }
+-        /// <summary>
+-        /// Allows developers to access the damage library
+-        /// </summary>
+-        /// <param name="source"></param>
+-        /// <param name="slot"></param>
+-        /// <returns></returns>
++        public static DamageLibraryManager.ChampionDamageDatabase GetChampionDamageDatabase(this AIHeroClient source)
++        {
++            DamageLibraryManager.ChampionDamageDatabase db;
++            return DamageLibraryManager.TryGetChampion(source.Hero, out db) ? db : new DamageLibraryManager.ChampionDamageDatabase();
++        }
+         public static DamageLibraryManager.SpellDamageDatabase GetSpellDamageDatabase(this AIHeroClient source, SpellSlot slot)
+         {
+             DamageLibraryManager.SpellDamageDatabase db;
+-- 
+1.9.4.msysgit.2
+

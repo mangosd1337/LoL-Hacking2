@@ -1,0 +1,10 @@
+{
+    "chat": {
+        "settings": {
+            "settings_manage": "settings_manage"
+        },
+        "logs": {
+            "logs_manage": "logs_manage"
+        }
+    }
+}

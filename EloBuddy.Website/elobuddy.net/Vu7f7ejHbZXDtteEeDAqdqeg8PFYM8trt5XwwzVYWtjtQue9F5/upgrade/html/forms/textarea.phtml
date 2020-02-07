@@ -1,0 +1,39 @@
+<ips:template parameters="$name, $value='', $required, $maxlength=NULL, $disabled=FALSE, $class='', $placeholder='', $nullLang=NULL, $tags=array()" />
+{{if !empty( $tags )}}
+<div class='ipsColumns ipsColumns_collapseTablet' data-controller='core.global.editor.customtags' data-tagFieldType='text' data-tagFieldID='{$name}'>
+	<div class='ipsColumn_fluid ipsColumn'>
+		<div data-role="editor">
+{{endif}}
+<textarea
+	name="{$name}"
+	id='{expression="preg_replace('/[^a-zA-Z0-9\-_]/', '_', $name)"}'
+	value="{$value}"
+	class="ipsField_fullWidth {$class}"
+	{{if $maxlength !== NULL}}maxlength="{$maxlength}"{{endif}}
+	{{if $required === TRUE}}required aria-required='true'{{endif}}
+	{{if $disabled}}disabled aria-disabled='true'{{endif}}
+	{{if $placeholder}}placeholder="{$placeholder}"{{endif}}
+>{$value}</textarea>
+{{if !empty( $tags )}}
+	</div>
+{{endif}}
+{{if $nullLang}}
+	{lang="or"} <input type="checkbox" role='checkbox' data-control="unlimited" name="{$name}_null" id="{$name}_null" value="1" {{if $value === NULL}}checked aria-checked='true'{{endif}} {{if $disabled}}disabled{{endif}} aria-controls='{$name}' aria-labelledby='{$name}_null_label'> <label for='{$name}_null' id='{$name}_null_label'>{lang="$nullLang"}</label>
+{{endif}}
+{{if !empty( $tags )}}
+	</div>
+	<div class='ipsColumn_medium ipsColumn ipsAreaBackground_light ipsComposeArea_sidebar {{if !isset( \IPS\Request::i()->cookie['tagSidebar'] )}}ipsComposeArea_sidebarOpen{{else}}ipsComposeArea_sidebarClosed{{endif}}'>
+		<a href='#' class="ipsJS_show" data-action='tagsToggle' data-ipsTooltip data-ipsTooltip-label="{lang="toggle_sidebar"}">{lang="toggle_sidebar"}</a>
+		<h3 class='ipsAreaBackground ipsPad_half ipsType_reset' data-role='tagsHeader'>{lang="editor_tags"}</h3>
+		<ul class='ipsList_reset ipsScrollbar' data-role='tagsList'>
+		{{foreach $tags as $tagKey => $tagValue }}
+			<li class='ipsPad_half'>
+				<label class="ipsJS_show" data-tagKey="{$tagKey}">{$tagKey}</label>
+				<div class='ipsJS_hide ipsType_light'><strong>{$tagKey}</strong></div>
+				<div class='ipsType_light ipsType_small'>{$tagValue}</div>
+			</li>
+		{{endforeach}}
+		</ul>
+	</div>
+</div>
+{{endif}}

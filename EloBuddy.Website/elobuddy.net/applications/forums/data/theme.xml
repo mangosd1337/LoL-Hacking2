@@ -1,0 +1,3129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<theme name="Default" author_name="Invision Power Services, Inc" author_url="http://www.invisionpower.com">
+ <field sc_key="forum_layout" sc_type="Select" sc_multiple="0" sc_updated="1435597968" sc_app="forums" sc_default="traditional" sc_tab_key="custom" sc_show_in_vse="1" sc_title="themesetting_forum_layout" sc_order="5" sc_condition="">[{&quot;key&quot;:&quot;grid&quot;,&quot;value&quot;:&quot;Grid View&quot;},{&quot;key&quot;:&quot;traditional&quot;,&quot;value&quot;:&quot;Traditional List&quot;}]</field>
+ <template template_group="feeds" template_name="importPreview" template_data="$feed" template_location="admin" template_app="forums"><![CDATA[<form method="post">
+	<input type="hidden" name="continue" value="1">
+	<ol class='ipsDataList ipsClear'>
+		{{foreach $feed as $item}}
+			<li class="ipsDataItem">
+				<div class='ipsDataItem_main'>
+					<h3 class='ipsDataItem_title'>{$item['title']}</h3>
+					<div class='ipsDataItem_meta ipsType_light'>
+						{$item['date']}
+					</div>
+				</div>
+			</li>
+		{{endforeach}}
+	</ol>
+	<div class="ipsAreaBackground_light ipsClearfix ipsPad ipsType_center">
+		<button type="submit" class="ipsButton ipsButton_primary">{lang="continue"}</button>
+	</div>
+</form>]]></template>
+ <template template_group="forums" template_name="forumButtons" template_data="$forum" template_location="front" template_app="forums"><![CDATA[{{if $forum->can('add')}}
+	<li class='ipsToolList_primaryAction'>
+		{{if $forum->forums_bitoptions['bw_enable_answers']}}
+			<a class="ipsButton ipsButton_medium ipsButton_important ipsButton_fullWidth" href="{$forum->url()->setQueryString( 'do', 'add' )}" title='{lang="ask_a_question_desc"}'>{lang="ask_a_question"}</a>
+		{{else}}
+			<a class="ipsButton ipsButton_medium ipsButton_important ipsButton_fullWidth" href="{$forum->url()->setQueryString( 'do', 'add' )}" title='{lang="start_new_topic_desc"}'>{lang="start_new_topic"}</a>
+		{{endif}}
+	</li>
+{{endif}}
+{{if $forum->topics AND \IPS\Member::loggedIn()->member_id}}
+	<li>
+		<a href="{$forum->url()->setQueryString( array( 'do' => 'markRead', 'fromForum' => 1 ) )->csrf()}" title='{lang="mark_forum_read_title"}' class='ipsButton ipsButton_medium ipsButton_fullWidth ipsButton_link' data-action='markForumRead'><i class="fa fa-check"></i> {lang="mark_forum_read"}</a>
+	</li>
+{{endif}}]]></template>
+ <template template_group="forums" template_name="forumDisplay" template_data="$forum, $table" template_location="front" template_app="forums"><![CDATA[
+{{if !\IPS\Request::i()->advancedSearchForm}}
+	{{$followerCount = \IPS\forums\Topic::containerFollowerCount( $forum );}}
+	<div class="ipsPageHeader ipsClearfix">
+		<header class='ipsSpacer_bottom'>
+			<h1 class="ipsType_pageTitle">{$forum->_title}</h1>
+			{{if $forum->sub_can_post and !$forum->password}}
+				<div class='ipsPos_right ipsResponsive_noFloat ipsResponsive_hidePhone'>
+					{template="follow" app="core" group="global" params="'forums','forum', $forum->_id, $followerCount"}
+				</div>
+			{{endif}}
+			{{if $forum->description}}
+				<div class='ipsType_richText ipsType_normal'>
+					{$forum->description|raw}
+				</div>
+			{{endif}}
+
+			{{if $forum->show_rules == 1}}
+				<hr class='ipsHr'>
+				<a href="#elForumRules" class='ipsJS_show ipsType_normal' data-ipsDialog data-ipsDialog-title="{lang="forums_forum_{$forum->id}_rulestitle"}" data-ipsDialog-content="#elForumRules">{lang="forums_forum_{$forum->id}_rulestitle"}</a>
+				<div id='elForumRules' class='ipsAreaBackground_light ipsPad ipsJS_hide'>
+					<div class='ipsType_richText ipsType_medium'>{lang="forums_forum_{$forum->id}_rules"}</div>
+				</div>
+			{{elseif $forum->show_rules == 2}}
+				<hr class='ipsHr'>
+				<strong class='ipsType_normal'>{lang="forums_forum_{$forum->id}_rulestitle"}</strong>
+				<div class='ipsType_richText ipsType_normal ipsSpacer_top'>{lang="forums_forum_{$forum->id}_rules"}</div>
+			{{endif}}
+		</header>
+	</div>
+	
+	{{if $forum->children()}}
+		<div class='ipsList_reset cForumList ipsBox ipsSpacer_bottom' data-controller='forums.front.forum.forumList' data-baseURL=''>
+			<h2 class='ipsType_sectionTitle ipsType_reset'>{{if $forum->sub_can_post}}{lang="subforums_header"}{{else}}{lang="subforums_header_category"}{{endif}}</h2>
+			{{if theme.forum_layout === 'grid'}}
+				<div class='ipsAreaBackground ipsPad' data-role="forums">
+					<div class='ipsGrid ipsGrid_collapsePhone' data-ipsGrid data-ipsGrid-minItemSize='300' data-ipsGrid-maxItemSize='400' data-ipsGrid-equalHeights='row'>
+						{{foreach $forum->children( 'view' ) as $childforum}}
+							{template="forumGridItem" group="index" app="forums" params="$childforum"}
+						{{endforeach}}
+					</div>
+				</div>
+			{{else}}
+				<ol class="ipsDataList ipsDataList_zebra ipsDataList_large ipsAreaBackground_reset">
+					{{foreach $forum->children( 'view' ) as $childforum}}
+						{template="forumRow" group="index" app="forums" params="$childforum, TRUE"}
+					{{endforeach}}
+				</ol>
+			{{endif}}				
+		</div>
+	{{endif}}
+{{endif}}
+<div data-controller='forums.front.forum.forumPage'>
+	<ul class="ipsToolList ipsToolList_horizontal ipsClearfix ipsSpacer_both">
+		{template="forumButtons" group="forums" params="$forum"}
+	</ul>
+	{$table|raw}
+</div>
+{{if !\IPS\Request::i()->advancedSearchForm && $forum->sub_can_post and !$forum->password}}
+	<div class='ipsResponsive_showPhone ipsResponsive_block ipsSpacer ipsSpacer_both'>
+		{template="follow" app="core" group="global" params="'forums','forum', $forum->_id, $followerCount"}
+	</div>
+{{endif}}]]></template>
+ <template template_group="forums" template_name="forumHome" template_data="$forum, $featuredTopic, $popularQuestions, $newQuestions" template_location="front" template_app="forums"><![CDATA[<br>
+{{if $featuredTopic}}
+	<div class="ipsPad">
+		<h2 class="ipsType_sectionHead">{lang="featured_question"}</h2>
+		<br><br>
+		<div class="ipsPhotoPanel ipsPhotoPanel_small ipsClearfix">
+			<img src='{expression="$featuredTopic->author()->photo"}' class="ipsUserPhoto ipsUserPhoto_small ipsPos_left">
+			<div>
+				<h3 class="ipsType_reset ipsType_large">
+					<a href="{$featuredTopic->url()}">{$featuredTopic->title}</a>
+				</h3>
+				<p class="ipsType_reset ipsType_normal ipsType_light">{lang="ask_byline" htmlsprintf="$featuredTopic->author()->link(), \IPS\DateTime::ts( $featuredTopic->start_date )->html()"}</p>
+				<br>
+				<div class="ipsType_normal" data-ipsTruncate data-ipsTruncate-type="remove" data-ipsTruncate-size="5 lines">
+					{$featuredTopic->truncated()}
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr class="ipsHr">
+{{endif}}
+<div class="ipsGrid ipsGrid_collapsePhone">
+	<div class="ipsGrid_span6 ipsPad">
+		<h2 class="ipsType_sectionHead">{lang="most_popular_questions"}</h2>
+		<p class="ipsType_reset ipsType_light">{lang="from_the_past_30_days"}</p>
+		<ol class="ipsDataList ipsDataList_reducedSpacing" id="elTopicList" itemscope="" itemtype="http://schema.org/ItemList">
+			<meta itemprop="itemListOrder" content="Descending">
+			{{foreach $popularQuestions as $question}}
+				<li class="ipsDataItem {{if $question->unread()}}ipsDataItem_unread{{endif}}" itemprop="itemListElement">
+					<div class='ipsDataItem_generic ipsDataItem_size1'>
+						<img src="{$question->author()->photo}" class='ipsUserPhoto ipsUserPhoto_mini'>
+					</div>
+					<div class="ipsDataItem_main">
+						<h4 class="ipsDataItem_title">{{if $question->unread()}} <i class="fa fa-circle cTopicIcon"></i> {{endif}}<a href="{$question->url()}">{$question->title}</a></h4>
+						<ul class="ipsDataItem_meta ipsList_inline ipsType_light">
+							{{if $question->bestAnswer()}}
+								<li>
+									{lang="best_answer_by" htmlsprintf="$question->bestAnswer()->author()->link(), \IPS\DateTime::ts( $question->bestAnswer()->post_date )->html()"}
+								</li>
+							{{endif}}
+						</ul>
+					</div>
+				</li>
+			{{endforeach}}
+		</ol>
+	</div>
+	<div class="ipsGrid_span6 ipsPad">
+		<h2 class="ipsType_sectionHead">{lang="new_questions"}</h2>
+		<p class="ipsType_reset ipsType_light">{lang="awaiting_an_answer"}</p>
+		<ol class="ipsDataList ipsDataList_reducedSpacing" id="elTopicList" itemscope="" itemtype="http://schema.org/ItemList">
+			<meta itemprop="itemListOrder" content="Descending">
+			{{foreach $newQuestions as $question}}
+				<li class="ipsDataItem {{if $question->unread()}}ipsDataItem_unread{{endif}}" itemprop="itemListElement">
+					<div class='ipsDataItem_generic ipsDataItem_size1'>
+						<img src="{$question->author()->photo}" class='ipsUserPhoto ipsUserPhoto_mini'>
+					</div>
+					<div class="ipsDataItem_main">
+						<h4 class="ipsDataItem_title">{{if $question->unread()}} <i class="fa fa-circle cTopicIcon"></i> {{endif}}<a href="{$question->url()}">{$question->title}</a></h4>
+						<ul class="ipsDataItem_meta ipsList_inline ipsType_light">
+							<li>
+								{lang="ask_byline" htmlsprintf="$question->author()->link(), \IPS\DateTime::ts( $question->start_date )->html()"}
+							</li>
+						</ul>
+					</div>
+				</li>
+			{{endforeach}}
+		</ol>
+	</div>
+</div>]]></template>
+ <template template_group="forums" template_name="forumPasswordPopup" template_data="$id, $action, $elements, $hiddenValues, $actionButtons, $uploadField, $class='', $attributes=array(), $sidebar, $form=NULL" template_location="front" template_app="forums"><![CDATA[
+<form accept-charset='utf-8' class="ipsForm ipsForm_vertical" method='post' action='{$action}' data-ipsValidation novalidate>
+	<input type="hidden" name="{$id}_submitted" value="1">
+	{{foreach $hiddenValues as $k => $v}}
+		<input type="hidden" name="{$k}" value="{$v}">
+	{{endforeach}}
+
+	<div class='ipsPad'>
+		<p class='ipsType_normal ipsType_reset'>
+			{lang="enter_forum_password_1"}
+		</p>
+
+		<br>
+		<ul class='ipsList_reset'>
+			{{foreach $elements as $collection}}
+				{{foreach $collection as $input}}
+					{{if $input instanceof \IPS\Helpers\Form\Text}}
+						<li class="ipsFieldRow ipsFieldRow_primary ipsFieldRow_noLabel ipsFieldRow_fullWidth {{if $input->error}}ipsFieldRow_error{{endif}}">
+							<input type="{$input->formType}" required placeholder="{lang="$input->name"}" name='{$input->name}' id='{$input->htmlId}'>
+							{{if $input->error}}
+								<br>
+								<span class="ipsType_warning">{lang="$input->error"}</span>
+							{{endif}}
+						</li>
+					{{endif}}
+				{{endforeach}}
+			{{endforeach}}
+		</ul>
+	</div>
+	<div class='ipsPad ipsAreaBackground ipsType_right'>
+		<button type="submit" class="ipsButton ipsButton_primary ipsButton_small">{lang="enter_forum"}</button>
+	</div>
+</form>]]></template>
+ <template template_group="forums" template_name="forumSelector" template_data="$form" template_location="front" template_app="forums"><![CDATA[
+<div class='ipsPad'>
+	{$form|raw}
+</div>]]></template>
+ <template template_group="forums" template_name="forumTable" template_data="$table, $headers, $rows, $quickSearch" template_location="front" template_app="forums"><![CDATA[<div class='ipsBox' data-baseurl='{$table->baseUrl}' data-resort='{$table->resortKey}' data-tableID='topics' data-controller='core.global.core.table{{if $table->canModerate()}},core.front.core.moderation{{endif}}'>
+	{{if $table->title}}
+		<h2 class='ipsType_sectionTitle {{if !$table->container()->forums_bitoptions['bw_enable_answers']}}ipsType_medium{{endif}} ipsType_reset ipsClear'>{$table->title}</h2>
+	{{endif}}
+
+	{{if $table->count > 0}}
+	<div class="ipsButtonBar ipsPad_half ipsClearfix ipsClear">
+		{{if $table->canModerate()}}
+			<ul class="ipsButtonRow ipsPos_right ipsClearfix">
+				<li>
+					<a class="ipsJS_show" href="#elCheck_menu" id="elCheck_{$table->uniqueId}" title='{lang="{$table->langPrefix}select_rows_tooltip"}' data-ipsTooltip data-ipsAutoCheck data-ipsAutoCheck-context="#elTable_{$table->uniqueId}" data-ipsMenu data-ipsMenu-activeClass="ipsButtonRow_active">
+						<span class="cAutoCheckIcon ipsType_medium"><i class="fa fa-square-o"></i></span> <i class="fa fa-caret-down"></i>
+						<span class='ipsNotificationCount' data-role='autoCheckCount'>0</span>
+					</a>
+					<ul class="ipsMenu ipsMenu_auto ipsMenu_withStem ipsHide" id="elCheck_{$table->uniqueId}_menu">
+						<li class="ipsMenu_title">{lang="{$table->langPrefix}select_rows"}</li>
+						<li class="ipsMenu_item" data-ipsMenuValue="all"><a href="#">{lang="all"}</a></li>
+						<li class="ipsMenu_item" data-ipsMenuValue="none"><a href="#">{lang="none"}</a></li>
+						{{if count($table->getFilters())}}
+							<li class="ipsMenu_sep"><hr></li>
+							{{foreach $table->getFilters() as $filter}}
+								<li class="ipsMenu_item" data-ipsMenuValue="{$filter}"><a href="#">{lang="$filter"}</a></li>
+							{{endforeach}}
+						{{endif}}
+					</ul>
+				</li>
+			</ul>
+		{{endif}}
+
+		<ul class="ipsButtonRow ipsPos_right ipsClearfix">
+			{{if isset( $table->sortOptions ) and !empty( $table->sortOptions ) }}
+				<li>
+					<a href="#elSortByMenu_menu" id="elSortByMenu_{$table->uniqueId}" data-role='sortButton' data-ipsMenu data-ipsMenu-activeClass="ipsButtonRow_active" data-ipsMenu-selectable="radio">{lang="sort_by"} <i class="fa fa-caret-down"></i></a>
+					<ul class="ipsMenu ipsMenu_auto ipsMenu_withStem ipsMenu_selectable ipsHide" id="elSortByMenu_{$table->uniqueId}_menu">
+						{{$custom = TRUE;}}
+						{{foreach $table->sortOptions as $k => $col}}
+							<li class="ipsMenu_item {{if $col === $table->sortBy}}{{$custom = FALSE;}}ipsMenu_itemChecked{{endif}}" data-ipsMenuValue="{$col}" data-sortDirection='{{if $col == 'title'}}asc{{else}}desc{{endif}}'><a href="{$table->baseUrl->setQueryString( array( 'filter' => $table->filter, 'sortby' => $col, 'sortdirection' => ( $col == 'title' ) ? 'asc' : 'desc', 'page' => '1' ) )}">{lang="{$table->langPrefix}sort_{$k}"}</a></li>
+						{{endforeach}}
+						{{if $table->advancedSearch}}
+							<li class="ipsMenu_item {{if $custom}}ipsMenu_itemChecked{{endif}}" data-noSelect="true">
+								<a href='{$table->baseUrl->setQueryString( array( 'advancedSearchForm' => '1', 'filter' => $table->filter, 'sortby' => $table->sortBy, 'sortdirection' => $table->sortDirection ) )}' data-ipsDialog data-ipsDialog-title='{lang="custom_sort"}'>{lang="custom"}</a>
+							</li>
+						{{endif}}
+					</ul>
+				</li>
+			{{endif}}
+			{{if !empty( $table->filters )}}
+				<li>
+					<a href="#elFilterByMenu_menu" id="elFilterByMenu_{$table->uniqueId}" data-role='tableFilterMenu' data-ipsMenu data-ipsMenu-activeClass="ipsButtonRow_active" data-ipsMenu-selectable="radio">{lang="filter_by"} <i class="fa fa-caret-down"></i></a>
+					<ul class='ipsMenu ipsMenu_auto ipsMenu_withStem ipsMenu_selectable ipsHide' data-role="tableFilterMenu" id='elFilterByMenu_{$table->uniqueId}_menu'>
+						<li data-action="tableFilter" data-ipsMenuValue='' class='ipsMenu_item {{if !$table->filter}}ipsMenu_itemChecked{{endif}}'>
+							<a href='{$table->baseUrl->setQueryString( array( 'filter' => '', 'sortby' => $table->sortBy, 'sortdirection' => $table->sortDirection, 'page' => '1' ) )}'>{lang="{$table->langPrefix}all"}</a>
+						</li>
+						{{foreach $table->filters as $k => $q}}
+							<li data-action="tableFilter" data-ipsMenuValue='{$k}' class='ipsMenu_item {{if $k === $table->filter}}ipsMenu_itemChecked{{endif}}'>
+								<a href='{$table->baseUrl->setQueryString( array( 'filter' => $k, 'sortby' => $table->sortBy, 'sortdirection' => $table->sortDirection, 'page' => '1' ) )}'>{lang="{$table->langPrefix}{$k}"}</a>
+							</li>
+						{{endforeach}}
+					</ul>
+				</li>
+			{{endif}}
+		</ul>
+
+		{{if $table->pages > 1}}
+			<div data-role="tablePagination">
+				{template="pagination" group="global" app="core" location="global" params="$table->baseUrl, $table->pages, $table->page, $table->limit, TRUE, $table->getPaginationKey()"}
+			</div>
+		{{endif}}
+	</div>
+	{{endif}}
+	{{if $table->canModerate()}}
+		<form action="{$table->baseUrl->csrf()}" method="post" data-role='moderationTools' data-ipsPageAction>
+	{{endif}}
+		{{if count( $rows )}}
+			<ol class='ipsDataList ipsDataList_zebra ipsClear cForumTopicTable {{if $table->container()->forums_bitoptions['bw_enable_answers']}}cForumQuestions{{endif}} {{foreach $table->classes as $class}}{$class} {{endforeach}}' id='elTable_{$table->uniqueId}' data-role="tableRows" itemscope itemtype="http://schema.org/ItemList">
+				{template="$table->rowsTemplate[1]" params="$table, $headers, $rows" object="$table->rowsTemplate[0]"}
+			</ol>
+		{{else}}
+			<div class='ipsType_center ipsPad'>
+				<p class='ipsType_large'>{{if $table->container()->forums_bitoptions['bw_enable_answers']}}{lang="no_questions_in_forum"}{{else}}{lang="no_topics_in_forum"}{{endif}}</p>
+
+				{{if $table->container()->can('add')}}
+					<a href='{$table->container()->url()->setQueryString( 'do', 'add' )}' class='ipsButton ipsButton_primary ipsButton_medium'>
+						{{if $table->container()->forums_bitoptions['bw_enable_answers']}}
+							{lang="submit_first_question"}
+						{{else}}
+							{lang="submit_first_topic"}
+						{{endif}}
+					</a>
+				{{endif}}
+			</div>
+		{{endif}}
+	{{if $table->canModerate()}}
+			<div class="ipsAreaBackground ipsPad ipsClearfix" data-role="pageActionOptions">
+				<div class="ipsPos_right">
+					<select name="modaction" data-role="moderationAction">
+						{{if $table->canModerate('unhide')}}
+							<option value='approve' data-icon='check-circle'>{lang="approve"}</option>
+						{{endif}}
+						{{if $table->canModerate('feature') or $table->canModerate('unfeature')}}
+							<optgroup label="{lang="feature"}" data-icon='star' data-action='feature'>
+								{{if $table->canModerate('feature')}}
+									<option value='feature'>{lang="feature"}</option>
+								{{endif}}
+								{{if $table->canModerate('unhide')}}
+									<option value='unfeature'>{lang="unfeature"}</option>
+								{{endif}}
+							</optgroup>
+						{{endif}}
+						{{if $table->canModerate('pin') or $table->canModerate('unpin')}}
+							<optgroup label="{lang="pin"}" data-icon='thumb-tack' data-action='pin'>
+								{{if $table->canModerate('pin')}}
+									<option value='pin'>{lang="pin"}</option>
+								{{endif}}
+								{{if $table->canModerate('unpin')}}
+									<option value='unpin'>{lang="unpin"}</option>
+								{{endif}}
+							</optgroup>
+						{{endif}}
+						{{if $table->canModerate('hide') or $table->canModerate('unhide')}}
+							<optgroup label="{lang="hide"}" data-icon='eye' data-action='hide'>
+								{{if $table->canModerate('hide')}}
+									<option value='hide'>{lang="hide"}</option>
+								{{endif}}
+								{{if $table->canModerate('unhide')}}
+									<option value='unhide'>{lang="unhide"}</option>
+								{{endif}}
+							</optgroup>
+						{{endif}}
+						{{if $table->canModerate('lock') or $table->canModerate('unlock')}}
+							<optgroup label="{lang="lock"}" data-icon='lock' data-action='lock'>
+								{{if $table->canModerate('lock')}}
+									<option value='lock'>{lang="lock"}</option>
+								{{endif}}
+								{{if $table->canModerate('unlock')}}
+									<option value='unlock'>{lang="unlock"}</option>
+								{{endif}}
+							</optgroup>
+						{{endif}}
+						{{if $table->canModerate('move')}}
+							<option value='move' data-icon='arrow-right'>{lang="move"}</option>
+						{{endif}}
+						{{if $table->canModerate('split_merge')}}
+							<option value='merge' data-icon='level-up'>{lang="merge"}</option>
+						{{endif}}
+						{{if $table->canModerate('delete')}}
+							<option value='delete' data-icon='trash'>{lang="delete"}</option>
+						{{endif}}
+						{{if $table->savedActions}}
+							<optgroup label="{lang="saved_actions"}" data-icon='tasks' data-action='saved_actions'>
+								{{foreach $table->savedActions as $k => $v}}
+									<option value='savedAction-{$k}'>{$v}</option>
+								{{endforeach}}
+							</optgroup>
+						{{endif}}
+					</select>
+					<button type="submit" class="ipsButton ipsButton_alternate ipsButton_verySmall">{lang="submit"}</button>
+				</div>
+			</div>
+		</form>
+	{{endif}}
+
+	{{if $table->pages > 1}}
+		<div class="ipsButtonBar ipsPad_half ipsClearfix ipsClear">
+			<div data-role="tablePagination">
+				{template="pagination" group="global" app="core" location="global" params="$table->baseUrl, $table->pages, $table->page, $table->limit, TRUE, $table->getPaginationKey()"}
+			</div>
+		</div>
+	{{endif}}
+</div>]]></template>
+ <template template_group="forums" template_name="popularQuestionRow" template_data="$question, $forum" template_location="front" template_app="forums"><![CDATA[{{$iposted = $forum->contentPostedIn( null, array( $question->tid ) );}}
+{{if !$question->mapped('moved_to')}}
+	<li class="ipsDataItem cForumQuestion {{if $question->unread()}}ipsDataItem_unread{{endif}} {{if $question->hidden()}}ipsModerated{{endif}}">
+		<div class='ipsDataItem_icon'>
+			{{if $question->topic_answered_pid}}
+				<span title='{lang="answered"}' class='cBestAnswerIndicator' data-ipsTooltip>
+					<i class='fa fa-check'></i>
+				</span>
+			{{else}}
+				<span title='{lang="awaiting_answer"}' class='cBestAnswerIndicator cBestAnswerIndicator_off' data-ipsTooltip>
+					<i class='fa fa-question'></i>
+				</span>
+			{{endif}}
+		</div>
+		<div class='ipsDataItem_main'>
+			{{if $question->mapped('pinned') || $question->mapped('featured') || $question->hidden() === -1 || $question->hidden() === 1}}
+				<span class='ipsPos_right'>
+					{{if $question->hidden() === -1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{$question->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+					{{elseif $question->hidden() === 1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+					{{endif}}							
+					{{if $question->mapped('pinned')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="pinned"}'><i class='fa fa-thumb-tack'></i></span>
+					{{endif}}
+					{{if $question->mapped('featured')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+					{{endif}}
+				</span>
+			{{endif}}
+			<h4 class='ipsDataItem_title ipsType_break'>
+				{{if $question->locked()}}
+					<i class='fa fa-lock' data-ipsTooltip title='{lang="topic_locked"}'></i>
+				{{endif}}
+				{{if $question->unread()}}
+					<a href='{$question->url( 'getNewComment' )}' title='{lang="first_unread_post"}' data-ipsTooltip>
+						<span class='ipsItemStatus'><i class="fa {{if in_array( $question->tid, $iposted )}}fa-star{{else}}fa-circle{{endif}}"></i></span>
+					</a>
+				{{else}}
+					{{if in_array( $question->tid, $iposted )}}
+						<span class='ipsItemStatus ipsItemStatus_read ipsItemStatus_posted'><i class="fa fa-star"></i></span>
+					{{endif}}
+				{{endif}}
+				{{if $question->prefix()}}
+					{template="prefix" group="global" app="core" params="$question->prefix( TRUE ), $question->prefix()"}
+				{{endif}}
+				
+				<a href='{$question->url()}'>
+					{{if $question->mapped('title')}}{wordbreak="$question->mapped('title')"}{{else}}<em class="ipsType_light">{lang="content_deleted"}</em>{{endif}}
+				</a>
+			</h4>
+			<div class='ipsDataItem_meta'>
+				<p class='ipsType_reset ipsType_normal ipsType_light'>
+					{lang="ask_byline" htmlsprintf="$question->author()->link(), \IPS\DateTime::ts( $question->start_date )->html()"}
+				</p>
+			</div>
+			{{if count( $question->tags() )}}
+				<p>{template="tags" group="global" app="core" params="$question->tags()"}</p>
+			{{endif}}
+		</div>
+		<div class='ipsDataItem_generic ipsDataItem_size2 ipsType_center cForumQuestion_stat'>
+			<span>{{if $question->question_rating}}{$question->question_rating}{{else}}0{{endif}}</span>
+			<span class='ipsType_light'>{lang="votes_no_number" pluralize="$question->question_rating"}</span>
+		</div>
+		<div class='ipsDataItem_generic ipsDataItem_size2 ipsType_center cForumQuestion_stat'>
+			{{foreach $question->stats(FALSE) AS $k => $v}}
+				{{if $k == 'forums_comments' OR $k == 'answers_no_number'}}
+					<span itemprop="answerCount">{number="$v"}</span>
+					<span class='ipsType_light'>{lang="answers_no_number" pluralize="$v"}</span>
+				{{endif}}
+			{{endforeach}}
+		</div>
+	</li>
+{{endif}}]]></template>
+ <template template_group="forums" template_name="qaForum" template_data="$table, $popularQuestions, $newQuestions, $featuredTopic, $forum" template_location="front" template_app="forums"><![CDATA[
+{{if $popularQuestions && $newQuestions}}
+	<div class='ipsBox ipsSpacer_bottom ipsSpacer_double'>
+		<h2 class='ipsType_sectionTitle ipsType_reset'>{lang="explore_questions_title"}</h2>
+		<div class="ipsTabs ipsClearfix" id="elQuestionsTabs" data-ipsTabBar data-ipsTabBar-contentarea="#elQuestionsTabsContent">
+			<a href="#elQuestionsTabs" data-action="expandTabs"><i class="fa fa-caret-down"></i></a>
+			<ul role="tablist" class="ipsList_reset">
+				<li>
+					<a href="#elPopularQuestions" role="tab" id="elPopularQuestions" class="ipsTabs_item {{if count( $popularQuestions ) || !count( $popularQuestions ) && !count( $newQuestions )}}ipsTabs_activeItem{{endif}}" role="tab" aria-selected="{{if count( $popularQuestions ) || !count( $popularQuestions ) && !count( $newQuestions )}}true{{else}}false{{endif}}">
+						{lang="popular_questions_title"}
+					</a>
+				</li>				
+				<li>
+					<a href="#elNewQuestions" id="elNewQuestions" role="tab" class="ipsTabs_item {{if !count( $popularQuestions ) && count( $newQuestions )}}ipsTabs_activeItem{{endif}}" role="tab" aria-selected="{{if !count( $popularQuestions ) && count( $newQuestions )}}true{{else}}false{{endif}}">
+						{{if \IPS\Settings::i()->forums_new_questions}}{lang="new_questions_title_no_answer"}{{else}}{lang="new_questions_title_no_best"}{{endif}}
+					</a>
+				</li>
+			</ul>
+		</div>
+		<section id='elQuestionsTabsContent'>
+			<div id="ipsTabs_elQuestionsTabs_elPopularQuestions_panel" class="ipsTabs_panel" aria-labelledby="elPopularQuestions">
+				{{if count( $popularQuestions )}}
+					<ol class='ipsDataList ipsDataList_zebra ipsClear cForumTopicTable cForumQuestions cTopicList' id='elTable_popularQuestions' data-role="tableRows">
+						{{foreach $popularQuestions as $question}}
+							{template="popularQuestionRow" params="$question, $forum" group="forums"}
+						{{endforeach}}
+					</ol>
+				{{else}}
+					<div class='ipsType_center ipsType_light'>
+						<p class='ipsType_large'>{lang="no_popular_questions"}</p>
+					</div>
+				{{endif}}
+			</div>
+			<div id="ipsTabs_elQuestionsTabs_elNewQuestions_panel" class="ipsTabs_panel" aria-labelledby="elNewQuestions">
+				{{if count( $newQuestions )}}
+					<ol class='ipsDataList ipsDataList_zebra ipsClear cForumTopicTable cForumQuestions cTopicList' id='elTable_newQuestions' data-role="tableRows">
+						{{foreach $newQuestions as $question}}
+							{template="popularQuestionRow" params="$question, $forum" group="forums"}
+						{{endforeach}}
+					</ol>
+				{{else}}
+					<div class='ipsType_center ipsType_light'>
+						<p class='ipsType_large'>{lang="no_new_questions"}</p>
+					</div>
+				{{endif}}
+			</div>
+		</section>
+	</div>
+{{else}}
+	{{if $popularQuestions}}
+		<section class='ipsBox ipsSpacer_bottom ipsSpacer_double'>
+			<h2 class='ipsType_sectionTitle ipsType_reset'>{lang="popular_questions_title"}</h2>
+			{{if count( $popularQuestions )}}
+				<ol class='ipsDataList ipsDataList_readStatus ipsClear cForumTopicTable' id='elTable_' data-role="tableRows">
+					{{foreach $popularQuestions as $question}}
+						{template="popularQuestionRow" params="$question, $forum" group="forums"}
+					{{endforeach}}
+				</ol>
+			{{else}}
+				<div class='ipsType_center ipsType_light'>
+					<p class='ipsType_large'>{lang="no_popular_questions"}</p>
+				</div>
+			{{endif}}
+		</section>
+	{{endif}}
+	{{if $newQuestions}}
+		<section class='ipsBox ipsSpacer_bottom ipsSpacer_double'>
+			<h2 class='ipsType_sectionTitle ipsType_reset'>{{if \IPS\Settings::i()->forums_new_questions}}{lang="new_questions_title_no_answer"}{{else}}{lang="new_questions_title_no_best"}{{endif}}</h2>
+			{{if count( $newQuestions )}}
+			<ol class='ipsDataList ipsDataList_readStatus ipsClear cForumTopicTable' id='elTable_' data-role="tableRows">
+				{{foreach $newQuestions as $question}}
+					{template="popularQuestionRow" params="$question, $forum" group="forums"}
+				{{endforeach}}
+			</ol>
+			{{else}}
+			<div class='ipsType_center ipsType_light'>
+				<p class='ipsType_large'>{lang="no_new_questions"}</p>
+			</div>
+			{{endif}}
+		</section>
+	{{endif}}
+{{endif}}
+{$table|raw}]]></template>
+ <template template_group="forums" template_name="questionRow" template_data="$table, $headers, $rows" template_location="front" template_app="forums"><![CDATA[{{$rowIds = array();}}
+{{foreach $rows as $row}}
+	{{$idField = $row::$databaseColumnId;}}
+	{{$rowIds[] = $row->$idField;}}
+{{endforeach}}
+{{$iposted = ( method_exists( $table, 'container' ) AND $table->container() !== NULL ) ? $table->container()->contentPostedIn( null, $rowIds ) : array();}}
+{{if count( $rows )}}
+	{{foreach $rows as $row}}
+	{{$idField = $row::$databaseColumnId;}}
+		{{if $row->mapped('moved_to')}}
+			{{if $movedTo = $row->movedTo()}}
+				<li class="ipsDataItem">
+					<div class='ipsDataItem_icon ipsType_center ipsType_noBreak'>
+						<i class="fa fa-arrow-left ipsType_large"></i>
+					</div>
+					<div class='ipsDataItem_main'>
+						<h4 class='ipsDataItem_title ipsType_break'>
+							<em><a href='{$movedTo->url()}' title='{lang="go_to_new_location"}'>{wordbreak="$row->mapped('title')"}</a></em>
+						</h4>
+						<div class='ipsDataItem_meta'>
+							<p class='ipsType_reset ipsType_light ipsType_blendLinks'>{lang="question_moved_to" sprintf="$movedTo->container()->url(), $movedTo->container()->_title"}</p>
+						</div>
+					</div>
+					{{if $table->canModerate()}}
+						<div class='ipsDataItem_modCheck'>
+							<span class='ipsCustomInput'>
+								<input type='checkbox' data-role='moderation' name="moderate[{$row->$idField}]" data-actions="{expression="implode( ' ', $table->multimodActions( $row ) )"}" data-state='{{if $row->mapped('pinned')}}pinned{{endif}} {{if $row->mapped('featured')}}featured{{endif}}'>
+								<span></span>
+							</span>
+						</div>
+					{{endif}}
+				</li>
+			{{endif}}
+		{{else}}
+			<li class="ipsDataItem {{if $row->unread()}}ipsDataItem_unread{{endif}} {{if method_exists( $row, 'tableClass' ) && $row->tableClass()}}ipsDataItem_{$row->tableClass()}{{endif}} {{if $row->hidden()}}ipsModerated{{endif}} cForumQuestion" data-rowID='{$row->$idField}' itemscope itemtype="http://schema.org/Question">
+				<div class='ipsDataItem_icon'>
+					{{if $row->topic_answered_pid}}
+						<span title='{lang="answered"}' class='cBestAnswerIndicator' data-ipsTooltip>
+							<i class='fa fa-check'></i>
+						</span>
+					{{else}}
+						<span title='{lang="awaiting_answer"}' class='cBestAnswerIndicator cBestAnswerIndicator_off' data-ipsTooltip>
+							<i class='fa fa-question'></i>
+						</span>
+					{{endif}}
+				</div>
+				<div class='ipsDataItem_main'>
+					{{if $row->mapped('pinned') || $row->mapped('featured') || $row->hidden() === -1 || $row->hidden() === 1}}
+						<span class='ipsPos_right'>
+							{{if $row->hidden() === -1}}
+								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{$row->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+							{{elseif $row->hidden() === 1}}
+								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+							{{endif}}							
+							{{if $row->mapped('pinned')}}
+								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="pinned"}'><i class='fa fa-thumb-tack'></i></span>
+							{{endif}}
+							{{if $row->mapped('featured')}}
+								<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+							{{endif}}
+						</span>
+					{{endif}}
+					<h4 class='ipsDataItem_title ipsType_break'>
+						{{if $row->locked()}}
+							<i class='fa fa-lock' data-ipsTooltip title='{lang="topic_locked"}'></i>
+						{{endif}}
+						{{if $row->unread()}}
+							<a href='{$row->url( 'getNewComment' )}' title='{lang="first_unread_post"}' data-ipsTooltip>
+								<span class='ipsItemStatus'><i class="fa {{if in_array( $row->$idField, $iposted )}}fa-star{{else}}fa-circle{{endif}}"></i></span>
+							</a>
+						{{else}}
+							{{if in_array( $row->$idField, $iposted )}}
+								<span class='ipsItemStatus ipsItemStatus_read ipsItemStatus_posted'><i class="fa fa-star"></i></span>
+							{{endif}}
+						{{endif}}
+
+						{{if $row->prefix()}}
+							{template="prefix" group="global" app="core" params="$row->prefix( TRUE ), $row->prefix()"}
+						{{endif}}
+						
+						<a href='{$row->url()}' {{if $row->tableHoverUrl and $row->canView()}}data-ipsHover data-ipsHover-target='{$row->url()->setQueryString('preview', 1)}' data-ipsHover-timeout='1.5'{{endif}} itemprop="url" {{if $row->canEdit()}} data-role="editableTitle"{{endif}}>
+							<span itemprop="name">
+								{{if $row->mapped('title')}}{wordbreak="$row->mapped('title')"}{{else}}<em class="ipsType_light">{lang="content_deleted"}</em>{{endif}}
+							</span>
+						</a>
+					</h4>
+					<div class='ipsDataItem_meta'>
+						<p class='ipsDataItem_meta ipsType_reset ipsType_light ipsType_blendLinks'>
+							<span itemprop="author" itemscope itemtype="http://schema.org/Person">
+								{lang="ask_byline_itemprop" htmlsprintf="$row->author()->link(), \IPS\DateTime::ts( $row->start_date )->html()"}
+							</span>
+							<meta itemprop="dateCreated" content="{expression="\IPS\DateTime::ts( $row->start_date )->rfc3339()"}">
+							{{if \IPS\Request::i()->controller != 'forums'}}
+								{lang="in"} <a href="{$row->container()->url()}">{$row->container()->_title}</a>
+							{{endif}}
+						</p>
+						{{if count( $row->tags() )}}
+							<div>{template="tags" group="global" app="core" params="$row->tags()"}</div>
+						{{endif}}
+					</div>
+				</div>
+				<div class='ipsDataItem_generic ipsDataItem_size2 ipsType_center cForumQuestion_stat'>
+					<span itemprop="upvoteCount">{{if $row->question_rating}}{$row->question_rating}{{else}}0{{endif}}</span>
+					<span class='ipsType_light'>{lang="votes_no_number" pluralize="$row->question_rating"}</span>
+				</div>
+				<div class='ipsDataItem_generic ipsDataItem_size2 ipsType_center cForumQuestion_stat'>
+					{{foreach $row->stats(FALSE) AS $k => $v}}
+						{{if $k == 'forums_comments' OR $k == 'answers_no_number'}}
+							<span itemprop="answerCount">{number="$v"}</span>
+							<span class='ipsType_light'>
+								{lang="answers_no_number" pluralize="$v"}
+								{{if \IPS\forums\Topic::modPermission( 'unhide', NULL, $row->container() ) AND $unapprovedComments = $row->mapped('unapproved_comments')}}
+									&nbsp;<a href='{$row->url()->setQueryString( 'queued_posts', 1 )}' class='ipsType_warning ipsType_small ipsResponsive_noFloat' data-ipsTooltip title='{lang="queued_posts_badge" pluralize="$row->topic_queuedposts"}'><i class='fa fa-warning'></i> <strong>{$unapprovedComments}</strong></a>
+								{{endif}}
+							</span>
+						{{endif}}
+					{{endforeach}}
+				</div>
+				{{if $table->canModerate()}}
+					<div class='ipsDataItem_modCheck'>
+						<span class='ipsCustomInput'>
+							<input type='checkbox' data-role='moderation' name="moderate[{$row->$idField}]" data-actions="{expression="implode( ' ', $table->multimodActions( $row ) )"}" data-state='{{if $row->tableStates()}}{$row->tableStates()}{{endif}}'>
+							<span></span>
+						</span>
+					</div>
+				{{endif}}
+			</li>
+		{{endif}}
+	{{endforeach}}
+{{endif}}]]></template>
+ <template template_group="forums" template_name="topicHover" template_data="$topic, $overviews" template_location="front" template_app="forums"><![CDATA[
+<div class='cTopicHovercard' data-controller='forums.front.forum.hovercard' data-topicID='{$topic->tid}'>
+	{{if count( $overviews ) > 1}}
+		<div class="ipsTabs ipsTabs_small ipsTabs_container ipsClearfix" id="elTopic_{$topic->tid}" data-ipsTabBar data-ipsTabBar-contentarea="#elTopic_{$topic->tid}_content">
+			<a href="#elTopic_{$topic->tid}" data-action="expandTabs"><i class="fa fa-caret-down"></i></a>
+			<ul role="tablist">
+				{{foreach $overviews as $tabID => $tabData}}
+					<li>
+						<a href="#ipsTabs_elTopic_{$topic->tid}_elTopic_{$topic->tid}_{$tabID}_panel" id="elTopic_{$topic->tid}_{$tabID}" class="ipsTabs_item ipsType_center" role="tab" aria-selected="{{if $tabID == 'firstPost'}}true{{else}}false{{endif}}">{lang="$tabData[0]"}</a>
+					</li>
+				{{endforeach}}
+			</ul>
+		</div>
+		<div id='elTopic_{$topic->tid}_content' class='ipsTabs_panels ipsTabs_contained cTopicHovercard_container ipsScrollbar'>
+	{{else}}
+		<div class='ipsPad cTopicHovercard_container ipsScrollbar'>
+	{{endif}}
+
+		{{foreach $overviews as $tabID => $tabData}}
+			{{if count( $overviews ) > 1}}
+				<div id='ipsTabs_elTopic_{$topic->tid}_elTopic_{$topic->tid}_{$tabID}_panel' class='ipsTabs_panel'>
+			{{endif}}
+				<div class='ipsPhotoPanel ipsPhotoPanel_tiny ipsClearfix'>
+					{template="userPhoto" group="global" app="core" params="$tabData[1]->author(), 'tiny'"}
+					<div class='ipsType_small'>
+						<strong>{$tabData[1]->author()->name}</strong>
+						<p class='ipsType_reset ipsType_light ipsType_blendLinks'>
+							{datetime="$tabData[1]->mapped('date')"}
+							{{if $tabData[1]->item()->unread() }}
+								&middot; <a href='{$tabData[1]->item()->url('markRead')->csrf()}' title='{lang="mark_topic_read"}' data-action='markTopicRead'><i class='fa fa-check'></i> {lang="mark_topic_read"}</a>
+							{{endif}}
+							{{if $tabData[1] instanceof \IPS\Content\ReportCenter and !\IPS\Member::loggedIn()->group['gbw_no_report'] }}
+								&middot; <a href='{$tabData[1]->url('report')}' data-ipsDialog data-ipsDialog-remoteSubmit data-ipsDialog-size='medium' data-ipsDialog-flashMessage='{lang="report_submit_success"}' data-ipsDialog-title="{lang="report_post"}" data-action='reportComment' title='{lang="report_post"}'><span class='ipsResponsive_showPhone ipsResponsive_inline'><i class='fa fa-flag'></i></span><span class='ipsResponsive_hidePhone ipsResponsive_inline'>{lang="report_post"}</span></a>
+							{{endif}}
+						</p>
+					</div>
+				</div>
+				<hr class='ipsHr'>
+
+				<div class='ipsType_richText ipsType_small' data-controller='core.front.core.lightboxedImages'>
+					{$tabData[1]->content()|raw}
+				</div>
+			{{if count( $overviews ) > 1}}
+				</div>
+			{{endif}}
+		{{endforeach}}
+	</div>
+</div>]]></template>
+ <template template_group="forums" template_name="topicRow" template_data="$table, $headers, $rows" template_location="front" template_app="forums"><![CDATA[{{$rowIds = array();}}
+{{foreach $rows as $row}}
+	{{$idField = $row::$databaseColumnId;}}
+	{{$rowIds[] = $row->$idField;}}
+{{endforeach}}
+{{$iposted = ( method_exists( $table, 'container' ) AND $table->container() !== NULL ) ? $table->container()->contentPostedIn( null, $rowIds ) : array();}}
+{{if count( $rows )}}
+	{{$rowCount=0;}}
+	{{foreach $rows as $row}}
+		{{if $rowCount == 1 AND $advertisement = \IPS\core\Advertisement::loadByLocation( 'ad_forum_listing' )}}
+			<li class="ipsDataItem">
+				{$advertisement|raw}
+			</li>
+		{{endif}}
+		{{$rowCount++;}}
+		{{$idField = $row::$databaseColumnId;}}
+		{{if $row->mapped('moved_to')}}
+			{{if $movedTo = $row->movedTo()}}
+				<li class="ipsDataItem">
+					<div class='ipsDataItem_icon ipsType_center ipsType_noBreak'>
+						<i class="fa fa-arrow-left ipsType_large"></i>
+					</div>
+					<div class='ipsDataItem_main'>
+						<h4 class='ipsDataItem_title ipsType_break'>
+							<em><a href='{$movedTo->url()}' title='{lang="go_to_new_location"}'>{wordbreak="$row->mapped('title')"}</a></em>
+						</h4>
+						<div class='ipsDataItem_meta'>
+							<p class='ipsType_reset ipsType_light ipsType_blendLinks'>{lang="topic_moved_to" sprintf="$movedTo->container()->url(), $movedTo->container()->_title"}</p>
+						</div>
+					</div>
+					{{if $table->canModerate()}}
+						<div class='ipsDataItem_modCheck'>
+							<span class='ipsCustomInput'>
+								<input type='checkbox' data-role='moderation' name="moderate[{$row->$idField}]" data-actions="{{if $row->mapped('featured')}}unfeature{{endif}} {{if $row->mapped('pinned')}}unpin{{endif}} delete" data-state='{{if $row->mapped('pinned')}}pinned{{endif}} {{if $row->mapped('featured')}}featured{{endif}}'>
+								<span></span>
+							</span>
+						</div>
+					{{endif}}
+				</li>
+			{{endif}}
+		{{else}}
+			<li class="ipsDataItem ipsDataItem_responsivePhoto {{if $row->unread()}}ipsDataItem_unread{{endif}} {{if method_exists( $row, 'tableClass' ) && $row->tableClass()}}ipsDataItem_{$row->tableClass()}{{endif}} {{if $row->hidden()}}ipsModerated{{endif}}" data-rowID='{$row->$idField}' itemprop="itemListElement" itemscope itemtype="http://schema.org/Article">
+				{{if member.member_id}}
+					<div class='ipsDataItem_icon ipsPos_top'>
+						{{if $row->unread()}}
+							<a href='{$row->url( 'getNewComment' )}' title='{lang="first_unread_post"}' data-ipsTooltip>
+								<span class='ipsItemStatus'><i class="fa {{if in_array( $row->$idField, $iposted )}}fa-star{{else}}fa-circle{{endif}}"></i></span>
+							</a>
+						{{else}}
+							{{if in_array( $row->$idField, $iposted )}}
+								<span class='ipsItemStatus ipsItemStatus_read ipsItemStatus_posted'><i class="fa fa-star"></i></span>
+							{{else}}
+								&nbsp;
+							{{endif}}
+						{{endif}}
+					</div>
+				{{endif}}
+				<div class='ipsDataItem_main'>
+					<h4 class='ipsDataItem_title ipsType_break'>
+						{{if $row->locked()}}
+							<i class='ipsType_medium fa fa-lock' data-ipsTooltip title='{lang="topic_locked"}'></i>
+							
+							{{if $row->topic_open_time && $row->topic_open_time > time()}}
+								<strong class='ipsType_small' data-ipsTooltip title='{lang="topic_unlocks_at" sprintf="\IPS\DateTime::ts( $row->topic_open_time )->relative(), \IPS\DateTime::ts( $row->topic_open_time )->localeTime( FALSE )"}'>{lang="topic_unlocks_at_short" sprintf="\IPS\DateTime::ts($row->topic_open_time)->relative(1)"}</strong>&nbsp;&nbsp;
+							{{endif}}
+						{{elseif !$row->locked() && $row->topic_close_time && $row->topic_close_time > time()}}
+							<strong class='ipsType_small' data-ipsTooltip title='{lang="topic_locks_at" sprintf="\IPS\DateTime::ts( $row->topic_close_time )->relative(), \IPS\DateTime::ts( $row->topic_close_time )->localeTime( FALSE )"}'><i class='fa fa-clock-o'></i> {lang="topic_locks_at_short" sprintf="\IPS\DateTime::ts($row->topic_close_time)->relative(1)"}</strong>&nbsp;&nbsp;
+						{{endif}}
+						
+						{{if $row->mapped('pinned') || $row->mapped('featured') || $row->hidden() === -1 || $row->hidden() === 1}}
+							<span>
+								{{if $row->hidden() === -1}}
+									<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{$row->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+								{{elseif $row->hidden() === 1}}
+									<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+								{{endif}}							
+								{{if $row->mapped('pinned')}}
+									<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="pinned"}'><i class='fa fa-thumb-tack'></i></span>
+								{{endif}}
+								{{if $row->mapped('featured')}}
+									<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+								{{endif}}
+							</span>
+						{{endif}}
+										
+						{{if $row->prefix()}}
+							{template="prefix" group="global" app="core" params="$row->prefix( TRUE ), $row->prefix()"}
+						{{endif}}
+						
+						<a href='{$row->url()}' itemprop="url"{{if $row->tableHoverUrl and $row->canView()}} data-ipsHover data-ipsHover-target='{$row->url()->setQueryString('preview', 1)}' data-ipsHover-timeout='1.5'{{endif}}{{if $row->canEdit()}} data-role="editableTitle"{{endif}}>
+							<span itemprop="name headline">
+								{{if $row->mapped('title')}}{wordbreak="$row->mapped('title')"}{{else}}<em class="ipsType_light">{lang="content_deleted"}</em>{{endif}}
+							</span>
+						</a>
+						<meta itemprop="position" content="{$row->tid}">
+					</h4>
+					{{if $row->commentPageCount() > 1}}
+						{$row->commentPagination( array(), 'miniPagination' )|raw}
+					{{endif}}
+					<div class='ipsDataItem_meta ipsType_reset ipsType_light ipsType_blendLinks'>
+						<span itemprop="author" itemscope itemtype="http://schema.org/Person">
+							{lang="byline_itemprop" htmlsprintf="$row->author()->link()"}
+						</span>{datetime="$row->mapped('date')" lowercase="true"}
+						<meta itemprop="dateCreated datePublished" content="{expression="\IPS\DateTime::create( $row->__get( $row::$databaseColumnMap['date'] ) )->rfc3339()"}">
+						{{if !in_array( \IPS\Dispatcher::i()->controller, array( 'forums', 'index' ) )}}
+							{lang="in"} <a href="{$row->container()->url()}">{$row->container()->_title}</a>
+						{{endif}}
+						{{if count( $row->tags() )}}
+							&nbsp;&nbsp;
+							{template="tags" group="global" app="core" params="$row->tags(), true, false"}
+						{{endif}}
+					</div>
+				</div>
+				<ul class='ipsDataItem_stats'>
+					{{foreach $row->stats(FALSE) as $k => $v}}
+						<li {{if $k == 'num_views'}}class='ipsType_light'{{elseif in_array( $k, $row->hotStats )}}class="ipsDataItem_stats_hot" data-text='{lang="hot_item"}' data-ipsTooltip title='{lang="hot_item_desc"}'{{endif}}>
+							<span class='ipsDataItem_stats_number' {{if $k == 'forums_comments' OR $k == 'answers_no_number'}}itemprop='commentCount'{{endif}}>{number="$v"}</span>
+							<span class='ipsDataItem_stats_type'>{lang="{$k}" pluralize="$v"}</span>
+							{{if ( $k == 'forums_comments' OR $k == 'answers_no_number' ) && \IPS\forums\Topic::modPermission( 'unhide', NULL, $row->container() ) AND $unapprovedComments = $row->mapped('unapproved_comments')}}
+								&nbsp;<a href='{$row->url()->setQueryString( 'queued_posts', 1 )}' class='ipsType_warning ipsType_small ipsPos_right ipsResponsive_noFloat' data-ipsTooltip title='{lang="queued_posts_badge" pluralize="$row->topic_queuedposts"}'><i class='fa fa-warning'></i> <strong>{$unapprovedComments}</strong></a>
+							{{endif}}
+						</li>
+					{{endforeach}}
+				</ul>
+				<ul class='ipsDataItem_lastPoster ipsDataItem_withPhoto ipsType_blendLinks'>
+					<li>
+						{{if $row->mapped('num_comments')}}
+							{template="userPhoto" app="core" group="global" params="$row->lastCommenter(), 'tiny'"}
+						{{else}}
+							{template="userPhoto" app="core" group="global" params="$row->author(), 'tiny'"}
+						{{endif}}
+					</li>
+					<li>
+						{{if $row->mapped('num_comments')}}
+							{$row->lastCommenter()->link()|raw}
+						{{else}}
+							{$row->author()->link()|raw}
+						{{endif}}
+					</li>
+					<li class="ipsType_light">
+						<a href='{$row->url( 'getLastComment' )}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>
+							{{if $row->mapped('last_comment')}}{datetime="$row->mapped('last_comment')"}{{else}}{datetime="$row->mapped('date')"}{{endif}}
+						</a>
+					</li>
+				</ul>
+				{{if $table->canModerate()}}
+					<div class='ipsDataItem_modCheck'>
+						<span class='ipsCustomInput'>
+							<input type='checkbox' data-role='moderation' name="moderate[{$row->$idField}]" data-actions="{expression="implode( ' ', $table->multimodActions( $row ) )"}" data-state='{{if $row->tableStates()}}{$row->tableStates()}{{endif}}'>
+							<span></span>
+						</span>
+					</div>
+				{{endif}}
+			</li>
+		{{endif}}
+	{{endforeach}}
+{{endif}}]]></template>
+ <template template_group="global" template_name="commentTableHeader" template_data="$comment, $topic" template_location="front" template_app="forums"><![CDATA[{{$iposted = $topic->container()->contentPostedIn();}}
+{{$idField = $topic::$databaseColumnId;}}
+<div>
+	<h3 class='ipsType_sectionHead ipsType_break'>
+		{{if $topic->unread()}}
+			<a href='{$topic->url( 'getNewComment' )}' title='{lang="first_unread_post"}' data-ipsTooltip>
+				<span class='ipsItemStatus'><i class="fa {{if in_array( $topic->$idField, $iposted )}}fa-star{{else}}fa-circle{{endif}}"></i></span>
+			</a>
+		{{else}}
+			{{if in_array( $topic->$idField, $iposted )}}
+				<span class='ipsItemStatus ipsItemStatus_read ipsItemStatus_posted'><i class="fa fa-star"></i></span>
+			{{endif}}
+		{{endif}}
+		<a href='{$comment->url()}' title='{lang="view_this_topic" sprintf="$topic->title"}'>{wordbreak="$topic->title"}</a>
+		{{if $topic->container()->allow_rating}}
+			{template="rating" group="global" location="front" app="core" params="'large', $topic->rating_hits ? ( $topic->rating_total / $topic->rating_hits ) : 0"}
+		{{endif}}
+	</h3>
+	<p class='ipsType_normal ipsType_light ipsType_blendLinks ipsType_reset'>{lang="in"} <a href='{$topic->container()->url()}'>{$topic->container()->_title}</a></p>
+</div>]]></template>
+ <template template_group="global" template_name="manageFollowNodeRow" template_data="$table, $headers, $rows" template_location="front" template_app="forums"><![CDATA[{{foreach $rows as $row}}
+	{{$contentItemClass = $row::$contentItemClass;}}
+	<li class="ipsDataItem {{if method_exists( $row, 'tableClass' ) && $row->tableClass()}}ipsDataItem_{$row->tableClass()}{{endif}}" data-controller='core.front.system.manageFollowed' data-followID='{$row->_followData['follow_area']}-{$row->_followData['follow_rel_id']}'>
+		<div class='ipsDataItem_main'>
+			<h4 class='ipsDataItem_title'>
+				{{if $row->_locked}}
+					<i class="fa fa-lock"></i>
+				{{endif}}
+				
+				<a href='{$row->url()}'>
+					{$row->_title}
+				</a>
+			</h4>
+			<ul class='ipsList_inline ipsType_light'>
+				{{$count = \IPS\forums\Topic::contentCount( $row, TRUE );}}
+				<li>{lang="posts_number" pluralize="$count"}</li>
+			</ul>
+		</div>
+		
+		<div class='ipsDataItem_generic ipsDataItem_size1 ipsType_center ipsType_large'>
+			<span class='ipsBadge ipsBadge_icon ipsBadge_new {{if !$row->_followData['follow_is_anon']}}ipsHide{{endif}}' data-role='followAnonymous' data-ipsTooltip title='{lang="follow_is_anon"}'><i class='fa fa-eye-slash'></i></span>
+		</div>
+
+		<div class='ipsDataItem_generic ipsDataItem_size6'>
+			<ul class='ipsList_reset'>
+				<li title='{lang="follow_when"}' data-role='followDate'><i class='fa fa-clock-o'></i> {datetime="$row->_followData['follow_added']"}</li>
+				<li title='{lang="follow_how"}' data-role='followFrequency'>
+					{{if $row->_followData['follow_notify_freq'] == 'none'}}
+						<i class='fa fa-bell-slash-o'></i>
+					{{else}}
+						<i class='fa fa-bell'></i>
+					{{endif}} {lang="follow_freq_{$row->_followData['follow_notify_freq']}"}
+				</li>
+			</ul>
+		</div>
+
+		<div class='ipsDataItem_generic ipsDataItem_size6 ipsType_center'>
+			{template="manageFollow" group="system" app="core" params="$row->_followData['follow_app'], $row->_followData['follow_area'], $row->_followData['follow_rel_id']"}
+		</div>
+
+		{{if $table->canModerate()}}
+			<div class='ipsDataItem_modCheck'>
+				<span class='ipsCustomInput'>
+					<input type='checkbox' data-role='moderation' name="moderate[{$row->_id}]" data-actions="{expression="implode( ' ', $table->multimodActions( $row ) )"}" data-state=''>
+					<span></span>
+				</span>
+			</div>
+		{{endif}}
+	</li>
+{{endforeach}}]]></template>
+ <template template_group="global" template_name="row" template_data="$table, $headers, $topic, $showReadMarkers=TRUE" template_location="front" template_app="forums"><![CDATA[{{$idField = $topic::$databaseColumnId;}}
+{{$iPosted = isset( $table->contentPostedIn ) ? $table->contentPostedIn : ( $table AND method_exists( $table, 'container' ) AND $topic->container() !== NULL ) ? $topic->container()->contentPostedIn() : array();}}
+<li class="ipsDataItem ipsDataItem_responsivePhoto {{if $topic->unread()}}ipsDataItem_unread{{endif}} {{if method_exists( $topic, 'tableClass' ) && $topic->tableClass()}}ipsDataItem_{$topic->tableClass()}{{endif}} {{if $topic->hidden()}}ipsModerated{{endif}}">
+	{{if $showReadMarkers}}
+		{{if $topic->unread()}}
+			<div class='ipsDataItem_icon ipsPos_top'>
+				<a href='{$topic->url( 'getNewComment' )}' title='{lang="first_unread_post"}' data-ipsTooltip>
+					<span class='ipsItemStatus'><i class="fa {{if in_array( $topic->$idField, $iPosted )}}fa-star{{else}}fa-circle{{endif}}"></i></span>
+				</a>
+			</div>
+		{{else}}
+			{{if in_array( $topic->$idField, $iPosted )}}
+				<div class='ipsDataItem_icon ipsPos_top'>
+					<span class='ipsItemStatus ipsItemStatus_read ipsItemStatus_posted'><i class="fa fa-star"></i></span>
+				</div>
+			{{else}}
+				<div class='ipsDataItem_icon ipsPos_top'>&nbsp;</div>
+			{{endif}}
+		{{endif}}
+	{{endif}}
+	<div class='ipsDataItem_main'>
+		<h4 class='ipsDataItem_title ipsType_break'>
+			{{if $topic->mapped('pinned') || $topic->mapped('featured') || $topic->hidden() === -1 || $topic->hidden() === 1}}
+				<span>
+					{{if $topic->hidden() === -1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{$topic->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+					{{elseif $topic->hidden() === 1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+					{{endif}}							
+					{{if $topic->mapped('pinned')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="pinned"}'><i class='fa fa-thumb-tack'></i></span>
+					{{endif}}
+					{{if $topic->mapped('featured')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+					{{endif}}
+				</span>
+			{{endif}}
+			
+			<a href='{$topic->url()}' {{if $topic->canView()}}data-ipsHover data-ipsHover-target='{$topic->url()->setQueryString('preview', 1)}' data-ipsHover-timeout='1.5' {{endif}}>
+				{{if $topic->isQuestion()}}
+					<strong class='ipsType_light'>{lang="question_title"}:</strong>
+				{{endif}}
+				{wordbreak="$topic->mapped('title')"}
+			</a>
+		</h4>
+		{{if $topic->commentPageCount() > 1}}
+			{$topic->commentPagination( array(), 'miniPagination' )|raw}
+		{{endif}}
+		<p class='ipsType_reset ipsType_medium ipsType_light'>
+			{lang="byline" htmlsprintf="$topic->author()->link()"} {datetime="$topic->mapped('date')"}
+			{{if \IPS\Request::i()->controller != 'forums'}}
+				{lang="in"} <a href="{$topic->container()->url()}">{$topic->container()->_title}</a>
+			{{endif}}
+		</p>
+		<ul class='ipsList_inline ipsClearfix ipsType_light'>
+			{{if $topic->isQuestion()}}
+				{{if $topic->topic_answered_pid}}
+					<li class='ipsType_success'><i class='fa fa-check-circle'></i> <strong>{lang="answered"}</strong></li>
+				{{else}}
+					<li class='ipsType_light'><i class='fa fa-question'></i> {lang="awaiting_answer"}</li>
+				{{endif}}
+			{{endif}}
+		</ul>
+	</div>
+	<ul class='ipsDataItem_stats'>
+		{{if $topic->isQuestion()}}
+			<li>
+				<span class='ipsDataItem_stats_number'>{{if $topic->question_rating}}{$topic->question_rating}{{else}}0{{endif}}</span>
+				<span class='ipsDataItem_stats_type'>{lang="votes_no_number" pluralize="$topic->question_rating"}</span>
+			</li>	
+			{{foreach $topic->stats(FALSE) as $k => $v}}
+				{{if $k == 'forums_comments' OR $k == 'answers_no_number'}}
+					<li>
+						<span class='ipsDataItem_stats_number'>{number="$v"}</span>
+						<span class='ipsDataItem_stats_type'>{lang="answers_no_number" pluralize="$v"}</span>
+					</li>
+				{{endif}}
+			{{endforeach}}
+		{{else}}
+			{{foreach $topic->stats(FALSE) as $k => $v}}
+				<li {{if in_array( $k, $topic->hotStats )}}class="ipsDataItem_stats_hot" data-text='{lang="hot_item"}' data-ipsTooltip title='{lang="hot_item_desc"}'{{endif}}>
+					<span class='ipsDataItem_stats_number'>{number="$v"}</span>
+					<span class='ipsDataItem_stats_type'>{lang="{$k}" pluralize="$v"}</span>
+				</li>
+			{{endforeach}}
+		{{endif}}
+	</ul>
+	<ul class='ipsDataItem_lastPoster ipsDataItem_withPhoto'>
+		<li>
+			{{if $topic->mapped('num_comments')}}
+				{template="userPhoto" app="core" group="global" params="$topic->lastCommenter(), 'tiny'"}
+			{{else}}
+				{template="userPhoto" app="core" group="global" params="$topic->author(), 'tiny'"}
+			{{endif}}
+		</li>
+		<li>
+			{{if $topic->mapped('num_comments')}}
+				{$topic->lastCommenter()->link()|raw}
+			{{else}}
+				{$topic->author()->link()|raw}
+			{{endif}}
+		</li>
+		<li class="ipsType_light">
+			<a href='{$topic->url( 'getLastComment' )}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>
+				{{if $topic->mapped('last_comment')}}{datetime="$topic->mapped('last_comment')"}{{else}}{datetime="$topic->mapped('date')"}{{endif}}
+			</a>
+		</li>
+	</ul>
+	{{if method_exists( $table, 'canModerate' ) AND $table->canModerate()}}
+		<div class='ipsDataItem_modCheck'>
+			<span class='ipsCustomInput'>
+				<input type='checkbox' data-role='moderation' name="moderate[{$topic->tid}]" data-actions="{expression="implode( ' ', $table->multimodActions( $topic ) )"}" data-state='{{if $topic->tableStates()}}{$topic->tableStates()}{{endif}}'>
+				<span></span>
+			</span>
+		</div>
+	{{endif}}
+</li>]]></template>
+ <template template_group="global" template_name="rows" template_data="$table, $headers, $rows" template_location="front" template_app="forums">{{if count( $rows )}}
+	{{foreach $rows as $row}}
+		{template=&quot;row&quot; group=&quot;global&quot; app=&quot;forums&quot; params=&quot;$table, $headers, $row&quot;}
+	{{endforeach}}
+{{endif}}</template>
+ <template template_group="global" template_name="searchNoPermission" template_data="$lang, $link=NULL" template_location="front" template_app="forums"><![CDATA[<li class="ipsStreamItem ipsStreamItem_contentBlock ipsAreaBackground_reset ipsPad">
+	<div class='ipsType_center ipsType_light ipsType_large'>
+		{$lang}{{if $link}} <a href="{$link}">{lang="enter_password"}</a>{{endif}}
+	</div>
+</li>
+]]></template>
+ <template template_group="index" template_name="forumGridItem" template_data="$forum" template_location="front" template_app="forums"><![CDATA[{{if $forum->can('view')}}
+{{$lastPost = $forum->lastPost();}}
+	<div class="ipsDataItem ipsGrid_span4 ipsAreaBackground_reset cForumGrid {{if \IPS\forums\Topic::containerUnread( $forum ) && !$forum->redirect_on}}cForumGrid_unread ipsDataItem_unread{{endif}} ipsClearfix" data-forumID="{$forum->_id}">
+
+		<div class='ipsPhotoPanel ipsPhotoPanel_mini ipsClearfix ipsPad ipsAreaBackground_light cForumGrid_forumInfo'>
+			<span class='ipsPos_left'>
+				{{if !$forum->redirect_on AND \IPS\forums\Topic::containerUnread( $forum ) AND \IPS\Member::loggedIn()->member_id}}
+					<a href="{$forum->url()->setQueryString( 'do', 'markRead' )->csrf()}" data-action='markAsRead'>
+				{{endif}}
+					{{if $forum->icon}}
+						<img src="{file="$forum->icon" extension="forums_Icons"}" class='ipsItemStatus ipsItemStatus_custom {{if !\IPS\forums\Topic::containerUnread( $forum ) && !$forum->redirect_on}}ipsItemStatus_read{{endif}}'>
+					{{else}}
+						{{if $forum->redirect_on}}
+							<span class='ipsItemStatus ipsItemStatus_large cForumIcon_redirect {{if !\IPS\forums\Topic::containerUnread( $forum ) && !$forum->redirect_on}}ipsItemStatus_read{{endif}}'>
+								<i class='fa fa-arrow-right'></i>
+							</span>
+						{{elseif $forum->forums_bitoptions['bw_enable_answers']}}
+							<span class='ipsItemStatus ipsItemStatus_large cForumIcon_answers {{if !\IPS\forums\Topic::containerUnread( $forum ) && !$forum->redirect_on}}ipsItemStatus_read{{endif}}'>
+								<i class='fa fa-question'></i>
+							</span>
+						{{elseif $forum->password}}
+							<span class='ipsItemStatus ipsItemStatus_large cForumIcon_password {{if !\IPS\forums\Topic::containerUnread( $forum ) && !$forum->redirect_on}}ipsItemStatus_read{{endif}}'>
+								{{if $forum->loggedInMemberHasPasswordAccess()}}
+									<i class='fa fa-unlock'></i>
+								{{else}}
+									<i class='fa fa-lock'></i>
+								{{endif}}
+							</span>
+						{{else}}
+							<span class='ipsItemStatus ipsItemStatus_large cForumIcon_normal {{if !\IPS\forums\Topic::containerUnread( $forum ) && !$forum->redirect_on}}ipsItemStatus_read{{endif}}'>
+								<i class="fa fa-comments"></i>
+							</span>
+						{{endif}}
+					{{endif}}
+				{{if !$forum->redirect_on AND \IPS\forums\Topic::containerUnread( $forum ) AND \IPS\Member::loggedIn()->member_id}}
+					</a>
+				{{endif}}
+			</span>
+			<div>
+				<h3 class='ipsType_reset ipsType_sectionHead ipsTruncate ipsTruncate_line cForumGrid_title'>
+					{{if $forum->password && !$forum->loggedInMemberHasPasswordAccess()}}
+						<a href="{$forum->url()->setQueryString( 'passForm', '1' )}" data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title='{lang="forum_requires_password"}'>{$forum->_title}</a>
+					{{else}}
+						<a href="{$forum->url()}">{$forum->_title}</a>
+					{{endif}}
+				</h3>
+				{{if !$forum->redirect_on}}
+					{{$count = \IPS\forums\Topic::contentCount( $forum, TRUE );}}
+					<p class='ipsType_reset'>{lang="posts_number" pluralize="$count"}</p>
+				{{endif}}
+				{{if \IPS\forums\Topic::modPermission( 'unhide', NULL, $forum ) AND ( $forum->queued_topics OR $forum->queued_posts )}}
+					<strong class='ipsType_warning ipsType_medium'>
+						<i class='fa fa-warning'></i>
+						{{if $forum->queued_topics}}
+							<a href='{$forum->url()->setQueryString( array( 'advanced_search_submitted' => 1, 'topic_type' => 'queued_topics' ) )->csrf()}' data-ipsTooltip title='{lang="queued_topics_badge" pluralize="$forum->queued_topics"}' class='ipsType_blendLinks'>{$forum->queued_topics}</a>
+						{{else}}
+							<span class='ipsType_light'>0</span>
+						{{endif}}
+						/
+						{{if $forum->queued_posts}}
+							<a href='{$forum->url()->setQueryString( array( 'advanced_search_submitted' => 1, 'topic_type' => 'queued_posts' ) )->csrf()}' data-ipsTooltip title='{lang="queued_posts_badge" pluralize="$forum->queued_posts"}' class='ipsType_blendLinks'>{$forum->queued_posts}</a>
+						{{else}}
+							<span class='ipsType_light'>0</span>
+						{{endif}}
+					</strong>					
+				{{endif}}
+			</div>
+		</div>
+		
+		<div class='ipsPad'>
+			{{if $forum->description}}
+				<div class='ipsType_richText ipsType_normal'>{$forum->description|raw}</div>
+			{{endif}}
+
+			{{if $forum->hasChildren()}}
+				<h4 class='ipsType_minorHeading ipsSpacer_top'>{lang="subforums"}</h4>
+				<ul class="ipsList_inline">
+					{{foreach $forum->children() as $subforum}}
+					<li class="{{if \IPS\forums\Topic::containerUnread( $subforum )}}ipsDataItem_unread{{endif}}">
+						<a href="{$subforum->url()}">
+							{{if \IPS\forums\Topic::containerUnread( $subforum )}}
+								<span class='ipsItemStatus ipsItemStatus_tiny {{if !\IPS\forums\Topic::containerUnread( $subforum ) && !$subforum->redirect_on}}ipsItemStatus_read{{endif}}'>
+									<i class="fa fa-circle"></i>
+								</span>
+							{{endif}}
+							{$subforum->_title}
+						</a>
+					</li>
+					{{endforeach}}
+				</ul>
+			{{endif}}
+		</div>
+
+		<div class='cForumGrid_info'>
+			<hr class='ipsHr'>
+
+			{{if !$forum->redirect_on}}
+				{{if $lastPost}}
+					<div class='ipsPhotoPanel ipsPhotoPanel_tiny'>
+						{template="userPhoto" app="core" group="global" params="$lastPost['author'], 'tiny'"}
+						<div>
+							<ul class='ipsList_reset'>
+								<li><a href="{$lastPost['topic_url']->setQueryString( 'do', 'getNewComment' )}" class='ipsType_break' title='{$lastPost['topic_title']}'>{truncate="$lastPost['topic_title']" length="30"}</a></li>
+								<li class='ipsType_light ipsTruncate ipsTruncate_line'>{lang="byline_nodate" htmlsprintf="$lastPost['author']->link()"}, <a href='{$lastPost['topic_url']->setQueryString( 'do', 'getLastComment' )}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>{datetime="$lastPost['date']"}</a></li>
+							</ul>
+						</div>
+					</div>
+				{{else}}
+					<p class='ipsType_light ipsType_reset ipsTruncate ipsTruncate_line'>{{if $forum->password}}{lang="no_forum_posts_password"}{{else}}{lang="no_forum_posts"}{{endif}}</p>
+				{{endif}}
+			{{else}}
+				<p class='ipsType_light ipsType_reset ipsTruncate ipsTruncate_line'>
+					{lang="redirect_hits" pluralize="$forum->redirect_hits"}
+				</p>
+			{{endif}}
+		</div>
+	</div>
+{{endif}}]]></template>
+ <template template_group="index" template_name="forumRow" template_data="$forum, $isSubForum=FALSE, $table=NULL" template_location="front" template_app="forums"><![CDATA[{{if $forum->can('view')}}
+{{$lastPost = $forum->lastPost();}}
+	<li class="ipsDataItem ipsDataItem_responsivePhoto {{if \IPS\forums\Topic::containerUnread( $forum ) && !$forum->redirect_on}}ipsDataItem_unread{{endif}} ipsClearfix" data-forumID="{$forum->_id}">
+		<div class="ipsDataItem_icon ipsDataItem_category">
+			{{if !$forum->redirect_on}}
+			{{if \IPS\forums\Topic::containerUnread( $forum ) AND \IPS\Member::loggedIn()->member_id}}<a href="{{if $isSubForum}}{$forum->url()->setQueryString( array( 'do' => 'markRead', 'return' => $forum->parent_id ) )->csrf()}{{else}}{$forum->url()->setQueryString( 'do', 'markRead' )->csrf()}{{endif}}" data-action='markAsRead' title='{lang="mark_forum_read"}' data-ipsTooltip>{{endif}}
+			{{endif}}
+				{{if $forum->icon}}
+					<img src="{file="$forum->icon" extension="forums_Icons"}" class='ipsItemStatus ipsItemStatus_custom {{if !\IPS\forums\Topic::containerUnread( $forum ) && !$forum->redirect_on}}ipsItemStatus_read{{endif}}'>
+				{{else}}
+					{{if $forum->redirect_on}}
+						<span class='ipsItemStatus ipsItemStatus_large cForumIcon_redirect {{if !\IPS\forums\Topic::containerUnread( $forum ) && !$forum->redirect_on}}ipsItemStatus_read{{endif}}'>
+							<i class='fa fa-arrow-right'></i>
+						</span>
+					{{elseif $forum->forums_bitoptions['bw_enable_answers']}}
+						<span class='ipsItemStatus ipsItemStatus_large cForumIcon_answers {{if !\IPS\forums\Topic::containerUnread( $forum ) && !$forum->redirect_on}}ipsItemStatus_read{{endif}}'>
+							<i class='fa fa-question'></i>
+						</span>
+					{{elseif $forum->password}}
+						<span class='ipsItemStatus ipsItemStatus_large cForumIcon_password {{if !\IPS\forums\Topic::containerUnread( $forum ) && !$forum->redirect_on}}ipsItemStatus_read{{endif}}'>
+							{{if $forum->loggedInMemberHasPasswordAccess()}}
+								<i class='fa fa-unlock'></i>
+							{{else}}
+								<i class='fa fa-lock'></i>
+							{{endif}}
+						</span>
+					{{else}}
+						<span class='ipsItemStatus ipsItemStatus_large cForumIcon_normal {{if !\IPS\forums\Topic::containerUnread( $forum ) && !$forum->redirect_on}}ipsItemStatus_read{{endif}}'>
+							<i class="fa fa-comments"></i>
+						</span>
+					{{endif}}
+				{{endif}}
+			{{if !$forum->redirect_on and \IPS\forums\Topic::containerUnread( $forum ) AND \IPS\Member::loggedIn()->member_id}}
+			</a>
+			{{endif}}
+		</div>
+		<div class="ipsDataItem_main">
+			<h4 class="ipsDataItem_title ipsType_large ipsType_break">
+				{{if $forum->password && !$forum->loggedInMemberHasPasswordAccess()}}
+					<a href="{$forum->url()->setQueryString( 'passForm', '1' )}" data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title='{lang="forum_requires_password"}'>{$forum->_title}</a>
+				{{else}}
+					<a href="{$forum->url()}">{$forum->_title}</a>
+				{{endif}}
+				{{if $forum->redirect_on}}
+					&nbsp;&nbsp;<span class='ipsType_light ipsType_medium'>({lang="redirect_hits" pluralize="$forum->redirect_hits"})</span>
+				{{endif}}
+			</h4>
+			{{if $forum->hasChildren()}}
+				<ul class="ipsDataItem_subList ipsList_inline">
+					{{foreach $forum->children() as $subforum}}
+						<li class="{{if \IPS\forums\Topic::containerUnread( $subforum )}}ipsDataItem_unread{{endif}}">
+							<a href="{$subforum->url()}">{{if \IPS\forums\Topic::containerUnread( $subforum )}}<span class='ipsItemStatus ipsItemStatus_tiny {{if !\IPS\forums\Topic::containerUnread( $subforum ) && !$subforum->redirect_on}}ipsItemStatus_read{{endif}}'><i class="fa fa-circle"></i></span>&nbsp;{{endif}}{$subforum->_title}</a>
+						</li>
+					{{endforeach}}
+				</ul>
+			{{endif}}
+			{{if $forum->description}}
+				<div class="ipsDataItem_meta ipsType_richText">{$forum->description|raw}</div>
+			{{endif}}
+		</div>
+		{{if !$forum->redirect_on}}
+			<div class="ipsDataItem_stats ipsDataItem_statsLarge">
+				{{if $lastPost}}
+					<dl>
+						{{$count = \IPS\forums\Topic::contentCount( $forum, TRUE );}}
+						<dt class="ipsDataItem_stats_number">{number="$count"}</dt>
+						<dd class="ipsDataItem_stats_type ipsType_light">{lang="posts_no_number" pluralize="$count"}</dd>
+					</dl>
+				{{endif}}
+				{{if \IPS\forums\Topic::modPermission( 'unhide', NULL, $forum ) AND $unapprovedContent = $forum->unapprovedContentRecursive() and ( $unapprovedContent['topics'] OR $unapprovedContent['posts'] )}}
+					<strong class='ipsType_warning ipsType_medium'>
+						<i class='fa fa-warning'></i>
+						{{if $unapprovedContent['topics']}}
+							<a href='{$forum->url()->setQueryString( array( 'advanced_search_submitted' => 1, 'topic_type' => 'queued_topics' ) )->csrf()}' data-ipsTooltip title='{lang="queued_topics_badge" pluralize="$unapprovedContent['topics']"}' class='ipsType_blendLinks'>{$unapprovedContent['topics']}</a>
+						{{else}}
+							<span class='ipsType_light'>0</span>
+						{{endif}}
+						/
+						{{if $unapprovedContent['posts']}}
+							<a href='{$forum->url()->setQueryString( array( 'advanced_search_submitted' => 1, 'topic_type' => 'queued_posts' ) )->csrf()}' data-ipsTooltip title='{lang="queued_posts_badge" pluralize="$unapprovedContent['posts']"}' class='ipsType_blendLinks'>{$unapprovedContent['posts']}</a>
+						{{else}}
+							<span class='ipsType_light'>0</span>
+						{{endif}}
+					</strong>
+				{{endif}}
+			</div>
+			<ul class="ipsDataItem_lastPoster ipsDataItem_withPhoto">
+				{{if $lastPost}}
+					<li>{template="userPhoto" app="core" group="global" params="$lastPost['author'], 'tiny'"}</li>
+					{{if $lastPost['topic_title']}}<li><a href="{$lastPost['topic_url']->setQueryString( 'do', 'getNewComment' )}" class='ipsType_break ipsContained' title='{$lastPost['topic_title']}'>{truncate="$lastPost['topic_title']" length="26"}</a></li>{{endif}}
+					<li class='ipsType_blendLinks'>{lang="byline_nodate" htmlsprintf="$lastPost['author']->link()"}</li>
+					{{if $lastPost['topic_title']}}
+						<li class="ipsType_light"><a href='{$lastPost['topic_url']->setQueryString( 'do', 'getLastComment' )}' title='{lang="get_last_post"}' class='ipsType_blendLinks'>{datetime="$lastPost['date']"}</a></li>
+					{{else}}
+						<li class="ipsType_light">{datetime="$lastPost['date']"}</li>
+					{{endif}}
+				{{else}}
+					<li class='ipsType_light ipsResponsive_showDesktop'>{{if $forum->password}}{lang="no_forum_posts_password"}{{else}}{lang="no_forum_posts"}{{endif}}</li>
+				{{endif}}
+			</ul>	
+		{{endif}}
+		{{if $table and $table->canModerate()}}
+			<div class='ipsDataItem_modCheck'>
+				<span class='ipsCustomInput'>
+					<input type='checkbox' data-role='moderation' name="moderate[{$forum->_id}]" data-actions="{expression="implode( ' ', $table->multimodActions( $forum ) )"}" data-state=''>
+					<span></span>
+				</span>
+			</div>
+		{{endif}}
+	</li>
+{{endif}}]]></template>
+ <template template_group="index" template_name="forumTableRow" template_data="$table, $headers, $forums" template_location="front" template_app="forums">{{foreach $forums as $forum}}
+	{template=&quot;forumRow&quot; group=&quot;index&quot; app=&quot;forums&quot; params=&quot;$forum, FALSE, $table&quot;}
+{{endforeach}}</template>
+ <template template_group="index" template_name="index" template_data="" template_location="front" template_app="forums"><![CDATA[{template="pageHeader" group="global" app="core" params="\IPS\Member::loggedIn()->language()->addToStack('forums')"}
+
+{{if \IPS\Member::loggedIn()->member_id}}
+	<ul class="ipsToolList ipsToolList_horizontal ipsResponsive_hideDesktop ipsResponsive_block ipsClearfix">
+		{template="indexButtons" group="index" app="forums" params=""}
+	</ul>
+{{endif}}
+
+<section>
+	<ol class='ipsList_reset cForumList' data-controller='core.global.core.table, forums.front.forum.forumList' data-baseURL=''>
+		{{foreach \IPS\forums\Forum::roots() as $category}}
+			{{if $category->can('view') && $category->hasChildren()}}
+			<li data-categoryID='{$category->_id}' class='cForumRow ipsBox ipsSpacer_bottom'>
+				<h2 class="ipsType_sectionTitle ipsType_reset cForumTitle">
+					<a href='#' class='ipsPos_right ipsJS_show ipsType_noUnderline cForumToggle' data-action='toggleCategory' data-ipsTooltip title='{lang="toggle_this_category"}'></a>
+					<a href='{$category->url()}'>{$category->_title}</a>
+				</h2>
+				{{if theme.forum_layout === 'grid'}}
+					<div class='ipsAreaBackground ipsPad' data-role="forums">
+						<div class='ipsGrid ipsGrid_collapsePhone' data-ipsGrid data-ipsGrid-minItemSize='250' data-ipsGrid-maxItemSize='500' data-ipsGrid-equalHeights='row'>
+							{{foreach $category->children() as $forum}}
+								{template="forumGridItem" group="index" app="forums" params="$forum"}
+							{{endforeach}}
+						</div>
+					</div>
+				{{else}}
+					<ol class="ipsDataList ipsDataList_large ipsDataList_zebra ipsAreaBackground_reset" data-role="forums">
+						{{foreach $category->children() as $forum}}
+							{template="forumRow" group="index" app="forums" params="$forum"}
+						{{endforeach}}
+					</ol>
+				{{endif}}
+			</li>
+			{{endif}}
+		{{endforeach}}
+	</ol>
+</section>]]></template>
+ <template template_group="index" template_name="indexButtons" template_data="" template_location="front" template_app="forums"><![CDATA[
+<li>
+	<a class="ipsButton ipsButton_large ipsButton_important ipsButton_fullWidth" href="{url="app=forums&module=forums&controller=forums&do=add"}" data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title='{lang="select_forum"}'>{lang="start_new_topic"}</a>
+</li>]]></template>
+ <template template_group="livesearch" template_name="forum" template_data="$forum" template_location="admin" template_app="forums"><![CDATA[<li class='ipsPad_half ipsClearfix' data-role='result'>
+	<a href='{url="app=forums&module=forums&controller=forums&do=form&id="}{$forum->id}' class='ipsPos_left'>{$forum->_title}</a>
+</li>
+
+]]></template>
+ <template template_group="settings" template_name="archiveRuleGtLt" template_data="$name, $value" template_location="admin" template_app="forums"><![CDATA[<select name="{$name}[0]">
+	<option value=">" {{if isset( $value[0] ) and $value[0] == '>'}}selected{{endif}}>{lang="greater_than"}</option>
+	<option value="<" {{if isset( $value[0] ) and $value[0] == '<'}}selected{{endif}}>{lang="less_than"}</option>
+</select>
+<input type="number" name="{$name}[1]" value="{{if isset( $value[1] )}}{$value[1]}{{endif}}" id='el{$name}_1' class="ipsField_short"> {lang="or"}
+<span class='ipsCustomInput'>
+	<input type="checkbox" name="{$name}[2]" data-control="unlimited" {{if isset( $value[2] ) and $value[2]}}checked{{endif}}>
+	<span></span>
+</span> <label for='el{$name}_1' class='ipsField_unlimited'>{{if in_array( $name, array( 'archive_topic_post', 'archive_topic_view', 'archive_topic_rating', 'archive_not_topic_post', 'archive_not_topic_view', 'archive_not_topic_rating'  ) )}}{lang="no_restriction"}{{else}}{lang="any_time"}{{endif}}</label>]]></template>
+ <template template_group="settings" template_name="archiveRules" template_data="$form, $totalTopics, $existingCount, $existingPercentage" template_location="admin" template_app="forums"><![CDATA[<div data-controller="forums.admin.settings.archiveRules">
+	<div class="ipsPad ipsType_normal">{lang="archiving_blurb"}</div>
+	<div data-ipsSticky data-ipsSticky-spacing='60' class="ipsPad_half ipsAreaBackground_reset ipsType_center">
+		<strong>{lang="archive_rules_effects"}</strong><br>
+		<div class="ipsProgressBar">
+			<div class="ipsProgressBar_progress" style="width:{$existingPercentage}%" data-role="percentageBar"><span data-role="percentage">{$existingPercentage}</span>% (<span data-role="number">{$existingCount}</span>/{$totalTopics})</div>
+		</div>
+	</div>
+	{$form|raw}
+</div>]]></template>
+ <template template_group="settings" template_name="archiveRuleTime" template_data="$name, $value" template_location="admin" template_app="forums"><![CDATA[<select name="{$name}[0]">
+	<option value="<" {{if isset( $value[0] ) and $value[0] == '<'}}selected{{endif}}>{lang="greater_than"}</option>
+	<option value=">" {{if isset( $value[0] ) and $value[0] == '>'}}selected{{endif}}>{lang="less_than"}</option>
+</select>
+<input type="number" name="{$name}[1]" value="{{if isset( $value[1] )}}{$value[1]}{{endif}}" class="ipsField_short" min="0">
+<select name="{$name}[2]">
+	<option value="d" {{if isset( $value[2] ) and $value[2] == 'd'}}selected{{endif}}>{lang="days"}</option>
+	<option value="m" {{if isset( $value[2] ) and $value[2] == 'm'}}selected{{endif}}>{lang="months"}</option>
+	<option value="y" {{if isset( $value[2] ) and $value[2] == 'y'}}selected{{endif}}>{lang="years"}</option>
+</select>
+{lang="ago"} {lang="or"} 
+<span class='ipsCustomInput'>
+	<input type="checkbox" name="{$name}[3]" id='el{$name}_3' data-control="unlimited" {{if isset( $value[3] ) and $value[3]}}checked{{endif}}>
+	<span></span>
+</span> <label for='el{$name}_3' class='ipsField_unlimited'>{{if mb_strpos( $name, 'not' )}}{lang="no_restriction"}{{else}}{lang="any_time"}{{endif}}</label>]]></template>
+ <template template_group="settings" template_name="popularNow" template_data="$name, $value" template_location="admin" template_app="forums"><![CDATA[<input type="number" name="{$name}[posts]" value="{$value['posts']}" class="ipsField_short"> {lang="posts_in_the_last"} <input type="number" name="{$name}[minutes]" value="{$value['minutes']}" class="ipsField_short"> {lang="minutes"} {lang="or"} 
+<span class='ipsCustomInput'>
+	<input type="checkbox" name="{$name}[never]" id='el{$name}_never' data-control="unlimited" {{if !$value['posts']}}checked{{endif}}>
+	<span></span>
+</span> <label for='el{$name}_never' class='ipsField_unlimited'>{lang="never"}</label>]]></template>
+ <template template_group="submit" template_name="createTopic" template_data="$form, $forum, $title" template_location="front" template_app="forums"><![CDATA[
+{template="pageHeader" if="!\IPS\Request::i()->isAjax()" group="global" app="core" params="\IPS\Member::loggedIn()->language()->addToStack( $title )"}
+
+{$form|raw}]]></template>
+ <template template_group="submit" template_name="createTopicForm" template_data="$forum, $hasModOptions, $topic, $id, $action, $elements, $hiddenValues, $actionButtons, $uploadField, $class='', $attributes=array(), $sidebar=NULL, $form=NULL, $errorTabs=array()" template_location="front" template_app="forums"><![CDATA[{{$modOptions = array( 'topic_create_state', 'create_topic_locked', 'create_topic_pinned', 'create_topic_hidden', 'create_topic_featured', 'topic_open_time', 'topic_close_time');}}
+
+<form accept-charset='utf-8' class="ipsForm {$class}" action="{$action}" method="post" {{if $uploadField}}enctype="multipart/form-data"{{endif}} data-ipsForm>
+	<input type="hidden" name="{$id}_submitted" value="1">
+	{{foreach $hiddenValues as $k => $v}}
+		<input type="hidden" name="{$k}" value="{$v}">
+	{{endforeach}}
+	{{if $uploadField}}
+		<input type="hidden" name="MAX_FILE_SIZE" value="{$uploadField}">
+		<input type="hidden" name="plupload" value="{expression="md5( uniqid() )"}">
+	{{endif}}
+	
+	{{if $form->error}}
+		<p class="ipsMessage ipsMessage_error">{$form->error}</p>
+	{{endif}}
+
+	<div class='ipsBox'>
+		<h2 class='ipsType_sectionTitle ipsType_reset'>{lang="topic_details"}</h2>
+		{{if count( $elements ) > 1}}
+			{{if !empty( $errorTabs )}}
+				<p class="ipsMessage ipsMessage_error ipsJS_show">{lang="tab_error"}</p>
+			{{endif}}
+			<div class='ipsTabs ipsClearfix ipsJS_show' id='tabs_{$id}' data-ipsTabBar data-ipsTabBar-contentArea='#ipsTabs_content_{$id}'>
+				<a href='#tabs_{$id}' data-action='expandTabs'><i class='fa fa-caret-down'></i></a>
+				<ul role='tablist'>
+					{{foreach $elements as $name => $content}}
+						<li>
+							<a href='#ipsTabs_tabs_{$id}_{$id}_tab_{$name}_panel' id='{$id}_tab_{$name}' class="ipsTabs_item {{if in_array( $name, $errorTabs )}}ipsTabs_error{{endif}}" role="tab" aria-selected="{{if $name == 'mainTab'}}true{{else}}false{{endif}}">
+								{{if in_array( $name, $errorTabs )}}<i class="fa fa-exclamation-circle"></i> {{endif}}{lang="$name"}
+							</a>
+						</li>
+					{{endforeach}}
+				</ul>
+			</div>
+			<div id='ipsTabs_content_{$id}' class='ipsTabs_panels'>
+				{{foreach $elements as $name => $contents}}
+					<div id='ipsTabs_tabs_{$id}_{$id}_tab_{$name}_panel' class="ipsTabs_panel ipsPad" aria-labelledby="{$id}_tab_{$name}" aria-hidden="false">
+
+						{{if $hasModOptions && $name == 'topic_mainTab'}}
+							<div class='ipsColumns ipsColumns_collapsePhone'>
+								<div class='ipsColumn ipsColumn_fluid'>
+						{{endif}}
+							<ul class='ipsForm ipsForm_vertical'>
+								{{foreach $contents as $inputName => $input}}
+									{{if !in_array( $inputName, $modOptions )}}
+										{$input|raw}
+									{{endif}}
+								{{endforeach}}
+							</ul>
+						{{if $hasModOptions && $name == 'topic_mainTab'}}
+								</div>
+								<div class='ipsColumn ipsColumn_wide'>
+									{template="createTopicModOptions" group="submit" app="forums" params="$elements, $modOptions"}
+								</div>
+							</div>
+						{{endif}}
+					</div>
+				{{endforeach}}
+			</div>		
+		{{else}}
+			<div class='ipsPad'>
+				{{if $hasModOptions}}
+					<div class='ipsColumns ipsColumns_collapsePhone'>
+						<div class='ipsColumn ipsColumn_fluid'>
+				{{endif}}
+					<ul class='ipsForm ipsForm_vertical'>
+						{{foreach $elements as $collection}}
+							{{foreach $collection as $inputName => $input}}
+								{{if !in_array( $inputName, $modOptions )}}
+									{$input|raw}
+								{{endif}}
+							{{endforeach}}
+						{{endforeach}}
+					</ul>
+				{{if $hasModOptions}}
+						</div>
+						<div class='ipsColumn ipsColumn_wide'>
+							{template="createTopicModOptions" group="submit" app="forums" params="$elements, $modOptions"}
+						</div>
+					</div>
+				{{endif}}
+			</div>
+		{{endif}}
+
+		<div class='ipsAreaBackground ipsPad ipsType_center'>
+			<a href="{{if !is_null($topic)}}{$topic->url()}{{else}}{$forum->url()}{{endif}}" class="ipsButton ipsButton_link ipsButton ipsButton_link">{lang="cancel"}</a>
+			{{if $topic}}
+			<button type='submit' class='ipsButton ipsButton_medium ipsButton_primary' tabindex="1" accesskey="s" role="button">{{if $forum->forums_bitoptions['bw_enable_answers']}}{lang="submit_question_edit"}{{else}}{lang="submit_topic_edit"}{{endif}}</button>
+			{{else}}
+			<button type='submit' class='ipsButton ipsButton_medium ipsButton_primary' tabindex="1" accesskey="s" role="button">{{if $forum->forums_bitoptions['bw_enable_answers']}}{lang="submit_question"}{{else}}{lang="submit_topic"}{{endif}}</button>
+			{{endif}}
+		</div>
+	</div>	
+</form>]]></template>
+ <template template_group="submit" template_name="createTopicModOptions" template_data="$elements, $modOptions" template_location="front" template_app="forums"><![CDATA[
+<div class='ipsPad ipsAreaBackground_light'>
+	<h3 class='ipsType_sectionHead'>{lang="topic_moderator_options"}</h3>
+	<ul class='ipsForm ipsForm_vertical ipsSpacer_top'>
+		{{foreach $elements as $collection}}
+			{{foreach $collection as $inputName => $input}}
+				{{if in_array( $inputName, $modOptions )}}
+					{{if $inputName == 'topic_open_time' or $inputName == 'topic_close_time'}}
+						<li class='ipsFieldRow ipsClearfix'>
+							<label class="ipsFieldRow_label" for="{$input->name}">{lang="$input->name"}</label>
+							<ul class='ipsFieldRow_content ipsList_reset cCreateTopic_date'>
+								<li>
+									<i class='fa fa-calendar'></i>
+									<input type="date" name="{$input->name}" class="ipsField_short" data-control="date" placeholder='{expression="mb_strtoupper( str_replace( 'y', 'yy', \IPS\Member::loggedIn()->language()->preferredDateFormat() ) )"}' value="{{if $input->value instanceof \IPS\DateTime}}{$input->value->format('Y-m-d')}{{else}}{$input->value}{{endif}}" data-preferredFormat="{{if $input->value instanceof \IPS\DateTime}}{$input->value->localeDate()}{{else}}{$input->value}{{endif}}">
+								</li>
+								<li>
+									<i class='fa fa-clock-o'></i>
+									<input name="{$input->name}_time" type="time" size="12" class="ipsField_short" placeholder="HH:MM" step="60" min="00:00" value="{{if $input->value instanceof \IPS\DateTime}}{$input->value->format('H:i')}{{endif}}">
+								</li>
+							</ul>
+						</li>
+					{{else}}
+						{$input|raw}
+					{{endif}}
+				{{endif}}
+			{{endforeach}}
+		{{endforeach}}
+	</ul>
+</div>]]></template>
+ <template template_group="topics" template_name="post" template_data="$item, $comment, $editorName, $app, $type, $class=''" template_location="front" template_app="forums"><![CDATA[{{$idField = $comment::$databaseColumnId;}}
+<div id='comment-{$comment->$idField}_wrap' data-controller='core.front.core.comment' data-commentApp='{$app}' data-commentType='{$type}' data-commentID="{$comment->$idField}" data-quoteData='{expression="json_encode( array('userid' => $comment->author()->member_id, 'username' => $comment->author()->name, 'timestamp' => $comment->mapped('date'), 'contentapp' => $comment::$application, 'contenttype' => $type, 'contentid' => $item->tid, 'contentclass' => $class, 'contentcommentid' => $comment->$idField) )"}' class='ipsComment_content ipsType_medium {{if $comment->hidden()}}ipsModerated{{endif}} ipsFaded_withHover'>
+	{{if settings.reputation_highlight and $comment->reputation() >= settings.reputation_highlight}}
+		<strong class='ipsComment_popularFlag' data-ipsTooltip title='{lang="this_is_a_popular_post"}'><i class='fa fa-heart'></i></strong>
+	{{endif}}
+
+	<div class='ipsComment_meta ipsType_light'>
+		<p class='ipsPos_right ipsType_reset ipsType_blendLinks ipsFaded ipsFaded_more'>
+			{{if \IPS\Member::loggedIn()->modPermission('can_use_ip_tools') and \IPS\Member::loggedIn()->canAccessModule( \IPS\Application\Module::get( 'core', 'modcp' ) )}}
+				<span class='ipsResponsive_hidePhone'>(<a href="{url="app=core&module=modcp&controller=modcp&tab=ip_tools&ip=$comment->ip_address" seoTemplate="modcp_ip_tools"}">{lang="ip_prefix" sprintf="$comment->ip_address"}</a>) &middot;</span>
+			{{endif}}
+			{{if $comment->mapped('first') }}
+				<a href='{$comment->item()->url()}' data-ipsTooltip title='{lang="share_this_post"}' data-ipsMenu data-ipsMenu-closeOnClick='false' id='elSharePost_{$comment->$idField}' data-role='shareComment'><i class='fa fa-share-alt'></i></a>
+			{{else}}
+				<a href='{$comment->item()->url()->setQueryString( array( 'do' => 'findComment', 'comment' => $comment->$idField ) )}' data-ipsTooltip title='{lang="share_this_post"}' data-ipsMenu data-ipsMenu-closeOnClick='false' id='elSharePost_{$comment->$idField}' data-role='shareComment'><i class='fa fa-share-alt'></i></a>
+			{{endif}}
+			{{if count( $item->commentMultimodActions() ) and !$comment->mapped('first')}}
+				&middot; 
+				<span class='ipsCustomInput'>
+					<input type="checkbox" name="multimod[{$comment->$idField}]" value="1" data-role="moderation" data-actions="{{if $comment->canSplit()}}split merge{{endif}} {{if $comment->hidden() === -1 AND $comment->canUnhide()}}unhide{{elseif $comment->hidden() === 1 AND $comment->canUnhide()}}approve{{elseif $comment->canHide()}}hide{{endif}} {{if $comment->canDelete()}}delete{{endif}}" data-state='{{if $comment->tableStates()}}{$comment->tableStates()}{{endif}}'>
+					<span></span>
+				</span>
+			{{endif}}
+		</p>
+
+		<p class='ipsType_reset'>
+			<a href='{$comment->item()->url()->setQueryString( array( 'do' => 'findComment', 'comment' => $comment->$idField ) )}' class='ipsType_blendLinks'>{$comment->dateLine()|raw}</a>
+			{{if $comment->editLine()}}
+				({lang="edited_lc"})
+			{{endif}}
+			{{if $comment->hidden()}}
+				&middot; {$comment->hiddenBlurb()}
+			{{endif}}
+			{{if $comment instanceof \IPS\Content\ReportCenter and !\IPS\Member::loggedIn()->group['gbw_no_report'] and $comment->hidden() !== 1 }}
+				&middot; <a href='{$comment->url('report')}' data-ipsDialog data-ipsDialog-remoteSubmit data-ipsDialog-size='medium' data-ipsDialog-flashMessage='{lang="report_submit_success"}' data-ipsDialog-title="{lang="report_post"}" data-action='reportComment' title='{lang="report_content"}' class='ipsFaded ipsFaded_more'><span class='ipsResponsive_showPhone ipsResponsive_inline'><i class='fa fa-flag'></i></span><span class='ipsResponsive_hidePhone ipsResponsive_inline'>{lang="report_post"}</span></a>
+			{{endif}}
+		</p>
+	</div>
+
+	{{if member.modPermission('mod_see_warn') and $comment->warning}}
+		{template="commentWarned" group="global" app="core" params="$comment"}
+	{{endif}}
+
+
+	<div class='cPost_contentWrap ipsPad'>		
+		<div data-role='commentContent' itemprop='text' class='ipsType_normal ipsType_richText ipsContained' data-controller='core.front.core.lightboxedImages'>
+			{$comment->content()|raw}
+
+			{{if $comment->editLine()}}
+				{$comment->editLine()|raw}
+			{{endif}}
+		</div>
+
+		{{if !( $comment->hidden() === 1 && ( $comment->canUnhide() || $comment->canDelete() ) )}}
+			{{if $comment instanceof \IPS\Content\Reputation and settings.reputation_enabled}}
+				{template="reputation" group="global" app="core" params="$comment, 'ipsPos_right ipsResponsive_noFloat'"}
+			{{endif}}
+		{{endif}}
+
+		<ul class='ipsComment_controls ipsClearfix' data-role="commentControls">
+			{{if $comment->hidden() === 1 && ( $comment->canUnhide() || $comment->canDelete() )}}
+				{{if $comment->canUnhide()}}
+					<li><a href='{$comment->url('unhide')->csrf()}' class='ipsButton ipsButton_verySmall ipsButton_positive' data-action='approveComment'><i class='fa fa-check'></i> {lang="approve"}</a></li>
+				{{endif}}
+				{{if $comment->canDelete()}}
+					<li><a href='{$comment->url('delete')->csrf()}' data-action='deleteComment' data-updateOnDelete="#commentCount" class='ipsButton ipsButton_verySmall ipsButton_negative'><i class='fa fa-times'></i> {lang="delete"}</a></li>
+				{{endif}}
+				{{if $comment->canEdit() || $comment->canSplit()}}
+					<li>
+						<a href='#elControls_{$comment->$idField}_menu' id='elControls_{$comment->$idField}' data-ipsMenu data-ipsMenu-appendTo='#comment-{$comment->$idField}_wrap'>{lang="options"} &nbsp;<i class='fa fa-caret-down'></i></a>
+						<ul id='elControls_{$comment->$idField}_menu' class='ipsMenu ipsMenu_narrow ipsHide'>
+							{{if $comment->canEdit()}}
+								{{if $comment->mapped('first') and $comment->item()->canEdit()}}
+									<li class='ipsMenu_item'><a href='{$comment->item()->url()->setQueryString( 'do', 'edit' )}'>{lang="edit"}</a></li>
+								{{else}}
+									<li class='ipsMenu_item'><a href='{$comment->url('edit')}' data-action='editComment'>{lang="edit"}</a></li>
+								{{endif}}
+							{{endif}}
+							{{if $comment->canSplit()}}
+								<li class='ipsMenu_item'><a href='{$comment->url('split')}' data-action='splitComment' data-ipsDialog data-ipsDialog-title="{lang="split_to_new" sprintf="\IPS\Member::loggedIn()->language()->addToStack( $item::$title )"}">{lang="split"}</a></li>
+							{{endif}}
+						</ul>
+					</li>
+				{{endif}}
+			{{else}}
+				{{if $comment->hidden() === 0 and $item->canComment() and $editorName}}
+					<li data-ipsQuote-editor='{$editorName}' data-ipsQuote-target='#comment-{$comment->$idField}' class='ipsJS_show'>
+						<button class='ipsButton ipsButton_light ipsButton_verySmall ipsButton_narrow cMultiQuote ipsHide' data-action='multiQuoteComment' data-ipsTooltip data-ipsQuote-multiQuote data-mqId='mq{$comment->$idField}' title='{lang="multiquote"}'><i class='fa fa-plus'></i></button>
+					</li>
+					<li data-ipsQuote-editor='{$editorName}' data-ipsQuote-target='#comment-{$comment->$idField}' class='ipsJS_show'>
+						<a href='#' data-action='quoteComment' data-ipsQuote-singleQuote>{lang="quote"}</a>
+					</li>
+				{{endif}}
+				{{if $comment->canEdit()}}
+					{{if $comment->mapped('first') and $comment->item()->canEdit()}}
+						<li><a href='{$comment->item()->url()->setQueryString( 'do', 'edit' )}'>{lang="edit"}</a></li>
+					{{else}}
+						<li><a href='{$comment->url('edit')}' data-action='editComment'>{lang="edit"}</a></li>
+					{{endif}}
+				{{endif}}
+				{{if $comment->canDelete() || $comment->canHide() || $comment->canUnhide() || $comment->canSplit()}}
+					<li>
+						<a href='#elControls_{$comment->$idField}_menu' id='elControls_{$comment->$idField}' data-ipsMenu data-ipsMenu-appendTo='#comment-{$comment->$idField}_wrap'>{lang="options"} &nbsp;<i class='fa fa-caret-down'></i></a>
+						<ul id='elControls_{$comment->$idField}_menu' class='ipsMenu ipsMenu_narrow ipsHide'>
+							{{if $comment instanceof \IPS\Content\Hideable}}
+								{{if !$comment->hidden() and $comment->canHide()}}
+									<li class='ipsMenu_item'><a href='{$comment->url('hide')->csrf()}' data-ipsDialog data-ipsDialog-title="{lang="hide"}">{lang="hide"}</a></li>
+								{{elseif $comment->hidden() and $comment->canUnhide()}}
+									<li class='ipsMenu_item'><a href='{$comment->url('unhide')->csrf()}'>{lang="unhide"}</a></li>
+								{{endif}}
+							{{endif}}
+							{{if $comment->canSplit()}}
+								<li class='ipsMenu_item'><a href='{$comment->url('split')}' data-action='splitComment' data-ipsDialog data-ipsDialog-title="{lang="split_to_new" sprintf="\IPS\Member::loggedIn()->language()->addToStack( $item::$title )"}">{lang="split"}</a></li>
+							{{endif}}
+							{{if $comment->canDelete()}}
+								<li class='ipsMenu_item'><a href='{$comment->url('delete')->csrf()}' data-action='deleteComment' data-updateOnDelete="#commentCount">{lang="delete"}</a></li>
+							{{endif}}
+						</ul>
+					</li>
+				{{endif}}
+			{{endif}}
+			<li class='ipsHide' data-role='commentLoading'>
+				<span class='ipsLoading ipsLoading_tiny ipsLoading_noAnim'></span>
+			</li>
+		</ul>
+		{{if $comment->author()->signature}}
+			{template="signature" group="global" app="core" params="$comment->author()"}
+		{{endif}}
+	</div>
+
+	<div class='ipsMenu ipsMenu_wide ipsHide cPostShareMenu' id='elSharePost_{$comment->$idField}_menu'>
+		<div class='ipsPad'>
+			<h4 class='ipsType_sectionHead'>{lang="share_this_post"}</h4>
+			<hr class='ipsHr'>
+			<h5 class='ipsType_normal ipsType_reset'>{lang="link_to_post"}</h5>
+			{{if $comment->mapped('first') }}
+			<input type='text' value='{$comment->item()->url()}' class='ipsField_fullWidth'>
+			{{else}}
+			<input type='text' value='{$comment->item()->url()->setQueryString( array( 'do' => 'findComment', 'comment' => $comment->$idField ) )}' class='ipsField_fullWidth'>
+			{{endif}}
+
+			{{if !$comment->item()->container()->disable_sharelinks and count( $comment->sharelinks() )}}
+				<h5 class='ipsType_normal ipsType_reset ipsSpacer_top'>{lang="share_externally"}</h5>
+				{template="sharelinks" group="global" app="core" params="$comment"}
+			{{endif}}
+		</div>
+	</div>
+</div>]]></template>
+ <template template_group="topics" template_name="postContainer" template_data="$item, $comment, $votes=array(), $otherClasses=''" template_location="front" template_app="forums"><![CDATA[{{$idField = $comment::$databaseColumnId;}}
+{{$itemClassSafe = str_replace( '\\', '_', mb_substr( $comment::$itemClass, 4 ) );}}
+{{if $comment->isIgnored()}}
+	<div class='ipsComment ipsComment_ignored ipsType_light' id='elIgnoreComment_{$comment->$idField}' data-ignoreCommentID='elComment_{$comment->$idField}' data-ignoreUserID='{$comment->author()->member_id}'>
+		{lang="ignoring_content" sprintf="$comment->author()->name"} <a href='#elIgnoreComment_{$comment->$idField}_menu' data-ipsMenu data-ipsMenu-menuID='elIgnoreComment_{$comment->$idField}_menu' data-ipsMenu-appendTo='#elIgnoreComment_{$comment->$idField}' data-action="ignoreOptions" title='{lang="see_post_ignore_options"}' class='ipsType_blendLinks'>{lang="options"} <i class='fa fa-caret-down'></i></a>
+		<ul class='ipsMenu ipsHide' id='elIgnoreComment_{$comment->$idField}_menu'>
+			<li class='ipsMenu_item ipsJS_show' data-ipsMenuValue='showPost'><a href='#'>{lang="show_this_post"}</a></li>
+			<li class='ipsMenu_sep ipsJS_show'><hr></li>
+			<li class='ipsMenu_item' data-ipsMenuValue='stopIgnoring'><a href='{url="app=core&module=system&controller=ignore&do=remove&id={$comment->author()->member_id}" seoTemplate="ignore"}'>{lang="stop_ignoring_posts_by" sprintf="$comment->author()->name"}</a></li>
+			<li class='ipsMenu_item'><a href='{url="app=core&module=system&controller=ignore" seoTemplate="ignore"}'>{lang="change_ignore_preferences"}</a></li>
+		</ul>
+	</div>
+{{endif}}
+
+<a id='comment-{$comment->$idField}'></a>
+<article itemscope {{if $item->isQuestion() && !$comment->new_topic}}itemprop="suggestedAnswer {{if $comment->post_bwoptions['best_answer']}}acceptedAnswer{{endif}}" itemtype="http://schema.org/Answer"{{else}}itemtype="http://schema.org/Comment"{{endif}} id='elComment_{$comment->$idField}' class='cPost ipsBox {{if $otherClasses}}{$otherClasses}{{endif}} ipsComment {{if settings.reputation_highlight and $comment->reputation() >= settings.reputation_highlight}}ipsComment_popular{{endif}} ipsComment_parent ipsClearfix ipsClear ipsColumns ipsColumns_noSpacing ipsColumns_collapsePhone {{if $comment->isIgnored()}}ipsHide{{endif}} {{if $comment->hidden()}}ipsModerated{{endif}}'>
+	{{if $item->isQuestion() and !$comment->new_topic}}
+		{template="postRating" group="topics" app="forums" params="$item, $comment, $votes"}
+	{{endif}}
+	<aside class='ipsComment_author cAuthorPane ipsColumn ipsColumn_medium'>
+		<h3 class='ipsType_sectionHead cAuthorPane_author ipsType_blendLinks ipsType_break' itemprop="creator" itemscope itemtype="http://schema.org/Person"><strong itemprop="name">{$comment->author()->link( $comment->warningRef() )|raw}</strong> <span class='ipsResponsive_showPhone ipsResponsive_inline'>&nbsp;&nbsp;{template="reputationBadge" group="global" app="core" params="$comment->author()"}</span></h3>
+		<ul class='cAuthorPane_info ipsList_reset'>
+			{{if $comment->author()->member_title && $comment->author()->member_id}}
+				<li class='ipsResponsive_hidePhone ipsType_break'>{$comment->author()->member_title}</li>
+			{{elseif $comment->author()->rank['title'] && $comment->author()->member_id}}
+				<li class='ipsResponsive_hidePhone ipsType_break'>{$comment->author()->rank['title']}</li>
+			{{endif}}
+			{{if $comment->author()->rank['image'] && $comment->author()->member_id}}
+				<li class='ipsResponsive_hidePhone'>{$comment->author()->rank['image']|raw}</li>
+			{{endif}}
+
+			<li class='cAuthorPane_photo'>
+				{template="userPhoto" app="core" group="global" params="$comment->author(), 'large', $comment->warningRef()"}
+			</li>
+			<li>{expression="\IPS\Member\Group::load( $comment->author()->member_group_id )->formattedName" raw="true"}</li>
+			{{if \IPS\Member\Group::load( $comment->author()->member_group_id )->g_icon }}
+				<li class='ipsResponsive_hidePhone'><img src='{file="$comment->author()->group['g_icon']" extension="core_Theme"}' alt='' class='cAuthorGroupIcon'></li>
+			{{endif}}
+			{{if $comment->author()->member_id}}
+				<li class='ipsResponsive_hidePhone'>{template="reputationBadge" group="global" app="core" params="$comment->author()"}</li>
+				<li class='ipsType_light'>{lang="member_post_count" pluralize="$comment->author()->member_posts"}</li>
+				{{if $comment->author()->reputationImage()}}
+					<li class='ipsPad_half ipsResponsive_hidePhone'>
+						<img src='{file="$comment->author()->reputationImage()" extension="core_Theme"}' title='{{if $comment->author()->reputation()}}{$comment->author()->reputation()}{{endif}}' alt=''>
+					</li>
+				{{endif}}
+				{template="customFieldsDisplay" group="global" app="core" params="$comment->author()"}
+			{{endif}}
+		</ul>
+	</aside>
+	<div class='ipsColumn ipsColumn_fluid'>
+		{template="post" group="topics" app="forums" params="$item, $comment, $item::$formLangPrefix . 'comment', $item::$application, $item::$module, $itemClassSafe"}
+	</div>
+</article>]]></template>
+ <template template_group="topics" template_name="postRating" template_data="$item, $comment, $votes=array()" template_location="front" template_app="forums"><![CDATA[{{$idField = $comment::$databaseColumnId;}}
+<div class='cRatingColumn {{if $comment->post_bwoptions['best_answer']}}cRatingColumn_on{{else}}ipsAreaBackground{{endif}} {{if isset( $votes[ $comment->$idField ] ) && $votes[ $comment->$idField ] === 1}}cRatingColumn_up{{elseif isset( $votes[ $comment->$idField ] ) && $votes[ $comment->$idField ] === -1}}cRatingColumn_down{{endif}} ipsColumn ipsColumn_narrow ipsType_center' data-controller='forums.front.topic.answers'>
+	<meta itemprop="upvoteCount" content="{$comment->post_field_int}">
+	
+	<ul class='ipsList_reset'>
+	{{if !$item->isArchived() }}
+		{{if $comment->post_bwoptions['best_answer'] or $item->canSetBestAnswer()}}
+			<li>
+				{{if $item->canSetBestAnswer() and !$comment->post_bwoptions['best_answer']}}
+					<a href='{$item->url()->csrf()->setQueryString( array( 'do' => 'bestAnswer', 'answer' => $comment->pid ) )}' title='{lang="set_as_best_answer"}' class='cBestAnswerIndicator cBestAnswerIndicator_off' data-ipsTooltip><i class='fa fa-check'></i></a>
+				{{else}}
+					{{if $item->canSetBestAnswer()}}
+						<a href='{$item->url()->csrf()->setQueryString( array( 'do' => 'unsetBestAnswer' ) )}' title='{lang="unset_as_best_answer"}' class='cBestAnswerIndicator' data-ipsTooltip><i class='fa fa-check'></i></a>
+					{{else}}
+						<strong class='cBestAnswerIndicator' data-ipsTooltip title='{lang="best_answer_tooltip"}'><i class='fa fa-check'></i></strong>
+					{{endif}}
+				{{endif}}
+			</li>
+		{{endif}}
+	
+		{{if $comment->canVote()}}
+			<li>
+				<a href='{$item->url()->setQueryString( array( 'do' => 'rateAnswer', 'answer' => $comment->pid, 'rating' => 1 ) )->csrf()}' class='{{if !$comment->canVote(1)}}ipsHide{{endif}} cAnswerRate cAnswerRate_up {{if isset( $votes[ $comment->$idField ] ) && $votes[ $comment->$idField ] === 1}}ipsType_positive{{endif}}' title='{lang="vote_answer_up"}' data-ipsTooltip><i class='fa fa-caret-up'></i></a>
+				<span class='{{if $comment->canVote(1)}}ipsHide{{endif}} cAnswerRate cAnswerRate_up {{if isset( $votes[ $comment->$idField ] ) && $votes[ $comment->$idField ] === 1}}ipsType_positive{{endif}}'><i class='fa fa-caret-up'></i></span>
+			</li>
+		{{else}}
+			<li>
+				<span class='cAnswerRate cAnswerRate_up cAnswerRate_noPermission' {{if !\IPS\Member::loggedIn()->member_id}}data-ipsTooltip title='{lang="sign_in_rate_answer"}'{{endif}}><i class='fa fa-caret-up'></i></span>
+			</li>
+		{{endif}}
+
+			<li>
+				<span title="{lang="votes_no_number" pluralize="$comment->post_field_int"}" data-role="voteCount" data-voteCount="{$comment->post_field_int}" class='cAnswerRating {{if isset( $votes[ $comment->$idField ] ) && $votes[ $comment->$idField ] === 1}}ipsType_positive{{elseif isset( $votes[ $comment->$idField ] ) && $votes[ $comment->$idField ] === -1}}ipsType_negative{{endif}}'>{$comment->post_field_int}</span>
+			</li>
+
+		{{if $comment->canVote() && \IPS\Settings::i()->forums_answers_downvote}}
+			<li>
+				<a href='{$item->url()->setQueryString( array( 'do' => 'rateAnswer', 'answer' => $comment->pid, 'rating' => -1 ) )->csrf()}' class='{{if !$comment->canVote(-1)}}ipsHide{{endif}} cAnswerRate cAnswerRate_down {{if isset( $votes[ $comment->$idField ] ) && $votes[ $comment->$idField ] === -1}}ipsType_negative{{endif}}' title='{lang="vote_answer_down"}' data-ipsTooltip><i class='fa fa-caret-down'></i></a>
+				<span class='{{if $comment->canVote(-1)}}ipsHide{{endif}} cAnswerRate cAnswerRate_down {{if isset( $votes[ $comment->$idField ] ) && $votes[ $comment->$idField ] === -1}}ipsType_negative{{endif}}'><i class='fa fa-caret-down'></i></span>
+			</li>
+		{{elseif \IPS\Settings::i()->forums_answers_downvote}}
+			<li>
+				<span class='cAnswerRate cAnswerRate_down cAnswerRate_noPermission' {{if !\IPS\Member::loggedIn()->member_id}}data-ipsTooltip title='{lang="sign_in_rate_answer"}'{{endif}}><i class='fa fa-caret-down'></i></span>
+			</li>
+		{{endif}}
+	{{else}}
+		{{if isset($comment->post_field_int) }}
+			<li>
+				<span title="{lang="votes_no_number" pluralize="$comment->post_field_int"}" data-role="voteCount" data-voteCount="{$comment->post_field_int}" class='cAnswerRating {{if isset( $votes[ $comment->$idField ] ) && $votes[ $comment->$idField ] === 1}}ipsType_positive{{elseif isset( $votes[ $comment->$idField ] ) && $votes[ $comment->$idField ] === -1}}ipsType_negative{{endif}}'>{$comment->post_field_int}</span>
+			</li>
+		{{endif}}
+	{{endif}}
+	</ul>
+
+</div>]]></template>
+ <template template_group="topics" template_name="topic" template_data="$topic, $comments, $question=NULL, $votes=array(), $nextUnread=NULL, $pagination, $topicVotes=array()" template_location="front" template_app="forums"><![CDATA[
+{{if $topic->isArchived()}}
+	<div class='ipsMessage ipsMessage_info ipsSpacer_bottom'>
+		<h4 class='ipsMessage_title'>{lang="topic_is_archived"}</h4>
+		<p class='ipsType_reset'>
+			{lang="topic_archived_desc"}
+		</p>
+	</div>
+{{endif}}
+
+{{if $topic->isQuestion()}}
+	<div itemscope itemtype="http://schema.org/Question">
+{{endif}}
+
+{{if $topic->isQuestion()}}
+	<div class='ipsColumns'>
+		<div class='cRatingColumn cRatingColumn_question ipsColumn ipsColumn_narrow ipsType_center'>
+			<ul class='ipsList_reset'>
+				{{if $topic->canVote()}}
+					<li>
+						<a href='{$topic->url()->setQueryString( array( 'do' => 'rateQuestion', 'rating' => 1 ) )->csrf()}' class='{{if !$topic->canVote(1)}}ipsHide{{endif}} cAnswerRate cAnswerRate_up {{if isset( $topicVotes[ \IPS\Member::loggedIn()->member_id ] ) && $topicVotes[ \IPS\Member::loggedIn()->member_id ] === 1}}ipsType_positive{{endif}}' title='{lang="vote_question_up"}' data-ipsTooltip><i class='fa fa-caret-up'></i></a>
+						<span class='{{if $topic->canVote(1)}}ipsHide{{endif}} cAnswerRate cAnswerRate_up {{if isset( $topicVotes[ \IPS\Member::loggedIn()->member_id ] ) && $topicVotes[ \IPS\Member::loggedIn()->member_id ] === 1}}ipsType_positive{{endif}}'><i class='fa fa-caret-up'></i></span>
+					</li>
+				{{else}}
+					<li>
+						<span class='cAnswerRate cAnswerRate_up cAnswerRate_noPermission' {{if !\IPS\Member::loggedIn()->member_id}}data-ipsTooltip title='{lang="sign_in_rate_question"}'{{endif}}><i class='fa fa-caret-up'></i></span>
+					</li>
+				{{endif}}
+
+					<li><span data-role="voteCount" data-voteCount="{expression="intval( $topic->question_rating )"}" class='cAnswerRating {{if isset( $topicVotes[ \IPS\Member::loggedIn()->member_id ] ) && $topicVotes[ \IPS\Member::loggedIn()->member_id ] === 1}}ipsType_positive{{elseif isset( $topicVotes[ \IPS\Member::loggedIn()->member_id ] ) && $topicVotes[ \IPS\Member::loggedIn()->member_id ] === -1}}ipsType_negative{{endif}}'>{expression="intval( $topic->question_rating )"}</span></li>
+
+				{{if $topic->canVote() && \IPS\Settings::i()->forums_answers_downvote}}
+					<li>
+						<a href='{$topic->url()->setQueryString( array( 'do' => 'rateQuestion', 'rating' => -1 ) )->csrf()}' class='{{if !$topic->canVote(-1)}}ipsHide{{endif}} cAnswerRate cAnswerRate_down {{if isset( $topicVotes[ \IPS\Member::loggedIn()->member_id ] ) && $topicVotes[ \IPS\Member::loggedIn()->member_id ] === -1}}ipsType_negative{{endif}}' title='{lang="vote_question_down"}' data-ipsTooltip><i class='fa fa-caret-down'></i></a>
+						<span class='{{if $topic->canVote(-1)}}ipsHide{{endif}} cAnswerRate cAnswerRate_down {{if isset( $topicVotes[ \IPS\Member::loggedIn()->member_id ] ) && $topicVotes[ \IPS\Member::loggedIn()->member_id ] === -1}}ipsType_negative{{endif}}'><i class='fa fa-caret-down'></i></span>
+					</li>
+				{{elseif \IPS\Settings::i()->forums_answers_downvote}}
+					<li>
+						<span class='cAnswerRate cAnswerRate_down cAnswerRate_noPermission' {{if !\IPS\Member::loggedIn()->member_id}}data-ipsTooltip title='{lang="sign_in_rate_question"}'{{endif}}><i class='fa fa-caret-down'></i></span>
+					</li>
+				{{endif}}
+			</ul>
+			<meta itemprop="upvoteCount" content="{expression="intval( $topic->question_rating )"}">
+		</div>
+		<div class='ipsColumn ipsColumn_fluid'>
+{{endif}}
+<div class="ipsPageHeader ipsClearfix">
+	{{if !$topic->isArchived() and !$topic->container()->password}}
+		<div class='ipsPos_right ipsResponsive_noFloat ipsResponsive_hidePhone'>
+			{template="follow" app="core" group="global" params="'forums', 'topic', $topic->tid, $topic->followersCount()"}
+		</div>
+	{{endif}}
+	<div class='ipsPhotoPanel ipsPhotoPanel_small ipsPhotoPanel_notPhone ipsClearfix'>
+		{template="userPhoto" group="global" app="core" params="$topic->author(), 'small', $topic->warningRef()"}
+		<div>
+			<h1 class='ipsType_pageTitle'>
+				{{if $topic->mapped('pinned') || $topic->mapped('featured') || $topic->hidden() === -1 || $topic->hidden() === 1}}
+					{{if $topic->hidden() === -1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_warning" data-ipsTooltip title='{$topic->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+					{{elseif $topic->hidden() === 1}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+					{{endif}}
+					{{if $topic->mapped('pinned')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_positive" data-ipsTooltip title='{lang="pinned"}'><i class='fa fa-thumb-tack'></i></span>
+					{{endif}}
+					{{if $topic->mapped('featured')}}
+						<span class="ipsBadge ipsBadge_icon ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+					{{endif}}
+				{{endif}}
+
+				{{if $topic->prefix()}}
+					{template="prefix" group="global" app="core" params="$topic->prefix( TRUE ), $topic->prefix()"}
+				{{endif}}	
+				{{if $topic->isQuestion()}}
+					<span itemprop="name">{wordbreak="$topic->title"}</span>
+				{{else}}
+					{wordbreak="$topic->title"}
+				{{endif}}
+			</h1>
+			{{if $topic->locked() && $topic->topic_open_time && $topic->topic_open_time > time()}}
+				<p class='ipsType_reset ipsType_medium'><strong><i class='fa fa-clock-o'></i> {lang="topic_unlocks_at" htmlsprintf="\IPS\DateTime::ts( $topic->topic_open_time )->html(), \IPS\DateTime::ts( $topic->topic_open_time )->localeTime( FALSE )"}</strong></p>
+			{{elseif !$topic->locked() && $topic->topic_close_time && $topic->topic_close_time > time()}}
+				<p class='ipsType_reset ipsType_medium'><strong><i class='fa fa-clock-o'></i> {lang="topic_locks_at" htmlsprintf="\IPS\DateTime::ts( $topic->topic_close_time )->html(), \IPS\DateTime::ts( $topic->topic_close_time )->localeTime( FALSE )"}</strong></p>
+			{{endif}}
+			<p class='ipsType_reset ipsType_blendLinks {{if count( $topic->tags() )}}ipsSpacer_bottom ipsSpacer_half{{endif}}'>
+				<span class='ipsType_normal'>{{if $topic->isQuestion()}}{lang="ask_byline_no_date" htmlsprintf="$topic->author()->link( $topic->warningRef() )"}{{else}}{lang="topic_started_by" htmlsprintf="$topic->author()->link( $topic->warningRef() )"}{{endif}}</span>, <span class='ipsType_light ipsType_noBreak'>{datetime="$topic->start_date"}</span><br>
+			</p>
+			{{if count( $topic->tags() )}}
+				{template="tags" group="global" app="core" params="$topic->tags()"}
+			{{endif}}
+		</div>
+	</div>
+</div>
+
+{{if $topic->isQuestion()}}
+	</div>
+</div>
+{{endif}}
+
+{{if $topic->hidden() === 1 and $topic->canUnhide()}}
+	<div class="ipsMessage ipsMessage_warning ipsSpacer_top">
+		<p class="ipsType_reset">{lang="topic_pending_approval"}</p>
+		<ul class='ipsList_inline ipsSpacer_top'>
+			<li><a href="{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unhide' ) )}" class="ipsButton ipsButton_positive ipsButton_verySmall" title='{lang="approve_title_topic"}'><i class="fa fa-check"></i> {lang="approve"}</a></li>
+			{{if $topic->canDelete()}}
+				<li><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'delete' ) )}' data-confirm  title='{lang="topic_delete_title"}' class='ipsButton ipsButton_negative ipsButton_verySmall'><i class='fa fa-times'></i> {lang="delete"}</a></li>
+			{{endif}}
+		</ul>
+	</div>
+{{endif}}
+
+<div class='ipsClearfix'>
+	{{if $topic->container()->forum_allow_rating}}
+		<div class='ipsPad_half ipsPos_left ipsType_light ipsResponsive_hidePhone'>
+			{{if $topic->canRate()}}
+				<p class='ipsType_reset ipsType_small'>
+					{{if $topic->isQuestion()}}{lang="rate_this_question"}{{else}}{lang="rate_this_topic"}{{endif}}
+				</p>
+			{{endif}}
+			{$topic->rating()|raw}
+		</div>
+	{{endif}}
+	
+	<ul class="ipsToolList ipsToolList_horizontal ipsClearfix ipsSpacer_both {{if !( $topic->canPin() or $topic->canUnpin() or $topic->canFeature() or $topic->canUnfeature() or $topic->canHide() or $topic->canUnhide() or $topic->canMove() or $topic->canLock() or $topic->canUnlock() or $topic->canDelete() or $topic->availableSavedActions() )}}ipsResponsive_hidePhone{{endif}}">
+		{{if $topic->canComment()}}
+			<li class='ipsToolList_primaryAction'>
+				<span data-controller='forums.front.topic.reply'>
+					{{if $topic->container()->forums_bitoptions['bw_enable_answers']}}
+						<a href='#replyForm' class='ipsButton {{if $topic->locked()}}ipsButton_negative{{else}}ipsButton_important{{endif}} ipsButton_medium ipsButton_fullWidth' data-action='replyToTopic'>{lang="answer_this_question"}{{if $topic->locked()}} ({lang="locked"}){{endif}}</a>
+					{{else}}
+						<a href='#replyForm' class='ipsButton {{if $topic->locked()}}ipsButton_negative{{else}}ipsButton_important{{endif}} ipsButton_medium ipsButton_fullWidth' data-action='replyToTopic'>{lang="reply_to_this_topic"}{{if $topic->locked()}} ({lang="locked"}){{endif}}</a>
+					{{endif}}
+				</span>
+			</li>
+		{{endif}}
+		{{if $topic->container()->can('add')}}
+			<li class='ipsResponsive_hidePhone'>
+				{{if $topic->container()->forums_bitoptions['bw_enable_answers']}}
+					<a href="{$topic->container()->url()->setQueryString( 'do', 'add' )}" class='ipsButton ipsButton_link ipsButton_medium ipsButton_fullWidth' title='{lang="ask_a_question_desc"}'>{lang="ask_a_question"}</a>
+				{{else}}
+					<a href="{$topic->container()->url()->setQueryString( 'do', 'add' )}" class='ipsButton ipsButton_link ipsButton_medium ipsButton_fullWidth' title='{lang="start_new_topic_desc"}'>{lang="start_new_topic"}</a>
+				{{endif}}
+			</li>
+		{{endif}}
+		{{if $topic->canPin() or $topic->canUnpin() or $topic->canFeature() or $topic->canUnfeature() or $topic->canHide() or $topic->canUnhide() or $topic->canMove() or $topic->canLock() or $topic->canUnlock() or $topic->canDelete() or $topic->availableSavedActions() or $topic->canMerge() or $topic->canUnarchive() or \IPS\Member::loggedIn()->modPermission('can_view_moderation_log')}}
+			<li>
+				<a href='#elTopicActions_menu' id='elTopicActions' class='ipsButton ipsButton_link ipsButton_medium ipsButton_fullWidth' data-ipsMenu>{lang="moderator_actions"} <i class='fa fa-caret-down'></i></a>
+				<ul id='elTopicActions_menu' class='ipsMenu ipsMenu_auto ipsHide'>
+					{{if $topic->canFeature()}}				
+						<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'feature' ) )}'>{lang="feature"}</a></li>
+					{{endif}}
+					{{if $topic->canUnfeature()}}				
+						<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unfeature' ) )}' >{lang="unfeature"}</a></li>
+					{{endif}}
+					{{if $topic->canPin()}}				
+						<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'pin' ) )}' >{lang="pin"}</a></li>
+					{{endif}}
+					{{if $topic->canUnpin()}}				
+						<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unpin' ) )}' >{lang="unpin"}</a></li>
+					{{endif}}
+					{{if $topic->canHide()}}				
+						<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'hide' ) )}' data-ipsDialog data-ipsDialog-title="{lang="hide"}">{lang="hide"}</a></li>
+					{{endif}}
+					{{if $topic->canUnhide()}}				
+						<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unhide' ) )}' >{{if $topic->hidden() === 1}}{lang="approve"}{{else}}{lang="unhide"}{{endif}}</a></li>
+					{{endif}}
+					{{if $topic->canLock()}}				
+						<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'lock' ) )}' >{lang="lock"}</a></li>
+					{{endif}}
+					{{if $topic->canUnlock()}}				
+						<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unlock' ) )}' >{lang="unlock"}</a></li>
+					{{endif}}
+					{{if $topic->canMove()}}				
+						<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'move' ) )}' data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title="{lang="move"}"  >{lang="move"}</a></li>
+					{{endif}}
+					{{if $topic->canMerge()}}				
+						<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'merge' ) )}' data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title="{lang="merge"}" >{lang="merge"}</a></li>
+					{{endif}}
+					{{if $topic->canUnarchive()}}
+						<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'unarchive' ) )}' data-confirm data-confirmSubMessage="{$topic->unarchiveBlurb()}" >{lang="unarchive"}</a></li>
+					{{endif}}
+					{{if $topic->canDelete()}}				
+						<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'delete' ) )}' data-confirm  >{lang="delete"}</a></li>
+					{{endif}}
+					{{if !$topic->isArchived() and $topic->availableSavedActions()}}
+						<li class='ipsMenu_sep'><hr></li>
+						{{foreach $topic->availableSavedActions() as $action}}
+							<li class="ipsMenu_item"><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'savedAction', 'action' => $action->_id ) )}' data-confirm>{$action->_title}</a></li>
+						{{endforeach}}
+					{{endif}}
+					{{if \IPS\Member::loggedIn()->modPermission('can_view_moderation_log')}}	
+						<li class='ipsMenu_sep'><hr></li>
+						<li class="ipsMenu_item"><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'modLog' ) )}' data-ipsDialog data-ipsDialog-title='{lang="moderation_history"}'>{lang="moderation_history"}</a></li>
+					{{endif}}
+				</ul>
+			</li>
+		{{endif}}
+	</ul>
+</div>
+{{if $poll = $topic->getPoll()}}
+{$poll|raw}
+<br>
+{{endif}}
+<div data-controller='core.front.core.commentFeed,forums.front.topic.view, core.front.core.ignoredComments' {{if settings.auto_polling_enabled}}data-autoPoll{{endif}} data-baseURL='{$topic->url()}' {{if $topic->isLastPage() and !$topic->isQuestion()}}data-lastPage{{endif}} data-feedID='topic-{$topic->tid}' class='cTopic ipsClear ipsSpacer_top'>
+	{{if $topic->isQuestion() && $question}}
+		<h2 class='ipsType_sectionTitle ipsType_reset'>{lang="question_title"}</h2>
+		<div class='ipsAreaBackground_light ipsPad'>
+			{template="postContainer" group="topics" app="forums" params="$topic, $question, $votes, 'cPostQuestion'"}
+		</div>
+		
+		<div class='ipsBox ipsSpacer_top'>
+			<h2 class='ipsType_sectionTitle ipsType_reset ipsType_medium'><meta itemprop="answerCount" content="{expression="$topic->posts - 1"}">{lang="answer_count" pluralize="( $topic->posts ) ? $topic->posts - 1 : 0"}</h2>
+			<div class="ipsButtonBar ipsPad_half ipsClearfix ipsClear">
+				<ul class="ipsPos_right ipsButtonRow ipsClearfix">
+					<li>
+						<a href='{$topic->url()}' id="elSortBy_answers" {{if !isset( request.sortby )}}class='ipsButtonRow_active{{endif}}'>{lang="sort_by_answers"}</a>
+					</li>
+					<li>
+						<a href='{$topic->url()->setQueryString( 'sortby', 'date' )}' id="elSortBy_date" {{if isset( request.sortby ) and request.sortby == 'date'}}class='ipsButtonRow_active{{endif}}'>{lang="sort_by_date"}</a>
+					</li>
+				</ul>
+				{{if $pagination}}
+					{$pagination|raw}
+				{{endif}}
+			</div>
+	{{else}}
+		<h2 class='ipsType_sectionTitle ipsType_reset ipsType_medium' data-role="comment_count" data-commentCountString="js_num_topic_posts">{lang="reply_count" pluralize="$topic->posts"}</h2>
+		{{if $pagination}}
+			<div class="ipsButtonBar ipsPad_half ipsClearfix ipsClear">
+				{$pagination|raw}
+			</div>
+		{{endif}}
+	{{endif}}
+
+	<div data-role='commentFeed' data-controller='core.front.core.moderation' class='ipsAreaBackground_light ipsPad'>
+		<form action="{$topic->url()->csrf()->setQueryString( 'do', 'multimodComment' )}" method="post" data-ipsPageAction data-role='moderationTools'>
+			{{$postCount=0; $timeLastRead = $topic->timeLastRead(); $lined = FALSE;}}
+			{{if count( $comments )}}
+				{{foreach $comments as $comment}}
+					{{if !$topic->isQuestion() and !$lined and $timeLastRead and $timeLastRead->getTimestamp() < $comment->mapped('date')}}
+						{{if $lined = TRUE and $postCount}}
+							<hr class="ipsCommentUnreadSeperator">
+						{{endif}}
+					{{endif}}
+					{{$postCount++;}}
+					{template="postContainer" group="topics" app="forums" params="$topic, $comment, $votes"}
+					{{if $postCount == 1 AND $advertisement = \IPS\core\Advertisement::loadByLocation( 'ad_topic_view' )}}
+						{$advertisement|raw}
+					{{endif}}
+				{{endforeach}}
+			{{else}}
+				{{if $topic->isQuestion()}}
+					<p class='ipsType_center ipsType_light ipsType_large ipsPad' data-role="noComments">
+						{lang="no_answers"}
+					</p>
+				{{endif}}
+			{{endif}}
+			{template="commentMultimod" app="core" group="global" params="$topic"}
+		</form>
+	</div>
+
+	{{if $topic->isQuestion()}}
+		</div>
+	{{endif}}
+	{{if $pagination}}
+		<div class="ipsButtonBar ipsPad_half ipsClearfix ipsClear">
+			{$pagination|raw}
+		</div>
+	{{endif}}
+
+	{{if $topic->commentForm() || $topic->locked() || \IPS\Member::loggedIn()->restrict_post || \IPS\Member::loggedIn()->members_bitoptions['unacknowledged_warnings']}}
+		<a id='replyForm'></a>
+		<div data-role='replyArea' class='cTopicPostArea ipsBox ipsBox_transparent ipsAreaBackground ipsPad {{if !$topic->canComment()}}cTopicPostArea_noSize{{endif}} ipsSpacer_top'>
+			{{if $topic->commentForm()}}
+				{{if $topic->locked()}}
+					<p class='ipsType_reset ipsType_warning ipsComposeArea_warning ipsSpacer_bottom ipsSpacer_half'><i class='fa fa-info-circle'></i> {lang="topic_locked_can_comment"}</p>
+				{{endif}}
+				{$topic->commentForm()|raw}
+			{{else}}
+				{{if $topic->locked()}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'topic_locked_cannot_comment'"}
+				{{elseif \IPS\Member::loggedIn()->restrict_post}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'restricted_cannot_comment', \IPS\Member::loggedIn()->warnings(5,NULL,'rpa'), \IPS\Member::loggedIn()->restrict_post"}
+				{{elseif \IPS\Member::loggedIn()->members_bitoptions['unacknowledged_warnings']}}
+					{template="commentUnavailable" group="forms" location="front" app="core" params="'unacknowledged_warning_cannot_post', \IPS\Member::loggedIn()->warnings( 1, FALSE )"}
+				{{endif}}
+			{{endif}}
+		</div>
+	{{endif}}
+
+	{{if !$topic->isArchived() and !$topic->container()->password}}
+		<div class='ipsResponsive_noFloat ipsResponsive_showPhone ipsResponsive_block ipsSpacer_top'>
+			{template="follow" app="core" group="global" params="'forums', 'topic', $topic->tid, $topic->followersCount()"}
+		</div>
+	{{endif}}
+</div>
+
+{{if $topic->isQuestion()}}
+	</div>
+{{endif}}
+
+{{if $topic->canPin() or $topic->canUnpin() or $topic->canFeature() or $topic->canUnfeature() or $topic->canHide() or $topic->canUnhide() or $topic->canMove() or $topic->canLock() or $topic->canUnlock() or $topic->canDelete() or $topic->availableSavedActions()}}
+	<ul class="ipsToolList ipsToolList_horizontal ipsClearfix ipsSpacer_top ipsResponsive_hidePhone">
+		<li>
+			<a href='#elTopicActions_menu' id='elTopicActions' class='ipsButton ipsButton_link ipsButton_medium ipsButton_fullWidth' data-ipsMenu>{lang="moderator_actions"} <i class='fa fa-caret-down'></i></a>
+			<ul id='elTopicActions_menu' class='ipsMenu ipsMenu_auto ipsHide'>
+				{{if $topic->canFeature()}}				
+					<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'feature' ) )}'>{lang="feature"}</a></li>
+				{{endif}}
+				{{if $topic->canUnfeature()}}				
+					<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unfeature' ) )}' >{lang="unfeature"}</a></li>
+				{{endif}}
+				{{if $topic->canPin()}}				
+					<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'pin' ) )}' >{lang="pin"}</a></li>
+				{{endif}}
+				{{if $topic->canUnpin()}}				
+					<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unpin' ) )}' >{lang="unpin"}</a></li>
+				{{endif}}
+				{{if $topic->canHide()}}				
+					<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'hide' ) )}' data-ipsDialog data-ipsDialog-title="{lang="hide"}">{lang="hide"}</a></li>
+				{{endif}}
+				{{if $topic->canUnhide()}}				
+					<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unhide' ) )}' >{{if $topic->hidden() === 1}}{lang="approve"}{{else}}{lang="unhide"}{{endif}}</a></li>
+				{{endif}}
+				{{if $topic->canLock()}}				
+					<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'lock' ) )}' >{lang="lock"}</a></li>
+				{{endif}}
+				{{if $topic->canUnlock()}}				
+					<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'unlock' ) )}' >{lang="unlock"}</a></li>
+				{{endif}}
+				{{if $topic->canMove()}}				
+					<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'move' ) )}' data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title="{lang="move"}"  >{lang="move"}</a></li>
+				{{endif}}
+				{{if $topic->canMerge()}}				
+					<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'merge' ) )}' data-ipsDialog data-ipsDialog-size='narrow' data-ipsDialog-title="{lang="merge"}" >{lang="merge"}</a></li>
+				{{endif}}
+				{{if $topic->canUnarchive()}}
+					<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'unarchive' ) )}' data-confirm data-confirmSubMessage="{$topic->unarchiveBlurb()}" >{lang="unarchive"}</a></li>
+				{{endif}}
+				{{if $topic->canDelete()}}				
+					<li class='ipsMenu_item'><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'moderate', 'action' => 'delete' ) )}' data-confirm  >{lang="delete"}</a></li>
+				{{endif}}
+				{{if !$topic->isArchived() and $topic->availableSavedActions()}}
+					<li class='ipsMenu_sep'><hr></li>
+					{{foreach $topic->availableSavedActions() as $action}}
+						<li class="ipsMenu_item"><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'savedAction', 'action' => $action->_id ) )}' data-confirm>{$action->_title}</a></li>
+					{{endforeach}}
+				{{endif}}
+				{{if \IPS\Member::loggedIn()->modPermission('can_view_moderation_log')}}	
+					<li class='ipsMenu_sep'><hr></li>
+					<li class="ipsMenu_item"><a href='{$topic->url()->csrf()->setQueryString( array( 'do' => 'modLog' ) )}' data-ipsDialog data-ipsDialog-title='{lang="moderation_history"}'>{lang="moderation_history"}</a></li>
+				{{endif}}
+			</ul>
+		</li>
+	</ul>
+{{endif}}
+
+<div class='ipsGrid ipsGrid_collapsePhone ipsPager ipsClearfix ipsSpacer_top'>
+	<div class="ipsGrid_span6 ipsType_left ipsPager_prev">
+		<a href="{$topic->container()->url()}" title="{lang="go_to_forum" sprintf="$topic->container()->metaTitle()"}" rel="up">
+			<span class="ipsPager_type">{{if $topic->isQuestion() }}{lang="go_back_to_qa_forum"}{{else}}{lang="go_back_to_forum"}{{endif}}</span>
+			<span class="ipsPager_title ipsType_light ipsType_break">{lang="$topic->container()->_title" wordbreak="true"}</span>
+		</a>
+	</div>
+	{{if $nextUnread !== NULL}}
+		<div class='ipsGrid_span6 ipsType_right ipsPager_next'>
+			<a href="{$nextUnread->url()->setQueryString( array( 'do' => 'getNewComment' ) )}" title='{{if $topic->isQuestion()}}{lang="view_next_unread_question_title"}{{else}}{lang="view_next_unread_title"}{{endif}}' rel='next'>
+				<span class="ipsPager_type">{{if $topic->isQuestion()}}{lang="view_next_unread_question"}{{else}}{lang="view_next_unread"}{{endif}}</span>
+				<span class="ipsPager_title ipsType_light ipsType_break">{$nextUnread->mapped('title')}</span>
+			</a>
+		</div>
+	{{endif}}
+</div>
+
+{{if !$topic->container()->disable_sharelinks}}
+	<hr class='ipsHr'>
+	{template="sharelinks" app="core" group="global" params="$topic"}
+{{endif}}]]></template>
+ <template template_group="widgets" template_name="forumStatistics" template_data="$stats, $orientation='vertical'" template_location="front" template_app="forums"><![CDATA[<h3 class='ipsType_reset ipsWidget_title'>{lang="block_forumStatistics"}</h3>
+<div class='ipsWidget_inner'>
+	{{if $orientation == 'vertical'}}
+		<div class='ipsPad_half'>
+			<ul class='ipsDataList'>
+				<li class='ipsDataItem'>
+					<div class='ipsDataItem_main ipsPos_middle'>
+						<strong>{lang="total_topics"}</strong>
+					</div>
+					<div class='ipsDataItem_stats ipsDataItem_statsLarge'>
+						<span class='ipsDataItem_stats_number'>{number="$stats['total_topics']"}</span>
+					</div>
+				</li>
+				<li class='ipsDataItem'>
+					<div class='ipsDataItem_main ipsPos_middle'>
+						<strong>{lang="total_posts"}</strong>
+					</div>
+					<div class='ipsDataItem_stats ipsDataItem_statsLarge'>
+						<span class='ipsDataItem_stats_number'>{number="$stats['total_posts']"}</span>
+					</div>
+				</li>
+			</ul>
+		</div>
+	{{else}}
+		<div class='ipsGrid ipsGrid_collapsePhone ipsWidget_stats'>
+			<div class='ipsGrid_span6 ipsType_center'>
+				<span class='ipsType_large ipsWidget_statsCount'>{number="$stats['total_topics']"}</span><br>
+				<span class='ipsType_light ipsType_medium'>{lang="total_topics"}</span>
+			</div>
+			<div class='ipsGrid_span6 ipsType_center'>
+				<span class='ipsType_large ipsWidget_statsCount'>{number="$stats['total_posts']"}</span><br>
+				<span class='ipsType_light ipsType_medium'>{lang="total_posts"}</span>
+			</div>
+		</div>
+	{{endif}}
+</div>]]></template>
+ <template template_group="widgets" template_name="hotTopics" template_data="$topics, $orientation='vertical'" template_location="front" template_app="forums"><![CDATA[{{if !empty( $topics ) }}
+	<h3 class='ipsWidget_title ipsType_reset'>{lang="block_hotTopics"}</h3>
+
+	{{if $orientation == 'vertical'}}
+		<div class='ipsPad_half ipsWidget_inner'>
+			<ul class='ipsDataList ipsDataList_reducedSpacing'>
+				{{foreach $topics as $topic}}
+					<li class='ipsDataItem{{if $topic->unread()}} ipsDataItem_unread{{endif}}{{if $topic->hidden()}} ipsModerated{{endif}}'>
+						<div class='ipsDataItem_icon ipsPos_top'>
+							{template="userPhoto" group="global" app="core" params="$topic->author(), 'tiny'"}
+						</div>
+						<div class='ipsDataItem_main'>
+							<div class="ipsCommentCount ipsPos_right {{if ( $topic->posts - 1 ) === 0}}ipsFaded{{endif}}" data-ipsTooltip title='{lang="replies_number" pluralize="$topic->posts - 1"}'>{expression="$topic->posts - 1"}</div>
+							<a href="{$topic->url()->setQueryString( 'do', 'getNewComment' )}" title='{lang="view_this_topic" sprintf="$topic->title"}' class='ipsDataItem_title ipsType_break'>{wordbreak="$topic->title"}</a>
+							{{if $topic->mapped('featured') || $topic->hidden() === -1 || $topic->hidden() === 1}}
+								<span>
+									{{if $topic->hidden() === -1}}
+										<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{$topic->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+									{{elseif $topic->hidden() === 1}}
+										<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+									{{endif}}
+									{{if $topic->mapped('featured')}}
+										<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+									{{endif}}
+								</span>
+							{{endif}}
+							<br>
+							<span class='ipsType_light ipsType_small'>{lang="byline_nodate" htmlsprintf="$topic->author()->link()"} &middot; {datetime="$topic->mapped('date')"}</span>
+						</div>
+					</li>
+				{{endforeach}}
+			</ul>
+		</div>
+	{{else}}
+		<div class='ipsWidget_inner'>
+			<ul class='ipsDataList'>
+				{{foreach $topics as $topic}}
+					{template="row" group="global" app="forums" params="NULL, NULL, $topic, FALSE"}
+				{{endforeach}}
+			</ul>
+		</div>
+	{{endif}}
+{{endif}}]]></template>
+ <template template_group="widgets" template_name="poll" template_data="$topic, $poll, $orientation='vertical'" template_location="front" template_app="forums">{$poll|raw}
+</template>
+ <template template_group="widgets" template_name="pollFormWidget" template_data="$url, $id, $action, $elements, $hiddenValues, $actionButtons, $uploadField, $class='', $attributes=array(), $sidebar, $form=NULL" template_location="front" template_app="forums"><![CDATA[<form accept-charset='utf-8' class="ipsForm {$class}" action="{$url->setQueryString( 'do', 'widgetPoll' )}" method="post" {{if $uploadField}}enctype="multipart/form-data"{{endif}} {{foreach $attributes as $k => $v}}{$k}="{$v}"{{endforeach}} data-ipsForm>
+	<input type="hidden" name="{$id}_submitted" value="1">
+	{{foreach $hiddenValues as $k => $v}}
+		<input type="hidden" name="{$k}" value="{$v}">
+	{{endforeach}}		
+	{{foreach $elements as $collection}}
+		<ol class='ipsList_reset cPollList cPollList_questions'>
+			{{foreach $collection as $idx => $input}}
+				<li class='ipsFieldRow ipsFieldRow_noLabel'>
+					<h4 class='ipsType_normal ipsType_reset'>{$idx}. {wordbreak="$input->label"}</h4>
+					{{if !$input->options['multiple']}}
+						{template="radio" app="core" location="global" group="forms" params="$input->name, $input->value, $input->required, $input->options['options'], $input->options['disabled'], '', $input->options['disabled']"}
+					{{else}}
+						{template="checkboxset" app="core" location="global" group="forms" params="$input->name, $input->value, $input->required, $input->options['options'], $input->options['disabled'], $input->options['toggles'], isset( $input->options['descriptions'] ) ? $input->options['descriptions'] : NULL, $input->options['userSuppliedInput']"}
+					{{endif}}
+					{{if $input->error}}
+						<br>
+						<span class="ipsType_warning">{lang="$input->error"}</span>
+					{{endif}}
+				</li>
+			{{endforeach}}
+		</ol>
+		<br>
+		<a class='ipsType_light ipsType_break' href="{$url}">{lang="poll_view_topic"}</a>
+		<br>
+	{{endforeach}}
+	<hr class='ipsHr'>
+	<ul class="ipsPos_left ipsToolList ipsToolList_horizontal ipsList_reset ipsClearfix">
+		{{foreach $actionButtons as $button}}
+			<li>{$button|raw}</li>
+		{{endforeach}}
+        <li><a class='ipsButton ipsButton_link' title='{lang="show_results_title"}' href="{$url->setQueryString( '_poll', 'results' )}" {{if !settings.allow_result_view}}data-viewResults-confirm="{lang="warn_allow_result_view"}"{{endif}} data-action='viewResults'>{lang="show_results"}</a></li>
+	</ul>
+</form>]]></template>
+ <template template_group="widgets" template_name="pollWidget" template_data="$poll, $url" template_location="front" template_app="forums"><![CDATA[{{if !isset( \IPS\Request::i()->fetchPoll )}}
+<section class='ipsBox' data-controller='core.front.core.poll'>
+{{endif}}
+	{{if $poll->canVote() and request._poll != 'results' and ( !$poll->getVote() or request._poll == 'form') and $pollForm = $poll->buildForm()}}
+		<h3 class='ipsWidget_title ipsType_reset'>
+			{wordbreak="$poll->poll_question"}&nbsp;&nbsp;
+			<span class='ipsType_small ipsType_light'>{lang="poll_num_votes" pluralize="$poll->votes"}</span>
+		</h2>
+		<div class='ipsPad_half ipsWidget_inner ipsClearfix' data-role='pollContents'>
+			{$pollForm->customTemplate( array( \IPS\Theme::i()->getTemplate( 'widgets', 'forums', 'front' ), 'pollFormWidget' ), $url )|raw}
+		</div>
+	{{elseif !$poll->canVote() or $poll->getVote() or ( request._poll == 'results' and settings.allow_result_view )}}
+		<h3 class='ipsWidget_title ipsType_reset'>
+			{wordbreak="$poll->poll_question"}&nbsp;&nbsp;
+			<span class='ipsType_small ipsType_light'>{lang="poll_num_votes" pluralize="$poll->votes"}</span>
+		</h3>
+		<div class='ipsPad_half ipsWidget_inner ipsClearfix' data-role='pollContents'>
+			<ol class='ipsList_reset cPollList'>
+				{{foreach $poll->choices as $questionId => $question}}
+					<li>
+						<h3 class='ipsType_normal ipsType_reset'>{$questionId}. {wordbreak="$question['question']"}</h3>
+						<br>
+						<ul class='ipsList_reset cPollList_choices'>
+							{{foreach $question['choice'] as $k => $choice}}
+								<li class='ipsGrid ipsGrid_collapsePhone'>
+									<div class='ipsGrid_span4 ipsType_right ipsType_richText ipsType_small ipsType_break'>
+										{$choice|raw}
+									</div>
+									<div class='ipsGrid_span7'>
+										<span class='cPollVoteBar'>
+											<span style='width: {{if array_sum( $question['votes'] ) > 0 }}{expression="intval( ( $question['votes'][ $k ] / array_sum( $question['votes'] ) ) * 100 )"}{{else}}0{{endif}}%' data-votes='{{if array_sum( $question['votes'] ) > 0}}{expression="round( ( $question['votes'][ $k ] / array_sum( $question['votes'] ) ) * 100, 2 )"}{{else}}0{{endif}}%' {{if array_sum( $question['votes'] ) && intval( ( $question['votes'][ $k ] / array_sum( $question['votes'] ) ) * 100 ) > 30}}class='cPollVoteBar_inside'{{endif}}></span>
+										</span>
+									</div>
+								</li>
+							{{endforeach}}
+						</ul>
+					</li>
+				{{endforeach}}
+			</ol>
+			{{if $poll->canVote() || !member.member_id}}
+				<hr class='ipsHr'>
+				{{if $poll->canVote()}}<a href="{$url->setQueryString( '_poll', 'form' )}" title='{lang="show_vote_options"}' class='ipsButton ipsButton_verySmall ipsButton_light' data-action='viewResults'><i class='fa fa-caret-left'></i> {lang="show_vote_options"}</a>{{endif}}
+				{{if !member.member_id}}{lang="poll_guest" htmlsprintf="\IPS\Http\Url::internal( 'app=core&module=system&controller=login', 'front', 'login' ), \IPS\Http\Url::internal( 'app=core&module=system&controller=register', 'front', 'register' )"}{{endif}}
+			{{endif}}
+			<a class='ipsPos_right ipsType_light ipsType_small ipsType_break' href="{$url}">{lang="poll_view_topic"}</a>
+		</div>
+	{{endif}}
+{{if !isset( \IPS\Request::i()->fetchPoll )}}
+</section>
+{{endif}}]]></template>
+ <template template_group="widgets" template_name="postFeed" template_data="$comments, $title, $orientation='vertical'" template_location="front" template_app="forums"><![CDATA[{{if !empty( $comments ) }}
+	<h3 class='ipsType_reset ipsWidget_title'>{$title}</h3>
+	{{if $orientation == 'vertical'}}
+		<div class='ipsWidget_inner ipsPad_half'>
+			<ul class='ipsDataList ipsDataList_reducedSpacing'>
+				{{foreach $comments as $comment}}
+					<li class='ipsDataItem'>
+						<div class='ipsDataItem_icon ipsPos_top'>
+							{template="userPhoto" group="global" app="core" params="$comment->author(), 'tiny'"}
+						</div>
+						<div class='ipsDataItem_main'>
+							<a href="{$comment->url()}" title='{lang="view_this_topic" sprintf="$comment->item()->title"}' class='ipsType_medium ipsType_break'>{wordbreak="$comment->item()->title"}</a><br>
+							<p class='ipsType_reset ipsType_light ipsType_medium ipsType_blendLinks'>{lang="byline_nodate" htmlsprintf="$comment->author()->link()"} &middot; <a href='{$comment->item()->url()->setQueryString( array( 'do' => 'findComment', 'comment' => $comment->pid ) )}' class='ipsType_blendLinks'>{$comment->dateLine()|raw}</a></p>
+							<div class='ipsType_medium ipsType_textBlock ipsType_richText ipsType_break ipsContained ipsSpacer_top ipsSpacer_half' data-ipsTruncate data-ipsTruncate-type='remove' data-ipsTruncate-size='{{if $orientation == 'vertical'}}6 lines{{else}}2 lines{{endif}}'>
+								{$comment->truncated( true )|raw}
+							</div>
+						</div>
+					</li>
+				{{endforeach}}
+			</ul>
+		</div>
+	{{else}}
+		<div class='ipsWidget_inner'>
+			<ul class='ipsDataList'>
+				{{foreach $comments as $comment}}
+					<li class='ipsDataItem ipsClearfix'>
+						<div class='ipsComment_header ipsPhotoPanel ipsPhotoPanel_mini'>
+							{template="userPhoto" app="core" group="global" params="$comment->author(), 'mini', $comment->warningRef()"}
+							<div>
+								<p class='ipsPos_right ipsType_reset ipsType_blendLinks'>
+									<a href='{$comment->item()->url()->setQueryString( array( 'do' => 'findComment', 'comment' => $comment->pid ) )}' data-ipsTooltip title='{lang="share_this_comment"}' data-ipsMenu data-ipsMenu-closeOnClick='false' id='elShareComment_{$comment->pid}' data-role='shareComment'><i class='fa fa-share-alt'></i></a>
+								</p>
+								<h3 class='ipsComment_author ipsType_blendLinks'>
+									<strong class='ipsType_normal'>{template="userLink" app="core" group="global" params="$comment->author(), $comment->warningRef()"}</strong>
+									{template="reputationBadge" group="global" app="core" params="$comment->author()"}
+								</h3>
+								<p class='ipsComment_meta ipsType_light ipsType_medium'>
+									<a href='{$comment->item()->url()->setQueryString( array( 'do' => 'findComment', 'comment' => $comment->pid ) )}' class='ipsType_blendLinks'>{$comment->dateLine()|raw}</a>
+									{{if $comment->editLine()}}
+										({lang="edited_lc"})
+									{{endif}}
+									{{if $comment->hidden()}}
+										&middot; {$comment->hiddenBlurb()}
+									{{endif}}
+									{{if $comment instanceof \IPS\Content\ReportCenter and !\IPS\Member::loggedIn()->group['gbw_no_report'] and $comment->hidden() !== 1 }}
+										&middot; <a href='{$comment->url('report')}' data-ipsDialog data-ipsDialog-remoteSubmit data-ipsDialog-size='medium' data-ipsDialog-flashMessage='{lang="report_submit_success"}' data-ipsDialog-title="{lang="report"}" data-action='reportComment' title='{lang="report_content"}'>{lang="report"}</a>
+									{{endif}}
+								</p>
+					
+								{{if member.modPermission('mod_see_warn') and $comment->warning}}
+									{template="commentWarned" group="global" app="core" params="$comment"}
+								{{endif}}
+							</div>
+						</div>
+
+						<div class='ipsPad ipsClearfix'>
+							<a href="{$comment->url()}" title='{lang="view_this_topic" sprintf="$comment->item()->title"}' class='ipsDataItem_title ipsType_break'>{wordbreak="$comment->item()->title"}</a><br>
+							<div data-role='commentContent' class='ipsType_normal ipsType_richText ipsType_break ipsContained' data-controller='core.front.core.lightboxedImages'>
+								{{if $comment->hidden() === 1 && $comment->author()->member_id == \IPS\Member::loggedIn()->member_id}}
+									<strong class='ipsType_medium ipsType_warning'><i class='fa fa-info-circle'></i> {lang="comment_awaiting_approval"}</strong>
+								{{endif}}
+								{$comment->content()|raw}
+								
+								{{if $comment->editLine()}}
+									{$comment->editLine()|raw}
+								{{endif}}
+							</div>
+							
+							{{if $comment->hidden() !== 1 && $comment instanceof \IPS\Content\Reputation and settings.reputation_enabled}}
+								{template="reputation" group="global" app="core" params="$comment, 'ipsPos_right ipsResponsive_noFloat'"}
+							{{endif}}
+						</div>
+					</li>
+				{{endforeach}}
+			</ul>
+		</div>
+	{{endif}}
+{{endif}}
+]]></template>
+ <template template_group="widgets" template_name="topicFeed" template_data="$topics, $title, $orientation='vertical'" template_location="front" template_app="forums"><![CDATA[{{if !empty( $topics ) }}
+	<h3 class='ipsWidget_title ipsType_reset'>{$title}</h3>
+
+	{{if $orientation == 'vertical'}}
+		<div class='ipsPad_half ipsWidget_inner'>
+			<ul class='ipsDataList ipsDataList_reducedSpacing'>
+				{{foreach $topics as $topic}}
+					<li class='ipsDataItem{{if $topic->unread()}} ipsDataItem_unread{{endif}}{{if $topic->hidden()}} ipsModerated{{endif}}'>
+						<div class='ipsDataItem_icon ipsPos_top'>
+							{template="userPhoto" group="global" app="core" params="$topic->author(), 'tiny'"}
+						</div>
+						<div class='ipsDataItem_main'>
+							<div class="ipsCommentCount ipsPos_right {{if ( $topic->posts - 1 ) === 0}}ipsFaded{{endif}}" data-ipsTooltip title='{lang="replies_number" pluralize="$topic->posts - 1"}'>{expression="$topic->posts - 1"}</div>
+							{{if $topic->mapped('featured') || $topic->hidden() === -1 || $topic->hidden() === 1}}
+								<span>
+									{{if $topic->hidden() === -1}}
+										<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{$topic->hiddenBlurb()}'><i class='fa fa-eye-slash'></i></span>
+									{{elseif $topic->hidden() === 1}}
+										<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_warning" data-ipsTooltip title='{lang="pending_approval"}'><i class='fa fa-warning'></i></span>
+									{{endif}}
+									{{if $topic->mapped('featured')}}
+										<span class="ipsBadge ipsBadge_icon ipsBadge_small ipsBadge_positive" data-ipsTooltip title='{lang="featured"}'><i class='fa fa-star'></i></span>
+									{{endif}}
+								</span>
+							{{endif}}
+							<a href="{$topic->url()->setQueryString( 'do', 'getNewComment' )}" title='{lang="view_this_topic" sprintf="$topic->title"}' class='ipsDataItem_title ipsType_break'>{wordbreak="$topic->title"}</a>
+							<br>
+							<p class='ipsType_reset ipsType_medium ipsType_blendLinks'>
+								<span>{lang="byline_nodate" htmlsprintf="$topic->author()->link()"}</span><br>
+								<span class='ipsType_light'>{lang="topic_started_date" htmlsprintf="\IPS\DateTime::ts( $topic->mapped('date') )->html()"}</span>
+							</p>
+						</div>
+					</li>
+				{{endforeach}}
+			</ul>
+		</div>
+	{{else}}
+		<div class='ipsWidget_inner'>
+			<ul class='ipsDataList'>
+				{{foreach $topics as $topic}}
+					{template="row" group="global" app="forums" location="front" params="NULL, NULL, $topic, FALSE"}
+				{{endforeach}}
+			</ul>
+		</div>
+	{{endif}}
+{{endif}}]]></template>
+ <css css_location="front" css_app="forums" css_attributes="" css_path="." css_name="embed.css"></css>
+ <css css_location="front" css_app="forums" css_attributes="" css_path="." css_name="forums_responsive.css">/* BOTH */
+@media screen and (max-width: 979px) {
+	.cAuthorPane {
+		margin-bottom: 0 !important;
+	}
+
+	.cTopicList .cBestAnswerIndicator {
+		width: 24px;
+		height: 24px;
+		line-height: 24px;
+		font-size: 14px;
+	}
+
+	.cTopicList .ipsDataItem_icon {
+		min-width: 25px;
+	}
+
+	html[dir=&quot;ltr&quot;] .cTopicList .ipsDataItem_icon + .ipsDataItem_main, 
+	html[dir=&quot;ltr&quot;] .cTopicList .ipsDataItem_icon + .ipsDataItem_main + .ipsDataItem_stats {
+		margin-left: 30px !important;
+	}
+	html[dir=&quot;rtl&quot;] .cTopicList .ipsDataItem_icon + .ipsDataItem_main, 
+	html[dir=&quot;rtl&quot;] .cTopicList .ipsDataItem_icon + .ipsDataItem_main + .ipsDataItem_stats {
+		margin-right: 30px !important;
+	}
+
+	.cTopicList .ipsDataItem_main {
+		padding: 0;
+	}
+}
+
+/* TABLETS */
+@media screen and (min-width: 768px) and (max-width: 979px) {
+	.cForumQuestion .ipsDataItem_main {
+		width: 100%;
+	}
+
+	.cForumQuestion .ipsDataItem_main,
+	.cForumQuestion .cForumQuestion_stat {
+		display: table-cell;
+	}
+}
+
+/* PHONES */
+@media screen and (max-width: 767px) {
+
+	.cForumGrid .cForumGrid_forumInfo.ipsPad {
+		padding: 15px;
+	}
+
+	html[dir] .cPost .ipsComment_content {
+		padding-left: 7px;
+		padding-right: 7px;
+	}
+	
+	.cPost .cAuthorPane + .ipsColumn {
+		margin-bottom: 0;
+	}
+
+	.cPost .ipsComment_meta {
+		border-bottom: 1px solid rgba(0,0,0,0.1);
+	}
+
+	html[dir=&quot;ltr&quot;] .cTopic .ipsComment.ipsComment_ignored {
+		padding-left: 7px;
+	}
+	html[dir=&quot;rtl&quot;] .cTopic .ipsComment.ipsComment_ignored {
+		padding-right: 7px;
+	}
+
+	.cAuthorPane_photo .ipsUserPhoto {
+		margin-top: 15px;
+	}
+	html[dir=&quot;ltr&quot;] .cAuthorPane_photo .ipsUserPhoto {
+		margin-left: 7px;
+	}
+	html[dir=&quot;rtl&quot;] .cAuthorPane_photo .ipsUserPhoto {
+		margin-right: 7px;
+	}
+
+	/* Forum view */
+	.cForumRow .ipsItemStatus_custom {
+		max-width: 26px;
+	}
+
+	html[dir=&quot;ltr&quot;] .cForumQuestions.cTopicList .ipsDataItem_main {
+		margin-left: 40px;
+	}
+	html[dir=&quot;rtl&quot;] .cForumQuestions.cTopicList .ipsDataItem_main {
+		margin-right: 40px;
+	}
+
+	.cForumQuestions.cTopicList .cForumQuestion_stat {
+		display: inline-block !important;
+	}
+
+	.cForumQuestions .cForumQuestion .cForumQuestion_stat,
+	.cForumQuestions .cForumQuestion .cForumQuestion_stat span:first-child {
+		display: inline-block;
+		min-width: 0;
+		color: inherit;
+	}
+
+		.cForumQuestions .cForumQuestion .cForumQuestion_stat span {
+			font-size: 13px;
+			color: inherit;
+			font-weight: bold;
+		}
+
+		html[dir=&quot;ltr&quot;] .cForumQuestions .cForumQuestion .ipsDataItem_modCheck,
+		html[dir=&quot;ltr&quot;] .cForumQuestions .cForumQuestion .ipsDataItem_main + .cForumQuestion_stat {
+			margin-left: 30px;
+		}
+		html[dir=&quot;rtl&quot;] .cForumQuestions .cForumQuestion .ipsDataItem_modCheck,
+		html[dir=&quot;rtl&quot;] .cForumQuestions .cForumQuestion .ipsDataItem_main + .cForumQuestion_stat {
+			margin-right: 30px;
+		}
+
+			.cForumQuestions .cForumQuestion .cForumQuestion_stat + .ipsDataItem_modCheck {
+				position: absolute;
+				top: 50px;
+			} 
+			html[dir=&quot;ltr&quot;] .cForumQuestions .cForumQuestion .cForumQuestion_stat + .ipsDataItem_modCheck {
+				left: -15px;
+			}
+			html[dir=&quot;rtl&quot;] .cForumQuestions .cForumQuestion .cForumQuestion_stat + .ipsDataItem_modCheck {
+				right: -15px;
+			}
+
+			html[dir=&quot;ltr&quot;] .cForumQuestions .cForumQuestion .cForumQuestion_stat + .cForumQuestion_stat {
+				margin-left: 10px;
+			}
+			html[dir=&quot;rtl&quot;] .cForumQuestions .cForumQuestion .cForumQuestion_stat + .cForumQuestion_stat {
+				margin-right: 10px;
+			}
+}</css>
+ <css css_location="front" css_app="forums" css_attributes="" css_path="." css_name="forums.css"><![CDATA[.cForumList .ipsDataItem {
+	border-bottom-width: 1px;
+}
+
+.cForumList .ipsDataItem_main {
+	vertical-align: middle;
+}
+
+.cForumGrid {
+	min-height: 230px !important;
+	margin-bottom: 15px;
+	position: relative;
+	padding: 0 0 80px 0 !important;
+	border: 1px solid rgba(0,0,0,0.1);
+}
+
+	.cForumGrid .cForumGrid_icon {
+		max-width: 40px;
+	}
+
+	.cForumGrid .cForumGrid_info {
+		position: absolute;
+		bottom: 15px;
+		left: 15px;
+		right: 15px;
+	}
+
+	.cForumGrid_unread .cForumGrid_title {
+		font-weight: bold;
+		line-height: 1.1;
+	}
+
+	.cForumGrid .cForumGrid_forumInfo {
+		min-height: 70px;
+		border-bottom: 1px solid rgba(0,0,0,0.05);
+	}
+
+.cForumTopicTable .ipsDataItem_title {
+	display: inline;
+}
+
+.cForumTitle {
+	{prefix="transition" value="0.3s linear all"}
+}
+
+	.cForumRow_hidden .cForumTitle {
+		opacity: 0.5;
+	}
+
+	.cForumRow_hidden > .ipsDataList {
+		display: none !important;
+	}
+
+.cForumToggle {
+	font-size: 18px;
+	opacity: 0.2;
+	{prefix="transition" value="0.3s all linear"}
+	width: 20px;
+	height: 20px;
+}
+
+	.cForumToggle:hover {
+		opacity: 1;
+	}
+
+	.cForumToggle:after {
+		content: "\f078";
+		font-family: "FontAwesome";
+		font-size: 18px;
+	}
+
+	.cForumRow_hidden .cForumToggle:after {
+		content: "\f053";
+	}
+	html[dir="rtl"] .cForumRow_hidden .cForumToggle:after {
+		content: "\f054";
+	}
+
+html[dir="ltr"] .cTopicList .ipsDataItem_icon {
+	min-width: 25px;
+	padding-right: 0;
+}
+html[dir="rtl"] .cTopicList .ipsDataItem_icon {
+	min-width: 25px;
+	padding-left: 0;
+}
+
+.cTopicList .ipsDataItem_main {
+	padding: 12px 10px;
+}
+
+.cTopicHovercard .cTopicHovercard_container {
+	height: 200px;
+	overflow: auto;
+	border-bottom: 0;
+}
+
+.cTopicHovercard .ipsType_richText {
+	font-size: 12px;
+}
+
+.cTopicHovercard hr.ipsHr {
+	margin: 7px 0;
+}
+
+/* Q&A RATINGS */
+.cForumQuestion_stat > span:first-child {
+	display: block;
+	font-size: 22px;
+}
+
+.cRatingColumn {
+	width: 65px;
+	padding: 15px 15px 0 15px !important;
+}
+
+	.cRatingColumn.cRatingColumn_question {
+		padding-top: 0 !important;
+	}
+
+	.cRatingColumn_on {
+		background: #e4ecdd;
+	}
+
+	.cRatingColumn_up {
+		border-color: #4a7c20;
+	}
+
+	.cRatingColumn_down {
+		border-color: #a52638;
+	}
+
+	.cRatingColumn > ul > li {
+		display: block;
+	}
+
+	.cRatingColumn_question {
+		padding-top: 15px;
+	}
+
+		html[dir="ltr"] .cRatingColumn_question + .ipsColumn {
+			padding-left: 15px;
+		}
+		html[dir="rtl"] .cRatingColumn_question + .ipsColumn {
+			padding-right: 15px;
+		}
+
+.cAnswerRate {
+	font-size: 60px;
+	line-height: 10px;
+	position: relative;
+	display: block;
+	overflow: hidden;
+}	
+
+	.cAnswerRate.cAnswerRate_up {
+		margin-bottom: 10px;
+	}
+
+html[dir="ltr"] .cAnswerRate {
+	left: 1px;
+}
+html[dir="rtl"] .cAnswerRate {
+	right: 1px;
+}
+
+	.cAnswerRate:not( .ipsType_positive ):not( .ipsType_negative ), 
+	.cAnswerRate:hover:not( .ipsType_positive ):not( .ipsType_negative ) {
+		color: {theme="text_color"};
+	}
+
+		span.cAnswerRate:not( .ipsType_positive ):not( .ipsType_negative ),
+		span.cAnswerRate:hover:not( .ipsType_positive ):not( .ipsType_negative ) {
+			color: {theme="text_light"};
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+
+		.cAnswerRate.ipsType_positive:hover {
+			color: #4a7c20;
+		}
+
+		.cAnswerRate.ipsType_negative:hover {
+			color: #a52638;
+		}
+
+	.cAnswerRate > .fa {
+		line-height: 30px;
+	}
+
+	span.cAnswerRate.cAnswerRate_noPermission {
+		opacity: 0.25 !important;
+	}
+
+.cAnswerRating {
+	font-size: 26px;
+	font-weight: 500;
+	line-height: 30px;
+	display: block;
+	margin-top: -8px;
+}
+
+.cBestAnswerIndicator {
+	display: inline-block;
+	color: #fff;
+	font-size: 22px;
+	width: 36px;
+	height: 36px;
+	text-align: center;
+	line-height: 36px;
+	position: relative;
+	background: #4a7c20;
+	border-radius: 36px;
+	margin-bottom: 5px;
+}
+	
+	.ipsDataList .cBestAnswerIndicator {
+		margin-bottom: 0;
+	}
+
+	.cBestAnswerIndicator_off {
+		background: #d4d4d4;
+	}
+
+		.cBestAnswerIndicator_off:hover {
+			background: #c9c9c9;
+			color: #fff;
+		}
+
+	a.cBestAnswerIndicator:not( .cBestAnswerIndicator_off ):hover {
+		line-height: 34px;
+	}
+
+		a.cBestAnswerIndicator:not( .cBestAnswerIndicator_off ):hover i.fa:before {
+			content: '\f00d';
+			color: #fff;
+		}
+
+/* POST WRAPPER STYLES */
+
+.cPost.ipsModerated,
+.cPost.ipsModerated .cAuthorPane {
+	background: {theme="moderated"};
+}
+
+.cTopic .cPost.ipsComment:last-of-type {
+	margin-bottom: 0;
+}
+
+.cPost.cPostQuestion {
+	border-top: 0;
+}
+
+.cPost .ipsComment_meta {
+	padding: 15px 10px 10px 0;
+}
+html[dir="rtl"] .cPost .ipsComment_meta  {
+	padding: 15px 0px 10px 10px;
+}
+
+	html[dir="ltr"] .cPost.ipsComment_popular .ipsComment_meta {
+		padding-right: 60px;
+	}
+	html[dir="rtl"] .cPost.ipsComment_popular .ipsComment_meta {
+		padding-left: 60px;
+	}
+
+.cPost .ipsComment_controls {
+	margin: 0;
+	padding: 0;
+}
+
+.cPost .cPost_contentWrap {
+	position: relative;
+	padding: 7px 15px 15px 0;
+	/*min-height: 200px;*/
+}
+html[dir="rtl"] .cPost .cPost_contentWrap {
+	padding: 7px 0px 15px 15px;
+}
+
+.cPost.ipsComment .ipsType_richText {
+	margin-top: 0;
+}
+
+html[dir="ltr"] .cPost .ipsComment_content {
+	padding-right: 0;
+	padding-left: 15px;
+}
+html[dir="rtl"] .cPost .ipsComment_content {
+	padding-left: 0;
+	padding-right: 15px;
+}
+
+.cAuthorPane {
+	text-align: center;
+	padding: 15px 10px !important;
+}
+
+	.cAuthorPane_photo {
+		margin: 10px 0;
+		position: relative;
+	}
+
+	.cAuthorPane_author {
+		display: block;
+		/* http://community.invisionpower.com/4bugtrack/infopane-display-name-split-r1164/ */
+		/*word-break: break-all;*/
+		line-height: 1.2;
+		word-wrap: initial;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		-moz-hyphens: initial;
+		margin-bottom: 3px;
+	}
+
+	.cAuthorPane_info .ipsRepBadge {
+		font-size: inherit;
+	}
+
+	.cAuthorPane .cAuthorGroupIcon {
+		max-width: 100%;
+	}
+
+.ipsApp .cTopic [data-role="commentFeed"] > .ipsComment:first-child {
+	padding-top: 15px;
+}
+
+.cPostShareMenu h5 {
+	margin-bottom: 5px;
+}
+
+html[dir="ltr"] .cTopic .ipsComment.ipsComment_ignored {
+	padding-left: 200px;
+}
+html[dir="rtl"] .cTopic .ipsComment.ipsComment_ignored {
+	padding-right: 200px;
+}
+
+/* REPLY AREA / CREATE TOPIC */
+.cTopicPostArea .ipsComposeArea {
+	margin-top: 0;
+}
+
+/*.cTopicPostArea:not( .cTopicPostArea_noSize ) .ipsComposeArea_dummy {
+	min-height: 200px;
+}*/
+
+/*.cTopicPostArea hr {
+	display: none;
+}*/
+
+.cCreateTopic_date input {
+	max-width: 100% !important;
+	width: 100% !important;
+	margin-bottom: 7px;
+}
+html[dir="ltr"] .cCreateTopic_date input {
+	padding-left: 35px !important;
+}
+html[dir="rtl"] .cCreateTopic_date input {
+	padding-right: 35px !important;
+}
+
+.cCreateTopic_date li {
+	position: relative;
+}
+
+.cCreateTopic_date i {
+	position: absolute;
+	top: 10px;
+	font-size: 18px;
+}
+html[dir="ltr"] .cCreateTopic_date i {
+	left: 10px;
+}
+html[dir="rtl"] .cCreateTopic_date i {
+	right: 10px;
+}
+
+/* FEATURED TOPICS */
+.cFeaturedTopics h2 {
+	font-weight: 500;
+}
+
+/* PHONES */
+@media screen and (max-width: 767px) {
+	.cPost.ipsComment .cAuthorPane {
+		text-align: left;
+	}
+	html[dir="rtl"] .cPost.ipsComment .cAuthorPane {
+		text-align: right;
+	}
+
+	.cPost.ipsComment .ipsUserPhoto {
+		display: inline-block;
+	}
+
+	.cPost.ipsComment .ipsUserPhoto > img {
+		width: 50px;
+		height: 50px;
+	}
+
+	.cPost.ipsComment .cAuthorPane_photo {
+		position: absolute;
+		top: 0;
+		margin: 0;
+	}
+	html[dir="ltr"] .cPost.ipsComment .cAuthorPane_photo {
+		left: 0;
+	}
+	html[dir="rtl"] .cPost.ipsComment .cAuthorPane_photo {
+		right: 0;
+	}
+
+	html[dir="ltr"] .cPost.ipsComment .cAuthorPane_info,
+	html[dir="ltr"] .cPost.ipsComment .cAuthorPane_author {
+		margin-left: 65px;
+	}
+	html[dir="rtl"] .cPost.ipsComment .cAuthorPane_info,
+	html[dir="rtl"] .cPost.ipsComment .cAuthorPane_author {
+		margin-right: 65px;
+	}
+
+	.cPost.ipsComment .cAuthorPane_author {
+		line-height: 1.1;
+	}
+
+		.cPost.ipsComment .cAuthorPane_author > a 	{
+			font-size: 14px;
+			line-height: 18px;
+			font-weight: bold;
+		}
+}]]></css>
+ <css css_location="front" css_app="forums" css_attributes="" css_path="." css_name="posts.css"><![CDATA[
+
+/*.ipsApp .ipsPost_wrap {
+	padding-left: 0;
+	margin-bottom: 30px;
+}
+
+	.ipsPost_wrap.ipsPost_lastPost {
+		border-bottom: 0;
+	}
+
+.ipsPost_ignored {
+	border-top: 4px solid #f6f6f6;
+	border-bottom: 4px solid #f6f6f6;
+}
+
+.ipsPost {
+	font-size: 14px;
+	line-height: 1.7;
+	background: #fff;
+}
+
+	.ipsPost_posted {
+		font-size: 13px;
+		color: #c4c4c4;
+		margin-bottom: 5px;
+	}
+
+		.ipsPost_posted .ipsBadge {
+			vertical-align: middle;
+		}
+
+	.ipsPost_controls {
+		font-size: 13px;
+		margin-top: 10px;
+	}
+
+	.ipsPost_controls li {
+		display: inline-block;
+		float: right;
+		margin: 0 0 0 20px;
+		line-height: 28px;
+	}
+
+		.ipsPost_controls .ipsPos_left {
+			float: left;
+			margin-left: 0;
+		}
+
+	.ipsPost_controls a {
+		text-decoration: none;
+		{prefix="transition" value="all 0.5s linear"}
+	}
+
+		.ipsPost_controls a.ipsButton:not( .ipsButton_simple ){
+			color: #fff;
+		}
+
+	.ipsPost_ignored > .ipsPost {
+		margin-left: 200px;
+	}
+
+.ipsPost .ipsImage {
+	margin: 0 5px 10px 0;
+}
+
+.ipsAuthorPane {
+	text-align: center;
+	padding: 15px 10px;
+}
+
+	.ipsAuthorPane h3 {
+		font-size: 18px;
+		margin-bottom: 10px;
+	}
+
+		.ipsAuthorPane h3 a {
+			color: #2f2f2f;
+			text-decoration: none;
+		}
+
+	.ipsAuthorPane_info {
+		margin-top: 8px;
+	}
+
+
+.ipsApp .ipsPost_wrap.ipsPost_topicView.ipsPost_bestAnswer {
+	background: #7a8871;
+	font-size: 15px;
+}
+	
+	.ipsPost_bestAnswer .ipsPost {
+		background: #fff;
+	}
+
+	.ipsPost_bestAnswer .ipsPost:before {
+		width: 0;
+		height: 0;
+		position: absolute;
+		display: block;
+		content: "";
+		border-width: 15px;
+		border-style: solid;
+		left: -30px;
+		top: 15px;
+		border-color: transparent #fcfffa transparent transparent;
+	}
+
+.ipsPost_bestAnswer_check {
+	font-size: 50px;
+	color: #fff;
+	display:block;
+}
+
+.ipsPost_bestAnswerTitle {
+	font-size: 15px;
+	font-weight: bold;
+	line-height: 24px;
+	color: #355416;
+}
+
+.ipsPost_bestAnswer .ipsAuthorPane h3 a {
+	color: #fff;
+}*/]]></css>
+</theme>
