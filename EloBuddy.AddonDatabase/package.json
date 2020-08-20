@@ -14,7 +14,7 @@
     "react-scripts": "0.6.1"
   },
   "dependencies": {
-    "bcrypt": "^0.8.7",
+    "bcrypt": "^5.0.0",
     "bootstrap": "^3.3.7",
     "express": "^4.14.0",
     "fingerprintjs2": "^1.4.1",
